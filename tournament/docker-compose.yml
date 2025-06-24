@@ -34,7 +34,7 @@ services:
   
 configs:
   openapi-yml:
-    file: ./swagger.yml
+    file: docs/swagger.yml
 
 volumes:
   tournament_node_modules:
