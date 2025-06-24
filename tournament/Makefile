@@ -15,7 +15,3 @@ up:
 
 down logs stats:
 	$(COMPOSE) $@ $(CMD_FLAGS)
-
-HOGE=312
-show:
-	echo $${HOGE}
