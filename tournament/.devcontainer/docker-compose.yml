@@ -1,0 +1,11 @@
+services:
+  tournament:
+    container_name: tournament
+    image: node:22
+    init: true
+    tty: true
+    ports:
+      - 8180:8080
+
+volumes:
+  tournament_node_modules:
