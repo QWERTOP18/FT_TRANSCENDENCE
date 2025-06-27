@@ -5,10 +5,10 @@ services:
     ports:
       - 8181:8080
     environment:
-      - SWAGGER_JSON=/api/tournament/v1/swagger.yml
+      - SWAGGER_JSON=/api/tournament/v1/openapi.json
     configs:
       - source: openapi-yml
-        target: /api/tournament/v1/swagger.yml
+        target: /api/tournament/v1/openapi.json
 
   swagger-editor:
     container_name: swagger-editor
@@ -16,10 +16,10 @@ services:
     ports:
       - 8182:8080
     environment:
-      - SWAGGER_JSON=/api/tournament/v1/swagger.yml
+      - SWAGGER_JSON=/api/tournament/v1/openapi.json
     configs:
       - source: openapi-yml
-        target: /api/tournament/v1/swagger.yml
+        target: /api/tournament/v1/openapi.json
   
 
   prism:
@@ -34,7 +34,7 @@ services:
   
 configs:
   openapi-yml:
-    file: docs/swagger.yml
+    file: docs/openapi.json
 
 volumes:
   tournament_node_modules:

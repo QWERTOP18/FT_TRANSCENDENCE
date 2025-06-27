@@ -19,7 +19,7 @@
  R: /tournaments
  U: /tournaments/{id}
  D: /tournaments/{id}
- 
+
  U: /tournaments/{id}/open : トーナメントを開始する パラメータ無し
  U: /tournaments/{id}/close : トーナメントを終了する パラメータ無し
  R: /tournaments/{id}/participants : 参加者取得
@@ -36,7 +36,7 @@
 
  ## エラー
  * EID : 存在しないIDです。
- * EPARAM : 変更できないパラメータです 
+ * EPARAM : 変更できないパラメータです
  * EEDIT : 変更に失敗しました
 
 # 参加者
@@ -56,7 +56,7 @@
 
  ## エラー
  * EID : 存在しないIDです。
- * EPARAM : 変更できないパラメータです 
+ * EPARAM : 変更できないパラメータです
  * EEDIT : 変更に失敗しました
 
 # マッチ
@@ -82,14 +82,14 @@
  * id : マッチID　連番
  * tournament_id : トーナメントID
  * order : マッチの順番 連番 トーナメント内で重複しない値 (変更不可)
- * type : 種類 - [(seed <- 後で追加するかも), versus]
- * status : ステータス - [ready, in_progress, done, skip] 変更可
+ * kind : 種類 - [(seed <- 後で追加するかも), versus]
+ * status : ステータス - [ready, in_progress, done] 変更可
  * participants : 参加者 participantsのorderで昇順でソートされる。
  * winners : 勝者
  * losers : 敗者
  * tie_players : 引き分け者
- 
+
 ## エラー
  * EID : 存在しないIDです。
- * EPARAM : 変更できないパラメータです 
+ * EPARAM : 変更できないパラメータです
  * EEDIT : 変更に失敗しました

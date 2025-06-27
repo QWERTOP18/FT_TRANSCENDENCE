@@ -1,7 +1,7 @@
 services:
   tournament:
     container_name: tournament
-    image: node:22
+    image: node:24
     init: true
     tty: true
     ports:

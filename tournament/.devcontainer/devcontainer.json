@@ -31,7 +31,8 @@
 			"extensions": [
 				"ms-vscode.vscode-typescript-next",
 				"usernamehw.errorlens",
-				"dbaeumer.vscode-eslint"
+				"dbaeumer.vscode-eslint",
+				"streetsidesoftware.code-spell-checker"
 			]
 		}
 	},
