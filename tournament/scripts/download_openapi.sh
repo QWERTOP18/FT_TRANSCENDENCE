@@ -25,3 +25,4 @@ if ! nc -vz localhost 8080; then
 fi
 
 curl  localhost:8080/documentation/json > "$1"
+curl  localhost:8080/documentation/yaml > "$2"

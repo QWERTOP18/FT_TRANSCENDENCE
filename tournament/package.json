@@ -6,7 +6,7 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
-    "download-json": "bash scripts/download_openapi_json.sh docs/openapi.json"
+    "download-openapi": "bash scripts/download_openapi.sh docs/openapi.json docs/openapi.yml"
   },
   "author": "",
   "license": "ISC",
