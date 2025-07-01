@@ -16,3 +16,7 @@ export function OKSchema(options?: ObjectOptions) {
 	}, { description: "OK", ...options })
 }
 export type OKSchema = Static<ReturnType<typeof OKSchema>>
+
+export function ScoreSchema(options?: NumberOptions) {
+	return Type.Number({ minimum: 0, ...options, description: "スコア" })
+}
