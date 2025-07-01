@@ -4,12 +4,6 @@
 		"./docker-compose.yml"
 	],
 	"service": "tournament",
-	"forwardPorts": [
-		"8180:8180",
-		"8181:8181",
-		"8182:8182",
-		"8183:8183"
-	],
 	"workspaceFolder": "/workspace",
 	"features": {
 		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
@@ -32,12 +26,17 @@
 				"ms-vscode.vscode-typescript-next",
 				"usernamehw.errorlens",
 				"dbaeumer.vscode-eslint",
-				"streetsidesoftware.code-spell-checker"
+				"streetsidesoftware.code-spell-checker",
+				"bierner.markdown-mermaid"
 			]
 		}
 	},
 	"onCreateCommand": {
-		"make-workspace": [ "mkdir", "-p", "${containerWorkspaceFolder}" ]
+		"make-workspace": [
+			"mkdir",
+			"-p",
+			"${containerWorkspaceFolder}"
+		]
 	},
 	"postCreateCommand": "npm ci",
 	"remoteUser": "root"

@@ -5,7 +5,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
-    "dev": "ts-node-dev src/index.ts",
+    "dev": "bash scripts/development.sh",
+    "prisma:generate": "prisma generate --schema=src/infrastructure/SQLite/prisma/schema.prisma",
     "download-openapi": "bash scripts/download_openapi.sh docs/openapi.json docs/openapi.yml"
   },
   "author": "",
@@ -16,12 +17,16 @@
     "@fastify/swagger-ui": "^5.2.3",
     "@fastify/type-provider-json-schema-to-ts": "^5.0.0",
     "@fastify/type-provider-typebox": "^5.1.0",
+    "@prisma/client": "^6.11.0",
     "@sinclair/typebox": "^0.34.37",
     "fastify": "^5.4.0",
+    "prisma": "^6.11.0",
     "zod": "^3.25.67"
   },
   "devDependencies": {
+    "@mermaid-js/mermaid-cli": "^11.6.0",
     "@types/node": "^24.0.3",
+    "puppeteer": "^23.11.1",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }
