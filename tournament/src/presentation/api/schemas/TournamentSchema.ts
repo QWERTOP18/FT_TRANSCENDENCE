@@ -1,23 +1,25 @@
-import { NumberOptions, ObjectOptions, SchemaOptions, Static, StringOptions, Type } from "@sinclair/typebox";
+import { ObjectOptions, SchemaOptions, Static, StringOptions, Type } from "@sinclair/typebox";
+import { HistoryIdSchema, HistorySchema } from "./HistorySchema";
 import { UUIDSchema } from "./OtherSchema";
-import { ParticipantSchema } from "./ParticipantSchema";
-import { MatchSchema } from "./MatchSchema";
+import { ParticipantIdSchema } from "./ParticipantSchema";
 
 // トーナメント
-export function TournamentSchema (options?: ObjectOptions) {
+export type TournamentSchema = Static<ReturnType<typeof TournamentSchema>>
+export function TournamentSchema(options?: ObjectOptions) {
 	return Type.Object({
-		id: TournamentIdSchema({description: "トーナメントID"}),
-		name: Type.String({description: "トーナメント名"}),
-		status: TournamentStatusSchema(),
-		num: ParticicantNumSchema({ description: "現在の参加人数" }),
-		max_num: ParticicantNumSchema({ description: "最大の参加人数" }),
-		particicants: Type.Array(ParticipantSchema(), { description: "参加者リスト" }),
-		matches: Type.Array(MatchSchema(), { description: "マッチリスト" }),
+		id: TournamentIdSchema({ description: "トーナメントID" }),
+		champion_id: ParticipantIdSchema({ description: "優勝者の参加者ID", nullable: true }),
+		owner_id: ParticipantIdSchema({ description: "トーナメントのオーナー参加者ID" }),
+		name: Type.String({ description: "トーナメント名" }),
+		description: Type.Optional(Type.String({ description: "トーナメントの説明" })),
+		state: TournamentStatusSchema(),
+		participants: Type.Array(ParticipantIdSchema(), { description: "参加者リスト" }),
+		histories: Type.Array(HistoryIdSchema(), { description: "トーナメントの履歴" }),
 	}, { description: "トーナメント", ...options })
 }
-export type TournamentSchema = Static<ReturnType<typeof TournamentSchema>>
 
 // トーナメントステータス
+export type TournamentStatusSchema = Static<ReturnType<typeof TournamentStatusSchema>>
 export function TournamentStatusSchema(options?: SchemaOptions) {
 	return Type.Union([
 		Type.Literal('reception'),
@@ -28,16 +30,9 @@ export function TournamentStatusSchema(options?: SchemaOptions) {
 		...options
 	})
 }
-export type TournamentStatusSchema = Static<ReturnType<typeof TournamentStatusSchema>>
-
-// 参加人数
-export function ParticicantNumSchema(options?: NumberOptions) {
-	return Type.Number({ minimum: 0, maximum: 16, ...options })
-}
-export type ParticicantNumSchema = Static<ReturnType<typeof ParticicantNumSchema>>
 
 // トーナメントID
+export type TournamentIdSchema = Static<ReturnType<typeof TournamentIdSchema>>
 export function TournamentIdSchema(options?: StringOptions) {
 	return UUIDSchema({ description: "ID", ...options })
 }
-export type TournamentIdSchema = Static<ReturnType<typeof TournamentIdSchema>>
