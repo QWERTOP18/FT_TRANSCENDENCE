@@ -7,7 +7,6 @@ import { GetTournamentRoute } from "./GetTournamentRoute";
 import { GetTournamentsRoute } from "./GetTournamentsRoute";
 import { OpenTournamentRoute } from "./OpenTournamentRoute";
 import { UpdateTournamentRoute } from "./UpdateTournamentRoute";
-import { GetTournamentMatchesRoute } from "./GetTournamentMatchesRoute";
 
 export function TournamentRoutes(fastify: FastifyInstance) {
 	const routes = [
@@ -19,7 +18,6 @@ export function TournamentRoutes(fastify: FastifyInstance) {
 		OpenTournamentRoute,
 		CloseTournamentRoute,
 		GetTournamentParticipantsRoute,
-		GetTournamentMatchesRoute,
 	] as const;
 
 	routes.forEach((route) => fastify.register(route));
