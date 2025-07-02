@@ -62,7 +62,6 @@ export const openapiConfig = {
 	},
 	tags: [
 		{ name: 'tournament', description: 'トーナメントに関するAPI' },
-		{ name: 'match', description: '対戦（マッチ）に関するAPI' },
 		{ name: 'participant', description: '参加者に関するAPI' },
 	]
 };
