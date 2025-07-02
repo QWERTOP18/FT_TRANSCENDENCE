@@ -13,15 +13,15 @@ stateをreceptionからopenに変更します。
 `
 
 export function OpenTournamentRoute(fastify: FastifyInstance) {
-	fastify.post('/tournaments/:id/open', {
+	fastify.put('/tournaments/:id/open', {
 		schema: {
 			description,
 			tags: ["tournament"],
 			summary: "トーナメントを開始する",
+			params: Type.Pick(TournamentSchema(), ['id']),
 			response: {
 				200: OKSchema()
 			},
-			params: Type.Pick(TournamentSchema(), ['id'])
 		}
 	}, () => {
 		throw NotImplementedError();
