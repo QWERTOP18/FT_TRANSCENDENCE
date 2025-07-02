@@ -7,9 +7,9 @@ import { TournamentSchema } from "../../schemas/TournamentSchema";
 const description = `
 # 概要
 トーナメントを開始します。
-
+stateをreceptionからopenに変更します。
 # 注意点
-* 参加者の変更ができなくなります。したがってマッチの追加もされません。
+* このトーナメントへの参加者が作成できなくなります。
 `
 
 export function OpenTournamentRoute(fastify: FastifyInstance) {
