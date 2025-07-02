@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: トーナメントAPI
-  description: >+
+  description: >
     
     トーナメント表を作成するためのAPI
 
@@ -18,7 +18,7 @@ info:
     で起動できるようにする予定。
 
 
-    ### 使い方
+    ### 使用例
 
     1. [POST] `tournaments`でトーナメントを作成する。
 
@@ -26,11 +26,17 @@ info:
 
     1. [POST] `tournaments/:id/open`でトーナメントを開始する。
 
-    1. [GET] `tournaments/:id`で適宜トーナメントを取得する。
+    1. [PUT] `participants/:id/ready`で参加者をreadyにする。
 
-    1. [POST] `match/:id/done`で対戦結果を登録するを進める。
+    1. [PUT] `participants/:id/cancel`で参加者をpendingにする。
 
-    1. [POST] `tournament/close`でトーナメントを閉じる。
+    1. [PUT] `participants/:id/battle`で参加者をin_progressにする。
+
+    1. [POST] `history`で対戦結果を保存する。
+
+    1. 参加者が一人になるまで、4, 5, 6を繰り返す。
+
+    1. 一人になると、自動で終了。
 
 
     ### 共通エラー
@@ -66,14 +72,14 @@ info:
 
      以下はこのシステムで更に定義されているものです。
 
-     | Code | Description | How to solve |
+     | コード | 説明 | 解決法 |
      | --- | :---: | :---: |
-     | TRT_ERR_NOT_IMPLEMENTED | This feature is not implemented | Please contact this server maintainer |
+     | TRT_ERR_NOT_IMPLEMENTED | この機能は実装されていません | 管理者に連絡してください |
 
     ### ドキュメンテーションパス
      * `/documentation` : このページ
      * `/documentation/json` : このページを生成するための生のopenapi.json
-
+     * `/documentation/yaml` : このページを生成するための生のopenapi.yaml
   version: 0.0.0
 components:
   schemas: {}
@@ -323,92 +329,8 @@ paths:
                   - state
                   - participants
                   - histories
-    put:
-      summary: トーナメント更新
-      tags:
-        - tournament
-      description: |
-        
-        # 概要
-        トーナメントを更新します。
-
-        # 注意点
-        * トーナメントの名称やmax_numを変更すると混乱が生じるためおすすめしません。
-        * すでに参加済みの参加者の人数以下にmax_numを設定することはできません。
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: トーナメント
-              type: object
-              properties:
-                name:
-                  description: トーナメント名
-                  type: string
-              required:
-                - name
-        required: true
-        description: トーナメント
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: トーナメントID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    enum:
-                      - true
-                required:
-                  - ok
-    delete:
-      summary: トーナメント削除
-      tags:
-        - tournament
-      description: |
-        
-        # 概要
-        トーナメントを削除します。
-
-        # 注意点
-        * このAPIは、誤ってトーナメントを削除するのを防ぐため、使用できなくなる可能性があります。
-        * トーナメントのすべての内容が消えます。
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: トーナメントID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    enum:
-                      - true
-                required:
-                  - ok
   /tournaments/{id}/open:
-    post:
+    put:
       summary: トーナメントを開始する
       tags:
         - tournament
@@ -416,44 +338,9 @@ paths:
         
         # 概要
         トーナメントを開始します。
-
+        stateをreceptionからopenに変更します。
         # 注意点
-        * 参加者の変更ができなくなります。したがってマッチの追加もされません。
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: トーナメントID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    enum:
-                      - true
-                required:
-                  - ok
-  /tournaments/{id}/close:
-    post:
-      summary: トーナメントを終了する
-      tags:
-        - tournament
-      description: |
-        
-        # 概要
-        開催中のトーナメントを終了します。
-
-        # 注意点
-        * 受付中のトーナメントも終了されます。
+        * このトーナメントへの参加者が作成できなくなります。
       parameters:
         - schema:
             format: uuid
@@ -478,7 +365,7 @@ paths:
                 required:
                   - ok
   /tournaments/{id}/participants:
-    post:
+    get:
       summary: トーナメントの参加者を取得する
       tags:
         - tournament
@@ -546,18 +433,17 @@ paths:
                     - tournament_id
                     - external_id
                     - state
-  /tournaments/{id}/matches:
-    post:
-      summary: トーナメントのマッチを取得する
+  /tournaments/{id}/histories:
+    get:
+      summary: トーナメントの対戦結果を取得する
       tags:
         - tournament
       description: |
         
         # 概要
-        トーナメントのマッチ一覧を取得します。
+        トーナメントの対戦結果を取得します。
 
         # 注意点
-        * マッチは追加ができず、参加者を追加することで自動で作成されます。
       parameters:
         - schema:
             format: uuid
@@ -568,1323 +454,280 @@ paths:
           description: トーナメントID
       responses:
         "200":
-          description: トーナメントのマッチ
+          description: トーナメントの対戦結果
           content:
             application/json:
               schema:
-                description: トーナメントのマッチ
+                description: トーナメントの対戦結果
                 type: array
                 items:
-                  description: マッチ
+                  description: トーナメントの履歴
                   type: object
                   properties:
                     id:
                       format: uuid
-                      description: ID
+                      description: 履歴ID
                       type: string
                     tournament_id:
                       format: uuid
-                      description: トーナメントID
+                      description: トーナメント ID
                       type: string
-                    order:
-                      minimum: 0
-                      description: 順番
-                      type: number
-                    round:
-                      minimum: 0
-                      description: ラウンド数
-                      type: number
-                    status:
-                      description: "マッチの状況 - ready: 対戦開始可能, in_progress: 対戦中, done: 対戦終了"
-                      anyOf:
-                        - type: string
-                          enum:
-                            - ready
-                        - type: string
-                          enum:
-                            - in_progress
-                        - type: string
-                          enum:
-                            - done
-                    participants:
-                      maxItems: 2
-                      description: 対戦相手
-                      type: array
-                      items:
-                        description: 参加者
-                        type: object
-                        properties:
-                          id:
-                            format: uuid
-                            description: 参加者ID
-                            type: string
-                          tournament_id:
-                            format: uuid
-                            description: トーナメント ID
-                            type: string
-                          external_id:
-                            description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                            type: string
-                          state:
-                            description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                              対戦済み, eliminated: 敗退, champion: 優勝"
-                            anyOf:
-                              - type: string
-                                enum:
-                                  - pending
-                              - type: string
-                                enum:
-                                  - ready
-                              - type: string
-                                enum:
-                                  - in_progress
-                              - type: string
-                                enum:
-                                  - battled
-                              - type: string
-                                enum:
-                                  - eliminated
-                              - type: string
-                                enum:
-                                  - champion
-                        required:
-                          - id
-                          - tournament_id
-                          - external_id
-                          - state
                     winner:
-                      description: 勝者
                       type: object
                       properties:
                         id:
                           format: uuid
-                          description: 参加者ID
+                          description: 勝者の参加者ID
                           type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
+                        score:
+                          minimum: 0
+                          description: スコア
+                          type: number
                       required:
                         - id
-                        - tournament_id
-                        - external_id
-                        - state
+                        - score
                     loser:
-                      description: 敗者
                       type: object
                       properties:
                         id:
                           format: uuid
-                          description: 参加者ID
+                          description: 敗者の参加者ID
                           type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
+                        score:
+                          minimum: 0
+                          description: スコア
+                          type: number
                       required:
                         - id
-                        - tournament_id
-                        - external_id
-                        - state
+                        - score
+                    created_at:
+                      description: 履歴の作成日時
+                      format: date-time
+                      type: string
                   required:
                     - id
                     - tournament_id
-                    - order
-                    - round
-                    - status
-                    - participants
                     - winner
                     - loser
-  /matches:
-    get:
-      summary: マッチ取得
-      tags:
-        - match
-      description: |
-        
-        # 概要
-        マッチ一覧を取得します。
-
-        # 注意点
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: array
-                items:
-                  description: マッチ
-                  type: object
-                  properties:
-                    id:
-                      format: uuid
-                      description: ID
-                      type: string
-                    tournament_id:
-                      format: uuid
-                      description: トーナメントID
-                      type: string
-                    order:
-                      minimum: 0
-                      description: 順番
-                      type: number
-                    round:
-                      minimum: 0
-                      description: ラウンド数
-                      type: number
-                    status:
-                      description: "マッチの状況 - ready: 対戦開始可能, in_progress: 対戦中, done: 対戦終了"
-                      anyOf:
-                        - type: string
-                          enum:
-                            - ready
-                        - type: string
-                          enum:
-                            - in_progress
-                        - type: string
-                          enum:
-                            - done
-                    participants:
-                      maxItems: 2
-                      description: 対戦相手
-                      type: array
-                      items:
-                        description: 参加者
-                        type: object
-                        properties:
-                          id:
-                            format: uuid
-                            description: 参加者ID
-                            type: string
-                          tournament_id:
-                            format: uuid
-                            description: トーナメント ID
-                            type: string
-                          external_id:
-                            description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                            type: string
-                          state:
-                            description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                              対戦済み, eliminated: 敗退, champion: 優勝"
-                            anyOf:
-                              - type: string
-                                enum:
-                                  - pending
-                              - type: string
-                                enum:
-                                  - ready
-                              - type: string
-                                enum:
-                                  - in_progress
-                              - type: string
-                                enum:
-                                  - battled
-                              - type: string
-                                enum:
-                                  - eliminated
-                              - type: string
-                                enum:
-                                  - champion
-                        required:
-                          - id
-                          - tournament_id
-                          - external_id
-                          - state
-                    winner:
-                      description: 勝者
-                      type: object
-                      properties:
-                        id:
-                          format: uuid
-                          description: 参加者ID
-                          type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
-                      required:
-                        - id
-                        - tournament_id
-                        - external_id
-                        - state
-                    loser:
-                      description: 敗者
-                      type: object
-                      properties:
-                        id:
-                          format: uuid
-                          description: 参加者ID
-                          type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
-                      required:
-                        - id
-                        - tournament_id
-                        - external_id
-                        - state
-                  required:
-                    - id
-                    - tournament_id
-                    - order
-                    - round
-                    - status
-                    - participants
-                    - winner
-                    - loser
+                    - created_at
+  /histories:
     post:
-      summary: マッチ作成
+      summary: 対戦結果作成
       tags:
-        - match
+        - histories
       description: |
         
         # 概要
-        マッチを作成します。
+        対戦結果を作成します。
+        対戦結果を作成すると、各参加者は以下のステータスになります。
+
+        loserのstateはeliminatedになります。
+
+        winnerのstateは、battledになります。
+        ただし、条件によっては、次の表のように変更されます。
+
+        | 条件 | 次のstate |
+        | --- | --- |
+        | 自分以外の全参加者がeliminatedになった場合 | champion |
+        | 全参加者のstateがeliminatedもしくはbattledになった場合 | battledの参加者はpendingになります。 |
+
+        pendingの参加者が奇数の場合はランダムで、一人だけstateがbattledになります。
+
+        また、championが決まった場合は、トーナメントのstateをcloseに変更します。
 
         # 注意点
-      responses:
-        "200":
-          description: マッチ
-          content:
-            application/json:
-              schema:
-                description: マッチ
-                type: object
-                properties:
-                  id:
-                    format: uuid
-                    description: ID
-                    type: string
-                  tournament_id:
-                    format: uuid
-                    description: トーナメントID
-                    type: string
-                  order:
-                    minimum: 0
-                    description: 順番
-                    type: number
-                  round:
-                    minimum: 0
-                    description: ラウンド数
-                    type: number
-                  status:
-                    description: "マッチの状況 - ready: 対戦開始可能, in_progress: 対戦中, done: 対戦終了"
-                    anyOf:
-                      - type: string
-                        enum:
-                          - ready
-                      - type: string
-                        enum:
-                          - in_progress
-                      - type: string
-                        enum:
-                          - done
-                  participants:
-                    maxItems: 2
-                    description: 対戦相手
-                    type: array
-                    items:
-                      description: 参加者
-                      type: object
-                      properties:
-                        id:
-                          format: uuid
-                          description: 参加者ID
-                          type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
-                      required:
-                        - id
-                        - tournament_id
-                        - external_id
-                        - state
-                  winner:
-                    description: 勝者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                  loser:
-                    description: 敗者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                required:
-                  - id
-                  - tournament_id
-                  - order
-                  - round
-                  - status
-                  - participants
-                  - winner
-                  - loser
-  /matches/{id}:
-    get:
-      summary: マッチ取得
-      tags:
-        - match
-      description: |
-        
-        # 概要
-        :idで指定されたマッチを取得します。
-
-        # 注意点
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: ID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  id:
-                    format: uuid
-                    description: ID
-                    type: string
-                  tournament_id:
-                    format: uuid
-                    description: トーナメントID
-                    type: string
-                  order:
-                    minimum: 0
-                    description: 順番
-                    type: number
-                  round:
-                    minimum: 0
-                    description: ラウンド数
-                    type: number
-                  status:
-                    description: "マッチの状況 - ready: 対戦開始可能, in_progress: 対戦中, done: 対戦終了"
-                    anyOf:
-                      - type: string
-                        enum:
-                          - ready
-                      - type: string
-                        enum:
-                          - in_progress
-                      - type: string
-                        enum:
-                          - done
-                  participants:
-                    maxItems: 2
-                    description: 対戦相手
-                    type: array
-                    items:
-                      description: 参加者
-                      type: object
-                      properties:
-                        id:
-                          format: uuid
-                          description: 参加者ID
-                          type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
-                      required:
-                        - id
-                        - tournament_id
-                        - external_id
-                        - state
-                  winner:
-                    description: 勝者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                  loser:
-                    description: 敗者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                required:
-                  - id
-                  - tournament_id
-                  - order
-                  - round
-                  - status
-                  - participants
-                  - winner
-                  - loser
-    put:
-      summary: マッチを更新します
-      tags:
-        - match
-      description: |
-        
-        # 概要
-        :idで指定されたマッチを更新します。
-
-        # 注意点
-        * ！！！！！使えません！！！！！
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: ID
-      responses:
-        "200":
-          description: NG
-          content:
-            application/json:
-              schema:
-                description: NG
-                type: object
-                properties:
-                  id:
-                    format: uuid
-                    description: ID
-                    type: string
-                  tournament_id:
-                    format: uuid
-                    description: トーナメントID
-                    type: string
-                  order:
-                    minimum: 0
-                    description: 順番
-                    type: number
-                  round:
-                    minimum: 0
-                    description: ラウンド数
-                    type: number
-                  status:
-                    description: "マッチの状況 - ready: 対戦開始可能, in_progress: 対戦中, done: 対戦終了"
-                    anyOf:
-                      - type: string
-                        enum:
-                          - ready
-                      - type: string
-                        enum:
-                          - in_progress
-                      - type: string
-                        enum:
-                          - done
-                  participants:
-                    maxItems: 2
-                    description: 対戦相手
-                    type: array
-                    items:
-                      description: 参加者
-                      type: object
-                      properties:
-                        id:
-                          format: uuid
-                          description: 参加者ID
-                          type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
-                      required:
-                        - id
-                        - tournament_id
-                        - external_id
-                        - state
-                  winner:
-                    description: 勝者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                  loser:
-                    description: 敗者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                required:
-                  - id
-                  - tournament_id
-                  - order
-                  - round
-                  - status
-                  - participants
-                  - winner
-                  - loser
-    delete:
-      summary: マッチ削除
-      tags:
-        - match
-      description: |
-        
-        # 概要
-        :idで指定されたマッチを削除します。
-
-        # 注意点
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: ID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    enum:
-                      - true
-                required:
-                  - ok
-  /matches/{id}/start:
-    put:
-      summary: マッチを開始します
-      tags:
-        - match
-      description: |
-        
-        # 概要
-        :idで指定されたマッチを開始します。
-        statusがreadyのときにstatusをin_progressに変更します。
-
-        # 注意点
-        * 一度終了したマッチを再度開始することはできません。＜＝仕様変更可能
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: ID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    enum:
-                      - true
-                required:
-                  - ok
-  /matches/{id}/next:
-    get:
-      summary: トーナメントで行う次のマッチを取得
-      tags:
-        - match
-      description: |
-        
-        # 概要
-        :idで指定されたトーナメントのidで、statusがreadyであるマッチのうち最もorderが小さいマッチを取得します。
-
-        # 注意点
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: id
-          required: true
-          description: ID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  id:
-                    format: uuid
-                    description: ID
-                    type: string
-                  tournament_id:
-                    format: uuid
-                    description: トーナメントID
-                    type: string
-                  order:
-                    minimum: 0
-                    description: 順番
-                    type: number
-                  round:
-                    minimum: 0
-                    description: ラウンド数
-                    type: number
-                  status:
-                    description: "マッチの状況 - ready: 対戦開始可能, in_progress: 対戦中, done: 対戦終了"
-                    anyOf:
-                      - type: string
-                        enum:
-                          - ready
-                      - type: string
-                        enum:
-                          - in_progress
-                      - type: string
-                        enum:
-                          - done
-                  participants:
-                    maxItems: 2
-                    description: 対戦相手
-                    type: array
-                    items:
-                      description: 参加者
-                      type: object
-                      properties:
-                        id:
-                          format: uuid
-                          description: 参加者ID
-                          type: string
-                        tournament_id:
-                          format: uuid
-                          description: トーナメント ID
-                          type: string
-                        external_id:
-                          description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                          type: string
-                        state:
-                          description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                            対戦済み, eliminated: 敗退, champion: 優勝"
-                          anyOf:
-                            - type: string
-                              enum:
-                                - pending
-                            - type: string
-                              enum:
-                                - ready
-                            - type: string
-                              enum:
-                                - in_progress
-                            - type: string
-                              enum:
-                                - battled
-                            - type: string
-                              enum:
-                                - eliminated
-                            - type: string
-                              enum:
-                                - champion
-                      required:
-                        - id
-                        - tournament_id
-                        - external_id
-                        - state
-                  winner:
-                    description: 勝者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                  loser:
-                    description: 敗者
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 参加者ID
-                        type: string
-                      tournament_id:
-                        format: uuid
-                        description: トーナメント ID
-                        type: string
-                      external_id:
-                        description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                        type: string
-                      state:
-                        description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                          対戦済み, eliminated: 敗退, champion: 優勝"
-                        anyOf:
-                          - type: string
-                            enum:
-                              - pending
-                          - type: string
-                            enum:
-                              - ready
-                          - type: string
-                            enum:
-                              - in_progress
-                          - type: string
-                            enum:
-                              - battled
-                          - type: string
-                            enum:
-                              - eliminated
-                          - type: string
-                            enum:
-                              - champion
-                    required:
-                      - id
-                      - tournament_id
-                      - external_id
-                      - state
-                required:
-                  - id
-                  - tournament_id
-                  - order
-                  - round
-                  - status
-                  - participants
-                  - winner
-                  - loser
-  /matches/{id}/done:
-    put:
-      summary: マッチ終了
-      tags:
-        - match
-      description: |
-        
-        # 概要
-        :idで指定されたマッチを終了します。
-        statusがin_progressのときに、statusをdoneに変更します。
-
-        # 注意点
-        * 開始していないマッチは終了できません。
-        * 必ずloserとwinnerの両方を指定する必要があります。
+         * close状態のトーナメントでは作成できません。
       requestBody:
         content:
           application/json:
             schema:
-              description: マッチ
+              description: トーナメントの履歴
               type: object
               properties:
-                loser:
-                  description: 敗者
-                  type: object
-                  properties:
-                    id:
-                      format: uuid
-                      description: 参加者ID
-                      type: string
-                    tournament_id:
-                      format: uuid
-                      description: トーナメント ID
-                      type: string
-                    external_id:
-                      description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                      type: string
-                    state:
-                      description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                        対戦済み, eliminated: 敗退, champion: 優勝"
-                      anyOf:
-                        - type: string
-                          enum:
-                            - pending
-                        - type: string
-                          enum:
-                            - ready
-                        - type: string
-                          enum:
-                            - in_progress
-                        - type: string
-                          enum:
-                            - battled
-                        - type: string
-                          enum:
-                            - eliminated
-                        - type: string
-                          enum:
-                            - champion
-                  required:
-                    - id
-                    - tournament_id
-                    - external_id
-                    - state
+                tournament_id:
+                  format: uuid
+                  description: トーナメント ID
+                  type: string
                 winner:
-                  description: 勝者
                   type: object
                   properties:
                     id:
                       format: uuid
-                      description: 参加者ID
+                      description: 勝者の参加者ID
                       type: string
-                    tournament_id:
-                      format: uuid
-                      description: トーナメント ID
-                      type: string
-                    external_id:
-                      description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                      type: string
-                    state:
-                      description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                        対戦済み, eliminated: 敗退, champion: 優勝"
-                      anyOf:
-                        - type: string
-                          enum:
-                            - pending
-                        - type: string
-                          enum:
-                            - ready
-                        - type: string
-                          enum:
-                            - in_progress
-                        - type: string
-                          enum:
-                            - battled
-                        - type: string
-                          enum:
-                            - eliminated
-                        - type: string
-                          enum:
-                            - champion
+                    score:
+                      minimum: 0
+                      description: スコア
+                      type: number
                   required:
                     - id
-                    - tournament_id
-                    - external_id
-                    - state
+                    - score
+                loser:
+                  type: object
+                  properties:
+                    id:
+                      format: uuid
+                      description: 敗者の参加者ID
+                      type: string
+                    score:
+                      minimum: 0
+                      description: スコア
+                      type: number
+                  required:
+                    - id
+                    - score
               required:
-                - loser
+                - tournament_id
                 - winner
+                - loser
         required: true
-        description: マッチ
+        description: トーナメントの履歴
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  id:
+                    format: uuid
+                    description: 履歴ID
+                    type: string
+                  tournament_id:
+                    format: uuid
+                    description: トーナメント ID
+                    type: string
+                  winner:
+                    type: object
+                    properties:
+                      id:
+                        format: uuid
+                        description: 勝者の参加者ID
+                        type: string
+                      score:
+                        minimum: 0
+                        description: スコア
+                        type: number
+                    required:
+                      - id
+                      - score
+                  loser:
+                    type: object
+                    properties:
+                      id:
+                        format: uuid
+                        description: 敗者の参加者ID
+                        type: string
+                      score:
+                        minimum: 0
+                        description: スコア
+                        type: number
+                    required:
+                      - id
+                      - score
+                  created_at:
+                    description: 履歴の作成日時
+                    format: date-time
+                    type: string
+                required:
+                  - id
+                  - tournament_id
+                  - winner
+                  - loser
+                  - created_at
+  /participants:
+    post:
+      summary: 参加者作成
+      tags:
+        - participant
+      description: |
+        
+        # 概要
+        参加者を作成します。
+
+        # 注意点
+         * トーナメントがreceptionの時のみ、参加者を作成できます。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: 参加者
+              type: object
+              properties:
+                tournament_id:
+                  format: uuid
+                  description: トーナメント ID
+                  type: string
+                external_id:
+                  description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
+                  type: string
+              required:
+                - tournament_id
+                - external_id
+        required: true
+        description: 参加者
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  id:
+                    format: uuid
+                    description: 参加者ID
+                    type: string
+                  tournament_id:
+                    format: uuid
+                    description: トーナメント ID
+                    type: string
+                  external_id:
+                    description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
+                    type: string
+                  state:
+                    description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
+                      対戦済み, eliminated: 敗退, champion: 優勝"
+                    anyOf:
+                      - type: string
+                        enum:
+                          - pending
+                      - type: string
+                        enum:
+                          - ready
+                      - type: string
+                        enum:
+                          - in_progress
+                      - type: string
+                        enum:
+                          - battled
+                      - type: string
+                        enum:
+                          - eliminated
+                      - type: string
+                        enum:
+                          - champion
+                required:
+                  - id
+                  - tournament_id
+                  - external_id
+                  - state
+  /participants/{id}/ready:
+    put:
+      summary: 参加者のステータスをreadyにする
+      tags:
+        - participant
+      description: |
+        
+        # 概要
+        参加者のステータスをreadyにします。
+
+        # 注意点
+         * sateがpendingの時のみ可能です。
+         * トーナメントがopenの時のみ可能です。
       parameters:
         - schema:
             format: uuid
@@ -1892,7 +735,80 @@ paths:
           in: path
           name: id
           required: true
-          description: ID
+          description: 参加者ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    enum:
+                      - true
+                required:
+                  - ok
+  /participants/{id}/cancel:
+    put:
+      summary: 参加者のステータスをpendingにする
+      tags:
+        - participant
+      description: |
+        
+        # 概要
+        参加者のステータスをpendingにします。
+
+        # 注意点
+         * stateがreadyの時のみ可能です。
+         * トーナメントがopenの時のみ可能です。
+      parameters:
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: id
+          required: true
+          description: 参加者ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    enum:
+                      - true
+                required:
+                  - ok
+  /participants/battle:
+    put:
+      summary: 参加者のステータスをin_progressにする
+      tags:
+        - participant
+      description: |
+        
+        # 概要
+        参加者のステータスをin_progressにします。
+
+        # 注意点
+         * stateがreadyの時のみ可能です。
+         * トーナメントがopenの時のみ可能です。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                format: uuid
+                description: 参加者ID
+                type: string
       responses:
         "200":
           description: OK
@@ -1911,7 +827,7 @@ paths:
 tags:
   - name: tournament
     description: トーナメントに関するAPI
-  - name: match
-    description: 対戦（マッチ）に関するAPI
+  - name: histories
+    description: 対戦結果に関するAPI
   - name: participant
     description: 参加者に関するAPI
