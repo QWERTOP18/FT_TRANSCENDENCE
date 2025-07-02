@@ -12,7 +12,7 @@ const description = `
 `
 
 export function GetTournamentParticipantsRoute(fastify: FastifyInstance) {
-	fastify.post('/tournaments/:id/participants', {
+	fastify.get('/tournaments/:id/participants', {
 		schema: {
 			description,
 			tags: ["tournament"],
