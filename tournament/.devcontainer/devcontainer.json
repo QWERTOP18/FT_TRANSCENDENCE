@@ -1,0 +1,43 @@
+{
+	"name": "Tournament",
+	"dockerComposeFile": [
+		"./docker-compose.yml"
+	],
+	"service": "tournament",
+	"workspaceFolder": "/workspace",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+	"mounts": [
+		{
+			"source": "${localWorkspaceFolder}",
+			"target": "${containerWorkspaceFolder}",
+			"type": "bind"
+		},
+		{
+			"source": "tournament_node_modules",
+			"target": "${containerWorkspaceFolder}/node_modules",
+			"type": "volume"
+		}
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"ms-vscode.vscode-typescript-next",
+				"usernamehw.errorlens",
+				"dbaeumer.vscode-eslint",
+				"streetsidesoftware.code-spell-checker",
+				"bierner.markdown-mermaid"
+			]
+		}
+	},
+	"onCreateCommand": {
+		"make-workspace": [
+			"mkdir",
+			"-p",
+			"${containerWorkspaceFolder}"
+		]
+	},
+	"postCreateCommand": "npm ci",
+	"remoteUser": "root"
+}

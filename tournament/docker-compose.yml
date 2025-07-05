@@ -1,0 +1,40 @@
+services:
+  swagger-ui:
+    container_name: swagger-ui
+    image: swaggerapi/swagger-ui
+    ports:
+      - 8181:8080
+    environment:
+      - SWAGGER_JSON=/api/tournament/v1/openapi.json
+    configs:
+      - source: openapi-yml
+        target: /api/tournament/v1/openapi.json
+
+  swagger-editor:
+    container_name: swagger-editor
+    image: swaggerapi/swagger-editor
+    ports:
+      - 8182:8080
+    environment:
+      - SWAGGER_JSON=/api/tournament/v1/openapi.json
+    configs:
+      - source: openapi-yml
+        target: /api/tournament/v1/openapi.json
+  
+
+  prism:
+    image: stoplight/prism:4
+    command: 'mock -h 0.0.0.0 /tmp/api.oas3.yml'
+    init: true
+    ports:
+      - '8183:4010'
+    configs:
+      - source: openapi-yml
+        target: /tmp/api.oas3.yml
+  
+configs:
+  openapi-yml:
+    file: docs/openapi.json
+
+volumes:
+  tournament_node_modules:
