@@ -2,16 +2,35 @@ import { HistoryId } from "../value-objects/HistoryId";
 import { ParticipantScore } from "../value-objects/ParticipantScore";
 import { TournamentId } from "../value-objects/TournamentId";
 
+
+export type HistoryValue = {
+	readonly id: HistoryId,
+	readonly tournamentId: TournamentId,
+	winner: ParticipantScore,
+	loser: ParticipantScore,
+	created_at: Date,
+}
+
 export class History {
-	constructor(private _props: {
-		readonly id: HistoryId,
-		readonly tournamentId: TournamentId,
+	private constructor(private _props: HistoryValue) { }
+
+	public static create(
+		tournamentId: TournamentId,
 		winner: ParticipantScore,
 		loser: ParticipantScore,
-		created_at: Date,
-	}) { }
+	) {
+		return new History({
+			id: new HistoryId(),
+			tournamentId,
+			winner,
+			loser,
+			created_at: new Date(),
+		});
+	}
 
-	/** セッター */
+	public static reconstruct(props: HistoryValue) {
+		return new History(props);
+	}
 
 	/** ゲッター */
 	get id() {

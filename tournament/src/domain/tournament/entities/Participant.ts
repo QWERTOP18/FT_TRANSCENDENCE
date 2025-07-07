@@ -3,13 +3,30 @@ import { ParticipantId } from "../value-objects/ParticipantId";
 import { ParticipantState } from "../value-objects/ParticipantState";
 import { TournamentId } from "../value-objects/TournamentId";
 
+export type ParticipantValue = {
+	readonly id: ParticipantId,
+	readonly tournamentId: TournamentId,
+	readonly externalId: string,
+	state: ParticipantState,
+}
+
 export class Participant {
-	constructor(private _props: {
-		readonly id: ParticipantId,
-		readonly tournamentId: TournamentId,
-		readonly externalId: string,
-		state: ParticipantState,
-	}) { }
+	constructor(private _props: ParticipantValue) { }
+
+	public static create(
+		tournamentId: TournamentId,
+		externalId: string) {
+		return new Participant({
+			id: new ParticipantId(),
+			tournamentId,
+			externalId,
+			state: new ParticipantState('pending'),
+		});
+	}
+
+	public static reconstruct(props: ParticipantValue) {
+		return new Participant(props);
+	}
 
 	public become(state: ParticipantState) {
 		if (this.canBecome(state) == false)
