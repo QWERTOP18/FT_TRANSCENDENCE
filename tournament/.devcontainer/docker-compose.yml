@@ -4,8 +4,8 @@ services:
     image: node:24
     init: true
     tty: true
-    ports:
-      - 8180:8080
+    # ports:
+    #   - 8180:8080 # You can use automatically forwarded port with vscode
 
 volumes:
   tournament_node_modules:
