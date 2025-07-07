@@ -10,7 +10,7 @@ datasource db {
 }
 
 model Tournament {
-  id          String       @id @default(uuid())
+  id          String  @id @default(uuid())
   champion_id String?
   name        String
   description String
@@ -24,28 +24,28 @@ model Tournament {
 }
 
 model Participant {
-  id            String       @id @default(uuid())
+  id            String           @id @default(uuid())
   external_id   String
   tournament_id String
   state         ParticipantState
 
-  tournament Tournament @relation(fields: [tournament_id], references: [id])
-  winner_histories History[] @relation("WinnerRelation")
-  loser_histories  History[] @relation("LoserRelation")
+  tournament       Tournament @relation(fields: [tournament_id], references: [id])
+  winner_histories History[]  @relation("WinnerRelation")
+  loser_histories  History[]  @relation("LoserRelation")
 
   @@map("participant")
 }
 
 model History {
-  id            String    @id @default(uuid())
+  id            String   @id @default(uuid())
   tournament_id String
   winner_id     String
   loser_id      String
   winner_score  Int
   loser_score   Int
-  created_at    DateTime  @default(now())
+  created_at    DateTime @default(now())
 
-  tournament Tournament @relation(fields: [tournament_id], references: [id])
+  tournament Tournament  @relation(fields: [tournament_id], references: [id])
   winner     Participant @relation("WinnerRelation", fields: [winner_id], references: [id])
   loser      Participant @relation("LoserRelation", fields: [loser_id], references: [id])
 

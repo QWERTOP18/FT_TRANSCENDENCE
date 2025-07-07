@@ -14,9 +14,15 @@
 EOF
 
 function main() {
+  migrate
 	generate_prisma_client
 	start_dev_server &
 	wait "$!"
+}
+
+function migrate() {
+  echo "Generating database..."
+  npx prisma migrate dev --schema=src/infrastructure/SQLite/prisma/schema.prisma
 }
 
 function generate_prisma_client() {
