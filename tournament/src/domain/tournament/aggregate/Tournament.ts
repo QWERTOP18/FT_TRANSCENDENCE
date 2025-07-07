@@ -1,6 +1,6 @@
 import { History } from "../entities/History";
 import { Participant } from "../entities/Participant";
-import { DuplicatedError, InvalidIdError, NoRelationalError, TournamentStateError } from "../TournamentError";
+import { BadStateError, DuplicatedError, InvalidIdError, NoRelationalError, TournamentStateError } from "../TournamentError";
 import { ParticipantId } from "../value-objects/ParticipantId";
 import { ParticipantState } from "../value-objects/ParticipantState";
 import { TournamentId } from "../value-objects/TournamentId";
@@ -30,11 +30,6 @@ export class Tournament {
 		return new Tournament(props);
 	}
 
-	/** セッター */
-	public setChampionId(id: ParticipantId) {
-		this._props.championId = id;
-	}
-
 	public changeName(name: string) {
 		this._props.name = name;
 	}
@@ -61,16 +56,86 @@ export class Tournament {
 		this._props.participants.push(participant);
 	}
 
+	public ready(participant: Participant) {
+		this.changeParticipantState(participant, new ParticipantState('ready'));
+	}
+
+	public cancel(participant: Participant) {
+		this.changeParticipantState(participant, new ParticipantState('pending'));
+	}
+
+	public start(participant1: Participant, participant2: Participant) {
+		this.changeParticipantState(participant1, new ParticipantState('in_progress'));
+		this.changeParticipantState(participant2, new ParticipantState('in_progress'));
+	}
+
+	public reRound() {
+		if (this._props.state.equals(new TournamentState('open')) == false)
+			throw new TournamentStateError("開催中のトーナメントでのみ再ラウンドできます");
+		if (this.isOverRound() == false)
+			throw new BadStateError("バトルが終了していません");
+		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
+		battledParticipants.forEach((p) => {
+			p.become(new ParticipantState('pending'));
+		});
+	}
+
 	public addHistory(history: History) {
 		if (history.tournamentId != this._props.id)
 			throw new InvalidIdError("トーナメントIDと履歴のIDが一致しません")
 		const winner = this.getParticipantById(history.getWinnerId());
 		const loser = this.getParticipantById(history.getLoserId());
-
+		if (!winner || !loser)
+			throw new NoRelationalError("トーナメントに属していない参加者です");
+		winner.become(new ParticipantState('battled'));
+		loser.become(new ParticipantState('eliminated'));
 		this._props.histories.push(history);
 	}
 
-	public changeParticipantState(participant: Participant, state: ParticipantState) {
+	public carryUpOneParticipant() {
+		const pendingParticipants = this.getParticipantsByState(new ParticipantState('pending'));
+		if (pendingParticipants.length == 0)
+			throw new BadStateError("昇格させる参加者がいません");
+		if (pendingParticipants.length % 2 != 1)
+			throw new BadStateError("昇格させる参加者は奇数人でなければなりません");
+		const target = pendingParticipants[Math.floor(Math.random() * pendingParticipants.length)];
+		target.become(new ParticipantState('battled'));
+	}
+
+	public setChampion() {
+		if (this.canSetChampion() == false)
+			throw new BadStateError("チャンピオンを決定できません");
+		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
+		const champion = battledParticipants[0];
+		if (!champion)
+			throw new BadStateError("バトル済みの参加者が1人ではありません");
+		this._props.championId = champion.id;
+		champion.become(new ParticipantState('champion'));
+		this.close();
+	}
+
+
+	public isOverRound() {
+		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
+		const eliminatedParticipants = this.getParticipantsByState(new ParticipantState('eliminated'));
+		const doneParticipantsLength = battledParticipants.length + eliminatedParticipants.length;
+		return doneParticipantsLength == this._props.participants.length;
+	}
+
+	public canSetChampion() {
+		if (this._props.state.equals(new TournamentState('open')) == false)
+			throw new TournamentStateError("開催中のトーナメントでのみ決定できます");
+		if (this._props.participants.length < 2)
+			throw new BadStateError("参加者が2人以上必要です");
+		if (this.isOverRound() == false)
+			throw new BadStateError("バトルが終了していません");
+		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
+		if (battledParticipants.length != 1)
+			throw new BadStateError("バトル済みの参加者が1人ではありません");
+		return true;
+	}
+
+	private changeParticipantState(participant: Participant, state: ParticipantState) {
 		const target = this.getParticipant(participant);
 		if (!target)
 			throw new NoRelationalError("トーナメントに属していない参加者です");
@@ -79,16 +144,19 @@ export class Tournament {
 		target.become(state);
 	}
 
-	/** ツール */
+	/** ゲッター */
 	public getParticipant(participant: Participant) {
-		return this._props.participants.find((p) => p.id.equals(participant.id));
+		return this.getParticipantById(participant.id);
 	}
 
 	public getParticipantById(id: ParticipantId) {
 		return this._props.participants.find((p) => p.id.equals(id));
 	}
 
-	/** ゲッター */
+	public getParticipantsByState(state: ParticipantState) {
+		return this._props.participants.filter((p) => p.state.equals(state));
+	}
+
 	get id() {
 		return this._props.id;
 	}
