@@ -22,15 +22,21 @@ export class Tournament {
 	private constructor(private _props: TournamentValue) { }
 
 	/** 構築 */
-	static create(ownerId: ParticipantId) {
+	static create(props: {
+		name?: string,
+		description?: string,
+		ownerExternalId: string
+	}) {
+		const tournamentId = new TournamentId();
+		const owner = Participant.create(tournamentId, props.ownerExternalId)
 		return new Tournament({
 			id: new TournamentId(),
-			ownerId: ownerId,
+			ownerId: owner.id,
 			championId: undefined,
-			name: '',
-			description: '',
+			name: props.name ?? '',
+			description: props.description ?? '',
 			state: new TournamentState('reception'),
-			participants: [],
+			participants: [owner],
 			histories: []
 		});
 	}

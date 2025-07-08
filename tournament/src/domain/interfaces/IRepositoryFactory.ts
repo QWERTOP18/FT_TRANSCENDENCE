@@ -2,6 +2,6 @@ import { ITournamentRepository } from "./ITournamentRepository";
 
 
 export interface IRepositoryFactory {
-	run(callback: (repository: ITournamentRepository) => Promise<void>): Promise<void>;
-	transaction(callback: (repository: ITournamentRepository) => Promise<void>): Promise<void>;
+	run<T>(callback: (repository: ITournamentRepository) => Promise<T>): Promise<T>;
+	transaction<T>(callback: (repository: ITournamentRepository) => Promise<T>): Promise<T>;
 }

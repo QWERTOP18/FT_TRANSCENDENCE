@@ -41,6 +41,14 @@ export class History {
 		return this._props.tournamentId;
 	}
 
+	get winner() {
+		return this._props.winner;
+	}
+
+	get loser() {
+		return this._props.loser;
+	}
+
 	public getWinnerId() {
 		return this._props.winner.id;
 	}
