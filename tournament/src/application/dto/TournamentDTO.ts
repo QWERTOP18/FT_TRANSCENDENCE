@@ -1,4 +1,5 @@
 import { Tournament } from "../../domain/tournament/aggregate/Tournament";
+import { TournamentStateValue } from "../../domain/tournament/value-objects/TournamentState";
 import { HistoryDTO } from "./HistoryDTO";
 import { ParticipantDTO } from "./ParticipantDTO";
 
@@ -10,7 +11,7 @@ export class TournamentDTO {
 		public championId: string | undefined,
 		public name: string,
 		public description: string,
-		public state: string,
+		public state: TournamentStateValue,
 		public participants: ParticipantDTO[],
 		public histories: HistoryDTO[]
 	) { }
@@ -21,7 +22,7 @@ export class TournamentDTO {
 		championId?: string,
 		name: string,
 		description: string,
-		state: string,
+		state: TournamentStateValue,
 		participants: ParticipantDTO[],
 		histories: HistoryDTO[]
 	}) {

@@ -2,6 +2,7 @@ import { IRepositoryFactory } from "../../domain/interfaces/IRepositoryFactory";
 import { TournamentDomainService } from "../../domain/services/Tournament/TournamentDomainService";
 import { Tournament } from "../../domain/tournament/aggregate/Tournament";
 import { DuplicatedError } from "../../domain/tournament/TournamentError";
+import { TournamentDTO } from "../dto/TournamentDTO";
 
 
 export type CreateTournamentApplicationServiceCommand = {
@@ -13,8 +14,8 @@ export type CreateTournamentApplicationServiceCommand = {
 export class CreateTournamentApplicationService {
 	constructor(private readonly repositoryFactory: IRepositoryFactory) { }
 
-	async execute(command: CreateTournamentApplicationServiceCommand): Promise<void> {
-		await this.repositoryFactory.transaction(async (repository) => {
+	async execute(command: CreateTournamentApplicationServiceCommand) {
+		return this.repositoryFactory.transaction(async (repository) => {
 			const tournament = Tournament.create({
 				name: command.name,
 				description: command.description,
@@ -24,7 +25,8 @@ export class CreateTournamentApplicationService {
 			const isDuplicated = await domainService.checkDuplicatedTournamentId(tournament.id);
 			if (isDuplicated)
 				throw new DuplicatedError(`Tournament with ID ${tournament.id.value} already exists.`);
-			return await repository.create(tournament);
+			await repository.create(tournament);
+			return TournamentDTO.fromDomain(tournament);
 		});
 	}
 }

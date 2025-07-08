@@ -1,6 +1,6 @@
 import { ValueObject } from "./ValueObject";
 
-type ParticipantStateValue = 'pending'
+export type ParticipantStateValue = 'pending'
 	| 'ready'
 	| 'in_progress'
 	| 'battled'

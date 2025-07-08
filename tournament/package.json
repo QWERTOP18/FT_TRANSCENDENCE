@@ -14,7 +14,8 @@
   "author": "",
   "license": "ISC",
   "prisma": {
-    "schema": "src/infrastructure/Prisma/prisma/schema.prisma"
+    "schema": "src/infrastructure/Prisma/prisma/schema.prisma",
+    "seed": "ts-node src/infrastructure/Prisma/prisma/seed.ts"
   },
   "dependencies": {
     "@fastify/error": "^4.2.0",

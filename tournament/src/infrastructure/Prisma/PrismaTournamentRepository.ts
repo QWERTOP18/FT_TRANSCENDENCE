@@ -23,7 +23,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 	}
 
 	async create(tournament: Tournament): Promise<void> {
-		this._client.tournament.create({
+		await this._client.tournament.create({
 			data: {
 				id: tournament.id.value,
 				owner_id: tournament.ownerId.value,
@@ -34,7 +34,6 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 				histories: {
 					create: tournament.histories.map(history => ({
 						id: history.id.value,
-						tournament_id: history.tournamentId.value,
 						created_at: history.created_at.toISOString(),
 						loser_id: history.getLoserId().value,
 						loser_score: history.getLoserScore().value,
@@ -46,7 +45,6 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 					create: tournament.participants.map(participant => ({
 						id: participant.id.value,
 						external_id: participant.externalId,
-						tournament_id: participant.tournamentId.value,
 						state: participant.state.value,
 					}))
 				}
@@ -55,7 +53,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 	}
 
 	async update(tournament: Tournament): Promise<void> {
-		this._client.tournament.update({
+		await this._client.tournament.update({
 			where: { id: tournament.id.value },
 			data: {
 				id: tournament.id.value,
@@ -68,7 +66,6 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 					update: tournament.histories.map(history => ({
 						where: { id: history.id.value },
 						data: {
-							tournament_id: history.tournamentId.value,
 							created_at: history.created_at.toISOString(),
 							loser_id: history.getLoserId().value,
 							loser_score: history.getLoserScore().value,
@@ -82,7 +79,6 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 						where: { id: participant.id.value },
 						data: {
 							external_id: participant.externalId,
-							tournament_id: participant.tournamentId.value,
 							state: participant.state.value,
 						}
 					}))
