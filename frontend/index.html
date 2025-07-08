@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ft_transcendence - Pong Game</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+<body class="bg-gray-100 text-gray-800 flex flex-col items-center min-h-screen">
+    <header class="w-full bg-gray-800 text-white p-4 text-center shadow-md">
+        <h1 class="text-2xl font-bold">My Pong Game</h1>
+        <nav class="mt-2">
+            <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/game')">Game</button>
+            <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/win')">Win Screen</button>
+            <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/lose')">Lose Screen</button>
+            <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/error')">Error Screen</button>
+        </nav>
+    </header>
+    <main class="flex-grow flex justify-center items-center w-full p-4">
+        <div id="app" class="w-full max-w-3xl"></div>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+</body>
+</html>
