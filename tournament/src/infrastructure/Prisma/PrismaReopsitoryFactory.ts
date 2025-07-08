@@ -1,10 +1,20 @@
-import { Prisma, PrismaClient } from "@prisma/client";
 import { IRepositoryFactory } from "../../domain/interfaces/IRepositoryFactory";
 import { ITournamentRepository } from "../../domain/interfaces/ITournamentRepository";
+import { PrismaClientProvider } from "./PrismaClientProvider";
 import { PrismaTournamentRepository } from "./PrismaTournamentRepository";
 
-export class PrismaRepositoryFactory implements IRepositoryFactory<PrismaClient | Prisma.TransactionClient> {
-	createTournamentRepository(client: PrismaClient | Prisma.TransactionClient): ITournamentRepository {
-		return new PrismaTournamentRepository({ client });
+export class PrismaRepositoryFactory implements IRepositoryFactory {
+	constructor(private readonly clientProvider: PrismaClientProvider) { }
+
+	async run(callback: (repository: ITournamentRepository) => Promise<void>): Promise<void> {
+		const repository = new PrismaTournamentRepository({ client: this.clientProvider.getInstance() });
+		return await callback(repository);
+	}
+
+	async transaction(callback: (repository: ITournamentRepository) => Promise<void>): Promise<void> {
+		return await this.clientProvider.getInstance().$transaction(async (transaction) => {
+			const repository = new PrismaTournamentRepository({ client: transaction });
+			return await callback(repository);
+		});
 	}
 }
