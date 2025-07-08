@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  /* 背景画像へのパスを指定 */
+  background-image: url("/assets/background.jpeg");
+
+  /* 画面全体を覆うように表示 */
+  background-size: cover;
+
+  /* 画像を中央に配置 */
+  background-position: center;
+
+  /* 画像を繰り返さない */
+  background-repeat: no-repeat;
+
+  /* スクロールしても背景を固定 */
+  background-attachment: fixed;
+}
