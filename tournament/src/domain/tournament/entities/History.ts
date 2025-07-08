@@ -49,6 +49,14 @@ export class History {
 		return this._props.loser.id;
 	}
 
+	public getWinnerScore() {
+		return this._props.winner.score;
+	}
+
+	public getLoserScore() {
+		return this._props.loser.score;
+	}
+
 	get created_at() {
 		return this._props.created_at;
 	}

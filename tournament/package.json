@@ -14,7 +14,7 @@
   "author": "",
   "license": "ISC",
   "prisma": {
-    "schema": "src/infrastructure/SQLite/prisma/schema.prisma"
+    "schema": "src/infrastructure/Prisma/prisma/schema.prisma"
   },
   "dependencies": {
     "@fastify/error": "^4.2.0",
