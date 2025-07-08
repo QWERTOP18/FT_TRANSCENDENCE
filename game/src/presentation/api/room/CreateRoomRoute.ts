@@ -1,6 +1,7 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { GameRoomSchema } from "../../schemas/GameRoomSchema";
+import { GameRoom } from "../../../domain/GameRoom";
 
 const description = `
 # 概要
@@ -27,8 +28,10 @@ export function CreateRoomRoute(fastify: FastifyInstance) {
         },
       },
     },
-    () => {
-      // throw
+    async (request, reply) => {
+      // GameRoomクラスで部屋インスタンスを生成し、スキーマ形式で返す
+      const room = new GameRoom();
+      return room.toSchema();
     }
   );
 }

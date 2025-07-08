@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { CreateRoomRoute } from "./wss-gateway/CreateRoomRoute";
+import { CreateRoomRoute } from "./room/CreateRoomRoute";
 
 export function GameRoutes(fastify: FastifyInstance) {
   const routes = [CreateRoomRoute] as const;

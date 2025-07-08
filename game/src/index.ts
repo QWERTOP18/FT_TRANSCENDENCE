@@ -2,11 +2,12 @@ import fastify from "fastify";
 import { GameRoutes } from "./presentation/api/route";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
+import { GameGateway } from "./presentation/gateway/GameGateway";
 
 async function main() {
-  const server = fastify();
+  const app = fastify();
 
-  await server.register(swagger, {
+  await app.register(swagger, {
     openapi: {
       info: {
         title: "Game API",
@@ -14,7 +15,7 @@ async function main() {
       },
     },
   });
-  await server.register(swaggerUI, {
+  await app.register(swaggerUI, {
     routePrefix: "/docs",
     uiConfig: {
       docExpansion: "full",
@@ -22,19 +23,17 @@ async function main() {
     },
   });
 
-  server.register(GameRoutes);
+  app.register(GameRoutes);
 
-  server.get("/ping", async (request, reply) => {
+  app.get("/ping", async (request, reply) => {
     return "pong\n";
   });
 
-  server.listen({ port: 4000 }, (err, address) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    console.log(`Server listening at ${address}`);
-  });
+  await app.listen({ port: 4000 });
+  const server = app.server;
+
+  // WebSocketサーバ・ルーム管理をGameGatewayに委譲
+  new GameGateway(server);
 }
 
 main();
