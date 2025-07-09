@@ -23,6 +23,6 @@ export function CreateParticipantRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, () => {
-		throw NotImplementedError();
+		throw new NotImplementedError();
 	})
 }

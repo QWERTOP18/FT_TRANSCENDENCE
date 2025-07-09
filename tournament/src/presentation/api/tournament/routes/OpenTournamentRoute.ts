@@ -24,7 +24,7 @@ export function OpenTournamentRoute(fastify: FastifyInstance) {
 			},
 		}
 	}, () => {
-		throw NotImplementedError();
+		throw new NotImplementedError();
 	})
 
 }

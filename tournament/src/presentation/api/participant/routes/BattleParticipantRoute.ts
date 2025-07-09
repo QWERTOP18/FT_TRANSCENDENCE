@@ -25,6 +25,6 @@ export function BattleParticipantRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, () => {
-		throw NotImplementedError();
+		throw new NotImplementedError();
 	})
 }

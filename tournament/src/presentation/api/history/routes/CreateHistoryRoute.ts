@@ -39,6 +39,6 @@ export function CreateHistoryRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, () => {
-		throw NotImplementedError();
+		throw new NotImplementedError();
 	})
 }

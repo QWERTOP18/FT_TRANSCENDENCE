@@ -25,6 +25,6 @@ export function CancelParticipantRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, () => {
-		throw NotImplementedError();
+		throw new NotImplementedError();
 	})
 }

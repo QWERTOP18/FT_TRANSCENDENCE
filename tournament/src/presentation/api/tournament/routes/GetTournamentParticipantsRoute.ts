@@ -23,6 +23,6 @@ export function GetTournamentParticipantsRoute(fastify: FastifyInstance) {
 			params: Type.Pick(TournamentSchema(), ['id'])
 		}
 	}, () => {
-		throw NotImplementedError();
+		throw new NotImplementedError();
 	})
 }
