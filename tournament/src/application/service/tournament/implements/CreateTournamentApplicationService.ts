@@ -1,7 +1,7 @@
 import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
 import { TournamentDomainService } from "../../../../domain/services/Tournament/TournamentDomainService";
 import { Tournament } from "../../../../domain/tournament/aggregate/Tournament";
-import { DuplicatedError } from "../../../../domain/tournament/TournamentError";
+import { InternalError } from "../../../../domain/tournament/TournamentError";
 import { TournamentDTO } from "../../../dto/TournamentDTO";
 
 
@@ -24,7 +24,7 @@ export class CreateTournamentApplicationService {
 			const domainService = new TournamentDomainService(repository);
 			const isDuplicated = await domainService.checkDuplicatedTournamentId(tournament.id);
 			if (isDuplicated)
-				throw new DuplicatedError(`Tournament with ID ${tournament.id.value} already exists.`);
+				throw new InternalError(`Tournament with ID ${tournament.id.value} already exists.`);
 			await repository.create(tournament);
 			return TournamentDTO.fromDomain(tournament);
 		});

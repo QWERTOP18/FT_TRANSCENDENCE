@@ -3,6 +3,7 @@ import { CreateTournamentApplicationService, CreateTournamentApplicationServiceC
 import { GetAllTournamentApplicationService, GetAllTournamentApplicationServiceCommand } from "./implements/GetAllTournamentApplicationService";
 import { GetTournamentApplicationService, GetTournamentApplicationServiceCommand } from "./implements/GetTournamentApplicationService";
 import { GetTournamentHistoriesApplicationService, GetTournamentHistoriesApplicationServiceCommand } from "./implements/GetTournamentHistoriesApplicationService";
+import { OpenTournamentApplicationService, OpenTournamentApplicationServiceCommand } from "./implements/OpenTournamentApplicationService";
 
 
 export type TournamentApplicationServiceProps = {
@@ -29,6 +30,11 @@ export class TournamentApplicationService {
 
 	async getHistories(command: GetTournamentHistoriesApplicationServiceCommand) {
 		const service = new GetTournamentHistoriesApplicationService(this.props.repositoryFactory);
+		return await service.execute(command);
+	}
+
+	async openTournament(command: OpenTournamentApplicationServiceCommand) {
+		const service = new OpenTournamentApplicationService(this.props.repositoryFactory);
 		return await service.execute(command);
 	}
 }

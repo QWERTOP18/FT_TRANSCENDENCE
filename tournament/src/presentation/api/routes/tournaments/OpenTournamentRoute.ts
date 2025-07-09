@@ -3,6 +3,8 @@ import { OKSchema } from "../../schemas/OtherSchema";
 import { NotImplementedError } from "../../classes/errors/error";
 import { Type } from "@sinclair/typebox";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { ToStatic } from "../../../types/ToStatic";
+import { DIContainer } from "../../../classes/DIContainer";
 
 const description = `
 # 概要
@@ -12,19 +14,44 @@ stateをreceptionからopenに変更します。
 * このトーナメントへの参加者が作成できなくなります。
 `
 
+const RouteSchema = {
+	Params: Type.Pick(TournamentSchema(), ['id']),
+	Querystring: undefined,
+	Body: undefined,
+	Headers: undefined,
+	Reply: {
+		200: OKSchema(),
+	}
+} as const;
+
+type RouteSchemaType = {
+	Params: ToStatic<typeof RouteSchema.Params>,
+	Querystring: ToStatic<typeof RouteSchema.Querystring>,
+	Body: ToStatic<typeof RouteSchema.Body>,
+	Headers: ToStatic<typeof RouteSchema.Headers>,
+	Reply: {
+		200: ToStatic<typeof RouteSchema.Reply[200]>
+	};
+}
+
+
+
 export function OpenTournamentRoute(fastify: FastifyInstance) {
-	fastify.put('/tournaments/:id/open', {
+	fastify.put<RouteSchemaType>('/tournaments/:id/open', {
 		schema: {
 			description,
 			tags: ["tournament"],
 			summary: "トーナメントを開始する",
-			params: Type.Pick(TournamentSchema(), ['id']),
+			params: RouteSchema.Params,
 			response: {
-				200: OKSchema()
+				200: RouteSchema.Reply[200]
 			},
 		}
-	}, () => {
-		throw new NotImplementedError();
+	}, async (request, reply) => {
+		const appService = DIContainer.applicationService();
+
+		await appService.openTournament({ tournamentId: request.params.id });
+		reply.status(200).send({ 'ok': true });
 	})
 
 }

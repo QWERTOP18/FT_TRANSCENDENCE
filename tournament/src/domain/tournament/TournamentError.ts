@@ -11,8 +11,7 @@ const createTournamentError = (errorCode: string) => {
 	}
 }
 
-export const TournamentStateError = createTournamentError("TRT_ERR_INVALID_TOURNAMENT_STATE");
-export const InvalidIdError = createTournamentError("TRT_ERR_INVALID_ID");
-export const NoRelationalError = createTournamentError("TRT_NO_RELATIONAL_TOURNAMENT");
-export const BadStateError = createTournamentError("TRT_BAD_STATE")
-export const DuplicatedError = createTournamentError("TRT_DUPLICATED")
+export const UsageError = createTournamentError("TRT_ERR_USAGE");
+export const RepositoryError = createTournamentError("TRT_ERR_REPOSITORY");
+export const InternalError = createTournamentError("TRT_ERR_INTERNAL")
+export const NotFoundError = createTournamentError("TRT_ERR_NOTFOUND");

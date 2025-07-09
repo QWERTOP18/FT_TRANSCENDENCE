@@ -1,4 +1,4 @@
-import { BadStateError } from "../TournamentError";
+import { UsageError } from "../TournamentError";
 import { ParticipantId } from "../value-objects/ParticipantId";
 import { ParticipantState } from "../value-objects/ParticipantState";
 import { TournamentId } from "../value-objects/TournamentId";
@@ -30,7 +30,7 @@ export class Participant {
 
 	public become(state: ParticipantState) {
 		if (this.canBecome(state) == false)
-			throw new BadStateError(`${state.value}に遷移することはできません`);
+			throw new UsageError(`${state.value}に遷移することはできません`);
 		this._props.state = state;
 	}
 
