@@ -5,6 +5,9 @@ import { TournamentApplicationService } from "../../../../application/Tournament
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { ToStatic } from "../../../../types/ToStatic";
+import { DIContainer } from "../../../../DIContainer";
+import { TournamentDTO } from "../../../../application/dto/TournamentDTO";
+import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
 
 const description = `
 # 概要
@@ -53,24 +56,9 @@ export function CreateTournamentRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, async (request, reply) => {
-		console.log('Creating tournament with body:\n', request.body);
-		const service = new TournamentApplicationService({
-			repositoryFactory: new PrismaRepositoryFactory(new PrismaClientProvider())
-		});
-		try {
-			const tournamentDTO = await service.createTournament(request.body);
-			reply.status(200).send({
-				id: tournamentDTO.id,
-				name: tournamentDTO.name,
-				champion_id: tournamentDTO.championId ?? '',
-				owner_id: tournamentDTO.ownerId,
-				description: tournamentDTO.description,
-				state: tournamentDTO.state,
-				participants: tournamentDTO.participants.map(p => p.id),
-				histories: tournamentDTO.histories.map(h => h.id),
-			})
-		} catch (error) {
-			console.error('Error creating tournament:', error);
-		}
+		const appService = DIContainer.applicationService();
+
+		const tournamentDTO = await appService.createTournament(request.body);
+		reply.status(200).send(TournamentDTO2JSON.toJSON(tournamentDTO));
 	})
 }

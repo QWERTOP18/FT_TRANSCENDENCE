@@ -5,6 +5,8 @@ import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaCl
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ToStatic } from "../../../../types/ToStatic";
+import { DIContainer } from "../../../../DIContainer";
+import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
 
 const description = `
 # 概要
@@ -44,22 +46,11 @@ export function GetTournamentsRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, async (request, reply) => {
-		const appService = new TournamentApplicationService({
-			repositoryFactory: new PrismaRepositoryFactory(new PrismaClientProvider())
-		});
+		const appService = DIContainer.applicationService();
 
 		const tournamentsDTO = await appService.getAllTournament({});
 		reply.status(200).send(
-			tournamentsDTO.map((tournamentDTO) => ({
-				id: tournamentDTO.id,
-				name: tournamentDTO.name,
-				champion_id: tournamentDTO.championId ?? '',
-				owner_id: tournamentDTO.ownerId,
-				description: tournamentDTO.description,
-				state: tournamentDTO.state,
-				participants: tournamentDTO.participants.map(p => p.id),
-				histories: tournamentDTO.histories.map(h => h.id),
-			}))
+			tournamentsDTO.map((tournamentDTO) => TournamentDTO2JSON.toJSON(tournamentDTO))
 		)
 	})
 }

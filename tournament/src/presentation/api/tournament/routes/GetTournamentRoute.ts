@@ -9,6 +9,7 @@ import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaCl
 import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
 import { IsFastifyErrorSchema } from "../IsFastifyErrorSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { DIContainer } from "../../../../DIContainer";
 
 const description = `
 # 概要
@@ -52,9 +53,7 @@ export function GetTournamentRoute(fastify: FastifyInstance) {
 			params: RouteSchema.Params
 		}
 	}, async (request, reply) => {
-		const appService = new TournamentApplicationService({
-			repositoryFactory: new PrismaRepositoryFactory(new PrismaClientProvider())
-		});
+		const appService = DIContainer.applicationService();
 
 		const tournament = await appService.getTournament({
 			tournamentId: request.params.id
