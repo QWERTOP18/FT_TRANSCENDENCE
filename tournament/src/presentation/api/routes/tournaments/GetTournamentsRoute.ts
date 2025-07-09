@@ -6,7 +6,7 @@ import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/Prism
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ToStatic } from "../../../types/ToStatic";
 import { DIContainer } from "../../../classes/DIContainer";
-import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
+import { TournamentDTO2JSON } from "../../classes/TournamentDTO2JSON";
 
 const description = `
 # 概要

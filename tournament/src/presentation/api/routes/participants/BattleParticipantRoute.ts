@@ -1,25 +1,25 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import { NotImplementedError } from "../../errors/error";
-import { ParticipantSchema } from "../../schemas/ParticipantSchema";
+import { NotImplementedError } from "../../classes/errors/error";
+import { ParticipantIdSchema, ParticipantSchema } from "../../schemas/ParticipantSchema";
 import { OKSchema } from "../../schemas/OtherSchema";
 
 const description = `
 # 概要
-参加者のステータスをpendingにします。
+複数の参加者のステータスをin_progressにします。
 
 # 注意点
  * stateがreadyの時のみ可能です。
  * トーナメントがopenの時のみ可能です。
 `
 
-export function CancelParticipantRoute(fastify: FastifyInstance) {
-	fastify.put('/participants/:id/cancel', {
+export function BattleParticipantRoute(fastify: FastifyInstance) {
+	fastify.put('/participants/battle', {
 		schema: {
 			description,
 			tags: ["participant"],
-			summary: "参加者のステータスをpendingにする",
-			params: Type.Pick(ParticipantSchema(), ['id']),
+			summary: "参加者のステータスをin_progressにする",
+			body: Type.Array(ParticipantIdSchema()),
 			response: {
 				200: OKSchema()
 			}

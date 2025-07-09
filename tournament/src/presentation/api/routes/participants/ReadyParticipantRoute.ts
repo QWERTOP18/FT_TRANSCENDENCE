@@ -1,6 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import { NotImplementedError } from "../../errors/error";
+import { NotImplementedError } from "../../classes/errors/error";
 import { ParticipantSchema } from "../../schemas/ParticipantSchema";
 import { OKSchema } from "../../schemas/OtherSchema";
 

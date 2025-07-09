@@ -2,7 +2,7 @@ import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import Fastify from 'fastify';
 import { openapiConfig } from './openapiConfig';
-import { TournamentAPIRoutes } from './route';
+import { TournamentAPIRoutes } from './routes/route';
 
 
 async function wakeupServer() {

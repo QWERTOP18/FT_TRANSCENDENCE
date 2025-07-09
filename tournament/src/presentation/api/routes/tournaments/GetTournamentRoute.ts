@@ -2,10 +2,10 @@ import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { DIContainer } from "../../../classes/DIContainer";
 import { ToStatic } from "../../../types/ToStatic";
-import { NotFoundError } from "../../errors/error";
+import { NotFoundError } from "../../classes/errors/error";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
+import { TournamentDTO2JSON } from "../../classes/TournamentDTO2JSON";
 
 const description = `
 # 概要

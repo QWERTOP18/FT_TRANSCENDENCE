@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { OKSchema } from "../../schemas/OtherSchema";
-import { NotImplementedError } from "../../errors/error";
+import { NotImplementedError } from "../../classes/errors/error";
 import { Type } from "@sinclair/typebox";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 

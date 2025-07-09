@@ -2,7 +2,7 @@ import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { ParticipantSchema } from "../../schemas/ParticipantSchema";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { NotImplementedError } from "../../errors/error";
+import { NotImplementedError } from "../../classes/errors/error";
 
 const description = `
 # 概要
