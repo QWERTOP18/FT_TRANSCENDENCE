@@ -1,5 +1,6 @@
 import { IRepositoryFactory } from "../domain/interfaces/IRepositoryFactory";
 import { CreateTournamentApplicationService, CreateTournamentApplicationServiceCommand } from "./implements/CreateTournamentApplicationService";
+import { GetAllTournamentApplicationService, GetAllTournamentApplicationServiceCommand } from "./implements/GetAllTournamentApplicationService";
 import { GetTournamentApplicationService, GetTournamentApplicationServiceCommand } from "./implements/GetTournamentApplicationService";
 
 
@@ -17,6 +18,11 @@ export class TournamentApplicationService {
 
 	async getTournament(command: GetTournamentApplicationServiceCommand) {
 		const service = new GetTournamentApplicationService(this.props.repositoryFactory);
+		return await service.execute(command);
+	}
+
+	async getAllTournament(command: GetAllTournamentApplicationServiceCommand) {
+		const service = new GetAllTournamentApplicationService(this.props.repositoryFactory);
 		return await service.execute(command);
 	}
 }

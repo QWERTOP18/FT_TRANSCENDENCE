@@ -5,4 +5,5 @@ export interface ITournamentRepository {
 	create(tournament: Tournament): Promise<void>;
 	update(tournament: Tournament): Promise<void>;
 	find(tournamentId: TournamentId): Promise<Tournament | null>;
+	findAll(): Promise<Array<Tournament>>;
 }

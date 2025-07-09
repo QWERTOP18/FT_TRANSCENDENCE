@@ -128,4 +128,42 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 			}))
 		});
 	}
+
+	async findAll(): Promise<Array<Tournament>> {
+		const tournaments = await this._client.tournament.findMany({
+			take: 10,
+			include: {
+				histories: true,
+				participants: true
+			}
+		})
+
+		return tournaments.map((tournament) => Tournament.reconstruct({
+			id: new TournamentId(tournament.id),
+			ownerId: new ParticipantId(tournament.owner_id),
+			name: tournament.name,
+			description: tournament.description,
+			state: new TournamentState(tournament.state),
+			championId: tournament.champion_id && new ParticipantId(tournament.champion_id) || undefined,
+			histories: tournament.histories.map(history => History.reconstruct({
+				id: new HistoryId(history.id),
+				tournamentId: new TournamentId(history.tournament_id),
+				loser: new ParticipantScore({
+					id: new ParticipantId(history.loser_id),
+					score: new Score(history.loser_score)
+				}),
+				winner: new ParticipantScore({
+					id: new ParticipantId(history.winner_id),
+					score: new Score(history.winner_score)
+				}),
+				created_at: new Date(history.created_at)
+			})),
+			participants: tournament.participants.map(participant => Participant.reconstruct({
+				id: new ParticipantId(participant.id),
+				externalId: participant.external_id,
+				tournamentId: new TournamentId(participant.tournament_id),
+				state: new ParticipantState(participant.state)
+			}))
+		}));
+	}
 }
