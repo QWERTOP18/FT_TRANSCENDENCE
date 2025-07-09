@@ -1,9 +1,10 @@
-import { Static, Type } from "@sinclair/typebox";
+import { Static, TSchema, Type } from "@sinclair/typebox";
 import { FastifyInstance, RouteShorthandOptions } from "fastify";
 import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { ToStatic } from "../../../../types/ToStatic";
 
 const description = `
 # 概要
@@ -12,20 +13,34 @@ const description = `
 # 注意点
 `
 
-const replySchema = Type.Array(TournamentSchema(), { description: "OK" });
+const RouteSchema = {
+	Params: undefined,
+	Querystring: undefined,
+	Body: undefined,
+	Headers: undefined,
+	Reply: {
+		200: Type.Array(TournamentSchema(), { description: "OK" }),
+	}
+} as const;
 
-type GetTournamentsSchema = {
-	Reply: Static<typeof replySchema>;
+type RouteSchemaType = {
+	Params: ToStatic<typeof RouteSchema.Params>,
+	Querystring: ToStatic<typeof RouteSchema.Querystring>,
+	Body: ToStatic<typeof RouteSchema.Body>,
+	Headers: ToStatic<typeof RouteSchema.Headers>,
+	Reply: {
+		200: ToStatic<typeof RouteSchema.Reply[200]>
+	};
 }
 
 export function GetTournamentsRoute(fastify: FastifyInstance) {
-	fastify.get<GetTournamentsSchema>('/tournaments', {
+	fastify.get<RouteSchemaType>('/tournaments', {
 		schema: {
 			description,
 			tags: ["tournament"],
 			summary: "トーナメント一覧取得",
 			response: {
-				200: replySchema
+				200: RouteSchema.Reply[200]
 			}
 		}
 	}, async (request, reply) => {

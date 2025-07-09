@@ -4,6 +4,7 @@ import { Static, Type } from "@sinclair/typebox";
 import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
+import { ToStatic } from "../../../../types/ToStatic";
 
 const description = `
 # 概要
@@ -14,29 +15,41 @@ const description = `
 * マッチの追加はできません。参加者の数に応じて自動的にマッチが作成されます。＜＝この仕様は要相談。例えばオートマッチ機能を作成する？
 `
 
-const bodySchema = Type.Intersect([
-	Type.Pick(TournamentSchema(), ['name', 'description']),
-	Type.Object({
-		ownerExternalId: Type.String({ description: "トーナメントのオーナーの外部ID" }),
-	})
-]);
 
-const replySchema = TournamentSchema({ description: "OK" });
+const RouteSchema = {
+	Params: undefined,
+	Querystring: undefined,
+	Body: Type.Intersect([
+		Type.Pick(TournamentSchema(), ['name', 'description']),
+		Type.Object({
+			ownerExternalId: Type.String({ description: "トーナメントのオーナーの外部ID" }),
+		})
+	]),
+	Headers: undefined,
+	Reply: {
+		200: TournamentSchema({ description: "OK" }),
+	}
+} as const;
 
-type CreateTournamentHandlerSchema = {
-	Body: Static<typeof bodySchema>;
-	Reply: Static<typeof replySchema>;
+type RouteSchemaType = {
+	Params: ToStatic<typeof RouteSchema.Params>,
+	Querystring: ToStatic<typeof RouteSchema.Querystring>,
+	Body: ToStatic<typeof RouteSchema.Body>,
+	Headers: ToStatic<typeof RouteSchema.Headers>,
+	Reply: {
+		200: ToStatic<typeof RouteSchema.Reply[200]>
+	};
 }
 
 export function CreateTournamentRoute(fastify: FastifyInstance) {
-	fastify.post<CreateTournamentHandlerSchema>('/tournaments', {
+	fastify.post<RouteSchemaType>('/tournaments', {
 		schema: {
 			description,
 			tags: ["tournament"],
 			summary: "トーナメント作成",
-			body: bodySchema,
+			body: RouteSchema.Body,
 			response: {
-				200: replySchema,
+				200: RouteSchema.Reply[200],
 			}
 		}
 	}, async (request, reply) => {
