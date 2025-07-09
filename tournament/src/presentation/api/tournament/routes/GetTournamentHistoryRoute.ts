@@ -8,6 +8,7 @@ import { TournamentApplicationService } from "../../../../application/Tournament
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { HistoryDTO2JSON } from "../HistoryDTO2JSON";
+import { DIContainer } from "../../../../DIContainer";
 
 const description = `
 # 概要
@@ -50,9 +51,7 @@ export function GetTournamentHistoryRoute(fastify: FastifyInstance) {
 			params: RouteSchema.Params,
 		}
 	}, async (request, reply) => {
-		const appService = new TournamentApplicationService({
-			repositoryFactory: new PrismaRepositoryFactory(new PrismaClientProvider())
-		});
+		const appService = DIContainer.applicationService();
 		const histories = await appService.getHistories({ tournamentId: request.params.id });
 		if (histories == null)
 			throw new NotFoundError();
