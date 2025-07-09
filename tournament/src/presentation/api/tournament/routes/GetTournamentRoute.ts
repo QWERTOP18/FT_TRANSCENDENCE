@@ -1,15 +1,11 @@
-import { FastifyError, FastifyInstance } from "fastify";
-import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { NotFoundError, NotImplementedError, SomeError } from "../../errors/error";
 import { Type } from "@sinclair/typebox";
-import { ToStatic } from "../../../types/ToStatic";
-import { TournamentApplicationService } from "../../../../application/service/tournament/TournamentApplicationServiceFacade";
-import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
-import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
-import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
-import { IsFastifyErrorSchema } from "../IsFastifyErrorSchema";
-import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { FastifyInstance } from "fastify";
 import { DIContainer } from "../../../classes/DIContainer";
+import { ToStatic } from "../../../types/ToStatic";
+import { NotFoundError } from "../../errors/error";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
 
 const description = `
 # 概要
