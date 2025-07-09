@@ -1,4 +1,4 @@
-import { IRepositoryFactory } from "../domain/interfaces/IRepositoryFactory";
+import { IRepositoryFactory } from "../../../domain/interfaces/IRepositoryFactory";
 import { CreateTournamentApplicationService, CreateTournamentApplicationServiceCommand } from "./implements/CreateTournamentApplicationService";
 import { GetAllTournamentApplicationService, GetAllTournamentApplicationServiceCommand } from "./implements/GetAllTournamentApplicationService";
 import { GetTournamentApplicationService, GetTournamentApplicationServiceCommand } from "./implements/GetTournamentApplicationService";

@@ -4,7 +4,7 @@ import { NotFoundError, NotImplementedError } from "../../errors/error";
 import { HistorySchema } from "../../schemas/HistorySchema";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ToStatic } from "../../../types/ToStatic";
-import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
+import { TournamentApplicationService } from "../../../../application/service/tournament/TournamentApplicationServiceFacade";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { HistoryDTO2JSON } from "../HistoryDTO2JSON";

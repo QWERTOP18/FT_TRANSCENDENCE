@@ -1,6 +1,6 @@
-import { IRepositoryFactory } from "../../domain/interfaces/IRepositoryFactory";
-import { TournamentId } from "../../domain/tournament/value-objects/TournamentId";
-import { TournamentDTO } from "../dto/TournamentDTO";
+import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
+import { TournamentId } from "../../../../domain/tournament/value-objects/TournamentId";
+import { TournamentDTO } from "../../../dto/TournamentDTO";
 
 export type GetTournamentApplicationServiceCommand = {
 	readonly tournamentId: string;

@@ -3,7 +3,7 @@ import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { NotFoundError, NotImplementedError, SomeError } from "../../errors/error";
 import { Type } from "@sinclair/typebox";
 import { ToStatic } from "../../../types/ToStatic";
-import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
+import { TournamentApplicationService } from "../../../../application/service/tournament/TournamentApplicationServiceFacade";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { TournamentDTO2JSON } from "../TournamentDTO2JSON";

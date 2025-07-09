@@ -1,4 +1,4 @@
-import { TournamentApplicationService } from "../../application/TournamentApplicationServiceFacade";
+import { TournamentApplicationService } from "../../application/service/tournament/TournamentApplicationServiceFacade";
 import { PrismaClientProvider } from "../../infrastructure/Prisma/PrismaClientProvider";
 import { PrismaRepositoryFactory } from "../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { IDIMachine } from "../interfaces/IDIMachine";

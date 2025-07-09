@@ -1,6 +1,6 @@
 import { Static, TSchema, Type } from "@sinclair/typebox";
 import { FastifyInstance, RouteShorthandOptions } from "fastify";
-import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
+import { TournamentApplicationService } from "../../../../application/service/tournament/TournamentApplicationServiceFacade";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { TournamentSchema } from "../../schemas/TournamentSchema";

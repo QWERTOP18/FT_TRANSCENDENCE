@@ -1,8 +1,8 @@
-import { IRepositoryFactory } from "../../domain/interfaces/IRepositoryFactory";
-import { TournamentDomainService } from "../../domain/services/Tournament/TournamentDomainService";
-import { Tournament } from "../../domain/tournament/aggregate/Tournament";
-import { DuplicatedError } from "../../domain/tournament/TournamentError";
-import { TournamentDTO } from "../dto/TournamentDTO";
+import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
+import { TournamentDomainService } from "../../../../domain/services/Tournament/TournamentDomainService";
+import { Tournament } from "../../../../domain/tournament/aggregate/Tournament";
+import { DuplicatedError } from "../../../../domain/tournament/TournamentError";
+import { TournamentDTO } from "../../../dto/TournamentDTO";
 
 
 export type CreateTournamentApplicationServiceCommand = {

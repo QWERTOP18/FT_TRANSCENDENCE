@@ -1,7 +1,7 @@
 import { FastifyInstance } from "fastify";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { Static, Type } from "@sinclair/typebox";
-import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
+import { TournamentApplicationService } from "../../../../application/service/tournament/TournamentApplicationServiceFacade";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { ToStatic } from "../../../types/ToStatic";
