@@ -3,12 +3,12 @@ import { FastifyInstance } from "fastify";
 import { NotFoundError, NotImplementedError } from "../../errors/error";
 import { HistorySchema } from "../../schemas/HistorySchema";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { ToStatic } from "../../../../types/ToStatic";
+import { ToStatic } from "../../../types/ToStatic";
 import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { HistoryDTO2JSON } from "../HistoryDTO2JSON";
-import { DIContainer } from "../../../../DIContainer";
+import { DIContainer } from "../../../classes/DIContainer";
 
 const description = `
 # 概要

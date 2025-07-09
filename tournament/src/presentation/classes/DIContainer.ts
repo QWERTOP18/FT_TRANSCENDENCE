@@ -1,5 +1,5 @@
-import { TournamentApplicationService } from "./application/TournamentApplicationServiceFacade";
-import { IDIMachine } from "./interfaces/IDIMachine";
+import { TournamentApplicationService } from "../../application/TournamentApplicationServiceFacade";
+import { IDIMachine } from "../interfaces/IDIMachine";
 
 
 export class DIContainer {

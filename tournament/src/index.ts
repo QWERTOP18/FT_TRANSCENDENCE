@@ -1,5 +1,5 @@
-import { DIContainer } from './DIContainer';
-import { DITournamentMachine } from './DITournamentMachine';
+import { DIContainer } from './presentation/classes/DIContainer';
+import { DITournamentMachine } from './presentation/classes/DITournamentMachine';
 import { runApiServer } from './presentation/api';
 
 (async () => {

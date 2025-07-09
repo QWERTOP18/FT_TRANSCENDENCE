@@ -4,8 +4,8 @@ import { TournamentApplicationService } from "../../../../application/Tournament
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { ToStatic } from "../../../../types/ToStatic";
-import { DIContainer } from "../../../../DIContainer";
+import { ToStatic } from "../../../types/ToStatic";
+import { DIContainer } from "../../../classes/DIContainer";
 import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
 
 const description = `

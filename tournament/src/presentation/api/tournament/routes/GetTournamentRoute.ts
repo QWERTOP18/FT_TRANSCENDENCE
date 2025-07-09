@@ -2,14 +2,14 @@ import { FastifyError, FastifyInstance } from "fastify";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { NotFoundError, NotImplementedError, SomeError } from "../../errors/error";
 import { Type } from "@sinclair/typebox";
-import { ToStatic } from "../../../../types/ToStatic";
+import { ToStatic } from "../../../types/ToStatic";
 import { TournamentApplicationService } from "../../../../application/TournamentApplicationServiceFacade";
 import { PrismaRepositoryFactory } from "../../../../infrastructure/Prisma/PrismaReopsitoryFactory";
 import { PrismaClientProvider } from "../../../../infrastructure/Prisma/PrismaClientProvider";
 import { TournamentDTO2JSON } from "../TournamentDTO2JSON";
 import { IsFastifyErrorSchema } from "../IsFastifyErrorSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
-import { DIContainer } from "../../../../DIContainer";
+import { DIContainer } from "../../../classes/DIContainer";
 
 const description = `
 # 概要
