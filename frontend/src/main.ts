@@ -64,7 +64,7 @@ const userDatabase: { [key: string]: { name: string; image: string } } = {
           this.handleLocation();
       }
   
-      public async handleLocation() {
+      public handleLocation() {
           const path = window.location.pathname;
   
           if (path.startsWith('/tournament/')) {
