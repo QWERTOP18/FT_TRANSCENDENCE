@@ -1,0 +1,11 @@
+services:
+  game:
+    container_name: game
+    image: node:24
+    init: true
+    tty: true
+    ports:
+      - 4000:4000
+
+volumes:
+  game_node_modules:
