@@ -9,11 +9,15 @@
 <body class="bg-gray-100 text-gray-800 flex flex-col items-center min-h-screen">
     <header class="w-full bg-gray-800 text-white p-4 text-center shadow-md">
         <h1 class="text-2xl font-bold">My Pong Game</h1>
-        <nav class="mt-2">
+        <nav class="mt-4 flex justify-between items-center">
             <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/game')">Game</button>
             <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/win')">Win Screen</button>
             <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/lose')">Lose Screen</button>
             <button class="mx-2 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded transition" onclick="router.navigateTo('/error')">Error Screen</button>
+            <button class="mx-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition" onclick="router.navigateTo('/tournament/2/before')">2P (Before)</button>
+            <button class="mx-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded transition" onclick="router.navigateTo('/tournament/2/after')">2P (After)</button>
+            <button class="mx-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition" onclick="router.navigateTo('/tournament/3/before')">3P (Before)</button>
+            <button class="mx-2 px-4 py-2 bg-green-600 hover:bg-green-700 rounded transition" onclick="router.navigateTo('/tournament/3/after')">3P (After)</button>
         </nav>
     </header>
     <main class="flex-grow flex justify-center items-center w-full p-4">
