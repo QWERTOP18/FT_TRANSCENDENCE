@@ -1,6 +1,7 @@
 import { IRepositoryFactory } from "../../../domain/interfaces/IRepositoryFactory";
 import { CreateTournamentApplicationService, CreateTournamentApplicationServiceCommand } from "./implements/CreateTournamentApplicationService";
 import { CreateTournamentHistoryApplicationService, CreateTournamentHistoryApplicationServiceCommand } from "./implements/CreateTournamentHistoryApplicationService";
+import { CreateTournamentParticipantServiceApplication, CreateTournamentParticipantServiceApplicationCommand } from "./implements/CreateTournamentParticipantServiceApplication";
 import { GetAllTournamentApplicationService, GetAllTournamentApplicationServiceCommand } from "./implements/GetAllTournamentApplicationService";
 import { GetTournamentApplicationService, GetTournamentApplicationServiceCommand } from "./implements/GetTournamentApplicationService";
 import { GetTournamentHistoriesApplicationService, GetTournamentHistoriesApplicationServiceCommand } from "./implements/GetTournamentHistoriesApplicationService";
@@ -47,6 +48,11 @@ export class TournamentApplicationService {
 
 	async createHistory(command: CreateTournamentHistoryApplicationServiceCommand) {
 		const service = new CreateTournamentHistoryApplicationService(this.props.repositoryFactory)
+		return await service.execute(command);
+	}
+
+	async createParticipant(command: CreateTournamentParticipantServiceApplicationCommand) {
+		const service = new CreateTournamentParticipantServiceApplication(this.props.repositoryFactory)
 		return await service.execute(command);
 	}
 }

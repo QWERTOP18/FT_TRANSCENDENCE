@@ -64,7 +64,7 @@ export class Tournament {
 	}
 
 	public addParticipant(participant: Participant) {
-		if (participant.tournamentId != this._props.id)
+		if (participant.tournamentId.equals(this._props.id) == false)
 			throw new UsageError("トーナメントIDと参加者のIDが一致しません")
 		if (this.getParticipant(participant))
 			throw new UsageError("すでに登録されています。")

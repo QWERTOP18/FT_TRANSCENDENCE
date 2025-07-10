@@ -63,26 +63,39 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 				state: tournament.state.value,
 				champion_id: tournament.championId?.value ?? null,
 				histories: {
-					update: tournament.histories.map(history => ({
+					upsert: tournament.histories.map(history => ({
 						where: { id: history.id.value },
-						data: {
+						update: {
 							created_at: history.created_at.toISOString(),
 							loser_id: history.getLoserId().value,
 							loser_score: history.getLoserScore().value,
 							winner_id: history.getWinnerId().value,
 							winner_score: history.getWinnerScore().value,
-						}
-					}))
+						},
+						create: {
+							id: history.id.value,
+							created_at: history.created_at.toISOString(),
+							loser_id: history.getLoserId().value,
+							loser_score: history.getLoserScore().value,
+							winner_id: history.getWinnerId().value,
+							winner_score: history.getWinnerScore().value,
+						},
+					})),
 				},
 				participants: {
-					update: tournament.participants.map(participant => ({
+					upsert: tournament.participants.map(participant => ({
 						where: { id: participant.id.value },
-						data: {
+						update: {
 							external_id: participant.externalId,
 							state: participant.state.value,
-						}
-					}))
-				}
+						},
+						create: {
+							id: participant.id.value,
+							external_id: participant.externalId,
+							state: participant.state.value,
+						},
+					})),
+				},
 			}
 		});
 	}
