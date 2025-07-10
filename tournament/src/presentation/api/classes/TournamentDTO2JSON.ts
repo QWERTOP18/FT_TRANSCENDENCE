@@ -1,9 +1,10 @@
 import { TournamentDTO } from "../../../application/dto/TournamentDTO";
+import { TournamentSchema } from "../schemas/TournamentSchema";
 
 
 export class TournamentDTO2JSON {
 
-	static toJSON(DTO: TournamentDTO) {
+	static toJSON(DTO: TournamentDTO): TournamentSchema {
 		return {
 			id: DTO.id,
 			name: DTO.name,
