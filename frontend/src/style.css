@@ -3,18 +3,97 @@
 @tailwind utilities;
 
 body {
-  /* 背景画像へのパスを指定 */
-  background-image: url("/assets/background.jpeg");
+    /* 背景画像へのパスを指定 */
+    background-image: url('/assets/background.jpeg');
+    
+    /* 画面全体を覆うように表示 */
+    background-size: cover;
+  
+    /* 画像を中央に配置 */
+    background-position: center;
+  
+    /* 画像を繰り返さない */
+    background-repeat: no-repeat;
+    
+    /* スクロールしても背景を固定 */
+    background-attachment: fixed;
+}
 
-  /* 画面全体を覆うように表示 */
-  background-size: cover;
+/* トーナメント用のカスタムスタイル */
+.tournament-bracket {
+    display: flex;
+    justify-content: space-around;
+  }
+  .round {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+  }
+  .matchup {
+    background-color: rgba(0, 0, 0, 0.4);
+    margin: 20px 0;
+    border-radius: 8px;
+    padding: 10px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  /* 試合の間のスペースを確保 */
+  .matchup + .matchup {
+      margin-top: 60px;
+  }
+  .player {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .player-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+  .score {
+    margin-left: auto;
+    font-family: monospace;
+    font-size: 1.2rem;
+  }
+  
+  /* 勝ち上がり線の描画 */
+  .matchup::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: -25px; /* 親要素の幅と線の太さを考慮 */
+    width: 25px;
+    height: 2px;
+    background-color: #9ca3af; /* gray-400 */
+  }
+  .round + .round .matchup::before {
+    content: '';
+    position: absolute;
+    top: -21px; /* (margin-top - matchup-height) / 2 + matchup-height/2 - 1 */
+    left: -25px;
+    width: 25px;
+    height: calc(var(--matchup-height) + var(--margin-top)); /* matchup-height + margin-top */
+    border: 2px solid #9ca3af; /* gray-400 */
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+  }
+  
+/* 最後のラウンドの線は不要 */
+.round:last-child > .matchup::after {
+    display: none;
+}
+.champion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
 
-  /* 画像を中央に配置 */
-  background-position: center;
-
-  /* 画像を繰り返さない */
-  background-repeat: no-repeat;
-
-  /* スクロールしても背景を固定 */
-  background-attachment: fixed;
+.status {
+    font-weight: bold;
+    min-width: 60px; /* Pending/Readyの幅を揃える */
+    text-align: center;
 }
