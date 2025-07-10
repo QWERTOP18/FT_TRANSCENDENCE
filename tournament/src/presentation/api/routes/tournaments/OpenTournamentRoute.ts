@@ -5,6 +5,7 @@ import { Type } from "@sinclair/typebox";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ToStatic } from "../../../types/ToStatic";
 import { DIContainer } from "../../../classes/DIContainer";
+import { OKJson } from "../../json/OKJson";
 
 const description = `
 # 概要
@@ -51,7 +52,7 @@ export function OpenTournamentRoute(fastify: FastifyInstance) {
 		const appService = DIContainer.applicationService();
 
 		await appService.openTournament({ tournamentId: request.params.id });
-		reply.status(200).send({ 'ok': true });
+		reply.status(200).send(OKJson);
 	})
 
 }

@@ -7,6 +7,7 @@ import { GetTournamentApplicationService, GetTournamentApplicationServiceCommand
 import { GetTournamentHistoriesApplicationService, GetTournamentHistoriesApplicationServiceCommand } from "./implements/GetTournamentHistoriesApplicationService";
 import { GetTournamentParticipantsApplicationService, GetTournamentParticipantsApplicationServiceCommand } from "./implements/GetTournamentParticipantsApplicationService";
 import { OpenTournamentApplicationService, OpenTournamentApplicationServiceCommand } from "./implements/OpenTournamentApplicationService";
+import { ReadyTournamentParticipantApplicationService, ReadyTournamentParticipantApplicationServiceCommand } from "./implements/ReadyTournamentParticipantApplicationService";
 
 
 export type TournamentApplicationServiceProps = {
@@ -53,6 +54,11 @@ export class TournamentApplicationService {
 
 	async createParticipant(command: CreateTournamentParticipantServiceApplicationCommand) {
 		const service = new CreateTournamentParticipantServiceApplication(this.props.repositoryFactory)
+		return await service.execute(command);
+	}
+
+	async readyParticipant(command: ReadyTournamentParticipantApplicationServiceCommand) {
+		const service = new ReadyTournamentParticipantApplicationService(this.props.repositoryFactory);
 		return await service.execute(command);
 	}
 }
