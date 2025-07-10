@@ -1,8 +1,12 @@
 import { FastifyInstance } from "fastify";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { NotImplementedError } from "../../classes/errors/error";
-import { Type } from "@sinclair/typebox";
+import { Parameters, Type } from "@sinclair/typebox";
 import { HistorySchema } from "../../schemas/HistorySchema";
+import { ToStatic } from "../../../types/ToStatic";
+import { DIContainer } from "../../../classes/DIContainer";
+import { HistoryDTO } from "../../../../application/dto/HistoryDTO";
+import { HistoryDTO2JSON } from "../../classes/HistoryDTO2JSON";
 
 const description = `
 # 概要
@@ -27,18 +31,50 @@ pendingの参加者が奇数の場合はランダムで、一人だけstateがba
  * close状態のトーナメントでは作成できません。
 `
 
+const RouteSchema = {
+	Params: undefined,
+	Querystring: undefined,
+	Body: Type.Pick(HistorySchema(), ['tournament_id', 'winner', 'loser']),
+	Headers: undefined,
+	Reply: {
+		200: HistorySchema({ description: "OK" }),
+	}
+} as const;
+
+type RouteSchemaType = {
+	Params: ToStatic<typeof RouteSchema.Params>,
+	Querystring: ToStatic<typeof RouteSchema.Querystring>,
+	Body: ToStatic<typeof RouteSchema.Body>,
+	Headers: ToStatic<typeof RouteSchema.Headers>,
+	Reply: {
+		200: ToStatic<typeof RouteSchema.Reply[200]>
+	};
+}
+
 export function CreateHistoryRoute(fastify: FastifyInstance) {
-	fastify.post('/histories', {
+	fastify.post<RouteSchemaType>('/histories', {
 		schema: {
 			description,
 			tags: ["histories"],
 			summary: "対戦結果作成",
-			body: Type.Pick(HistorySchema(), ['tournament_id', 'winner', 'loser']),
+			body: RouteSchema.Body,
 			response: {
-				200: HistorySchema({ description: "OK" })
+				200: RouteSchema.Reply[200]
 			}
 		}
-	}, () => {
-		throw new NotImplementedError();
+	}, async (request, reply) => {
+		const appService = DIContainer.applicationService();
+		const historyDTO = await appService.createHistory({
+			tournament_id: request.body.tournament_id,
+			loser: {
+				id: request.body.loser.id,
+				score: request.body.loser.score,
+			},
+			winner: {
+				id: request.body.winner.id,
+				score: request.body.winner.score,
+			},
+		});
+		reply.status(200).send(HistoryDTO2JSON.toJSON(historyDTO));
 	})
 }

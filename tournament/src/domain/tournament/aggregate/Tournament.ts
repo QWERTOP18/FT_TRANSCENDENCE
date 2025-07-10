@@ -96,7 +96,7 @@ export class Tournament {
 	}
 
 	public addHistory(history: History) {
-		if (history.tournamentId != this._props.id)
+		if (history.tournamentId.equals(this._props.id) == false)
 			throw new UsageError("トーナメントIDと履歴のIDが一致しません")
 		const winner = this.getParticipantById(history.getWinnerId());
 		const loser = this.getParticipantById(history.getLoserId());
