@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { TournamentIdSchema, TournamentSchema } from "../../schemas/TournamentSchema";
 import { NotImplementedError } from "../../classes/errors/error";
 import { Parameters, Type } from "@sinclair/typebox";
 import { HistorySchema } from "../../schemas/HistorySchema";
@@ -32,9 +32,11 @@ pendingの参加者が奇数の場合はランダムで、一人だけstateがba
 `
 
 const RouteSchema = {
-	Params: undefined,
+	Params: Type.Object({
+		id: TournamentIdSchema(),
+	}),
 	Querystring: undefined,
-	Body: Type.Pick(HistorySchema(), ['tournament_id', 'winner', 'loser']),
+	Body: Type.Pick(HistorySchema(), ['winner', 'loser']),
 	Headers: undefined,
 	Reply: {
 		200: HistorySchema({ description: "OK" }),
@@ -52,7 +54,7 @@ type RouteSchemaType = {
 }
 
 export function CreateHistoryRoute(fastify: FastifyInstance) {
-	fastify.post<RouteSchemaType>('/histories', {
+	fastify.post<RouteSchemaType>('/tournaments/:id/histories', {
 		schema: {
 			description,
 			tags: ["histories"],
@@ -65,7 +67,7 @@ export function CreateHistoryRoute(fastify: FastifyInstance) {
 	}, async (request, reply) => {
 		const appService = DIContainer.applicationService();
 		const historyDTO = await appService.createHistory({
-			tournament_id: request.body.tournament_id,
+			tournament_id: request.params.id,
 			loser: {
 				id: request.body.loser.id,
 				score: request.body.loser.score,

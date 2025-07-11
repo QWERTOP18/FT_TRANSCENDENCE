@@ -1,10 +1,10 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import { NotImplementedError } from "../../classes/errors/error";
-import { ParticipantSchema } from "../../schemas/ParticipantSchema";
-import { ToStatic } from "../../../types/ToStatic";
 import { DIContainer } from "../../../classes/DIContainer";
+import { ToStatic } from "../../../types/ToStatic";
 import { ParticipantDTO2JSON } from "../../classes/ParticipantDTO2JSON";
+import { ParticipantSchema } from "../../schemas/ParticipantSchema";
+import { TournamentIdSchema } from "../../schemas/TournamentSchema";
 
 const description = `
 # 概要
@@ -15,9 +15,11 @@ const description = `
 `
 
 const RouteSchema = {
-	Params: undefined,
+	Params: Type.Object({
+		id: TournamentIdSchema(),
+	}),
 	Querystring: undefined,
-	Body: Type.Pick(ParticipantSchema(), ['tournament_id', 'external_id']),
+	Body: Type.Pick(ParticipantSchema(), ['external_id']),
 	Headers: undefined,
 	Reply: {
 		200: ParticipantSchema({ description: "OK" }),
@@ -35,7 +37,7 @@ type RouteSchemaType = {
 }
 
 export function CreateParticipantRoute(fastify: FastifyInstance) {
-	fastify.post<RouteSchemaType>('/participants', {
+	fastify.post<RouteSchemaType>('/tournaments/:id/participants', {
 		schema: {
 			description,
 			tags: ["participant"],
@@ -48,7 +50,7 @@ export function CreateParticipantRoute(fastify: FastifyInstance) {
 	}, async (request, reply) => {
 		const appService = DIContainer.applicationService();
 		const participantDTO = await appService.createParticipant({
-			tournament_id: request.body.tournament_id,
+			tournament_id: request.params.id,
 			external_id: request.body.external_id,
 		});
 		reply.status(200).send(ParticipantDTO2JSON.toJSON(participantDTO));

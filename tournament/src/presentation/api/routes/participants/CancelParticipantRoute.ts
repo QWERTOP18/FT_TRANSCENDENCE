@@ -1,13 +1,11 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import { NotImplementedError } from "../../classes/errors/error";
-import { ParticipantIdSchema, ParticipantSchema } from "../../schemas/ParticipantSchema";
-import { OKSchema } from "../../schemas/OtherSchema";
-import { ToStatic } from "../../../types/ToStatic";
-import { TournamentIdSchema } from "../../schemas/TournamentSchema";
-import { ReadyParticipantRoute } from "./ReadyParticipantRoute";
 import { DIContainer } from "../../../classes/DIContainer";
+import { ToStatic } from "../../../types/ToStatic";
 import { OKJson } from "../../json/OKJson";
+import { OKSchema } from "../../schemas/OtherSchema";
+import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
+import { TournamentIdSchema } from "../../schemas/TournamentSchema";
 
 const description = `
 # 概要
@@ -42,7 +40,7 @@ type RouteSchemaType = {
 }
 
 export function CancelParticipantRoute(fastify: FastifyInstance) {
-	fastify.put<RouteSchemaType>('/participants/:id/cancel', {
+	fastify.put<RouteSchemaType>('/tournaments/:tournament_id/participants/:participant_id/cancel', {
 		schema: {
 			description,
 			tags: ["participant"],
