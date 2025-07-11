@@ -1,4 +1,5 @@
 import { IRepositoryFactory } from "../../../domain/interfaces/IRepositoryFactory";
+import { BattleTournamentParticipantApplicationService, BattleTournamentParticipantApplicationServiceCommand } from "./implements/BattleTournamentParticipantApplicatioinService";
 import { CancelTournamentParticipantApplicationService, CancelTournamentParticipantApplicationServiceCommand } from "./implements/CancelTournamentParticipantApplicationService";
 import { CreateTournamentApplicationService, CreateTournamentApplicationServiceCommand } from "./implements/CreateTournamentApplicationService";
 import { CreateTournamentHistoryApplicationService, CreateTournamentHistoryApplicationServiceCommand } from "./implements/CreateTournamentHistoryApplicationService";
@@ -65,6 +66,11 @@ export class TournamentApplicationService {
 
 	async cancelParticipant(command: CancelTournamentParticipantApplicationServiceCommand) {
 		const service = new CancelTournamentParticipantApplicationService(this.props.repositoryFactory);
+		return await service.execute(command);
+	}
+
+	async battleParticipant(command: BattleTournamentParticipantApplicationServiceCommand) {
+		const service = new BattleTournamentParticipantApplicationService(this.props.repositoryFactory);
 		return await service.execute(command);
 	}
 }
