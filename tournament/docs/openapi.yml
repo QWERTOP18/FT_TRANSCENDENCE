@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: トーナメントAPI
-  description: >
+  description: >+
     
     トーナメント表を作成するためのAPI
 
@@ -80,6 +80,7 @@ info:
      * `/documentation` : このページ
      * `/documentation/json` : このページを生成するための生のopenapi.json
      * `/documentation/yaml` : このページを生成するための生のopenapi.yaml
+
   version: 0.0.0
 components:
   schemas: {}
@@ -176,16 +177,26 @@ paths:
         content:
           application/json:
             schema:
-              description: トーナメント
               type: object
-              properties:
-                name:
-                  description: トーナメント名
-                  type: string
-              required:
-                - name
-        required: true
-        description: トーナメント
+              allOf:
+                - description: トーナメント
+                  type: object
+                  properties:
+                    name:
+                      description: トーナメント名
+                      type: string
+                    description:
+                      description: トーナメントの説明
+                      type: string
+                  required:
+                    - name
+                - type: object
+                  properties:
+                    ownerExternalId:
+                      description: トーナメントのオーナーの外部ID
+                      type: string
+                  required:
+                    - ownerExternalId
       responses:
         "200":
           description: OK
@@ -329,6 +340,31 @@ paths:
                   - state
                   - participants
                   - histories
+        "404":
+          description: 見つからなかった
+          content:
+            application/json:
+              schema:
+                description: 見つからなかった
+                type: object
+                properties:
+                  code:
+                    description: エラーコード
+                    type: string
+                  statusCode:
+                    description: ステータスコード
+                    type: number
+                  error:
+                    description: エラー概要
+                    type: string
+                  message:
+                    description: エラーメッセージ
+                    type: string
+                required:
+                  - code
+                  - statusCode
+                  - error
+                  - message
   /tournaments/{id}/open:
     put:
       summary: トーナメントを開始する
@@ -433,6 +469,84 @@ paths:
                     - tournament_id
                     - external_id
                     - state
+    post:
+      summary: 参加者作成
+      tags:
+        - participant
+      description: |
+        
+        # 概要
+        参加者を作成します。
+
+        # 注意点
+         * トーナメントがreceptionの時のみ、参加者を作成できます。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: 参加者
+              type: object
+              properties:
+                external_id:
+                  description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
+                  type: string
+              required:
+                - external_id
+        required: true
+        description: 参加者
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: id
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  id:
+                    format: uuid
+                    description: 参加者ID
+                    type: string
+                  tournament_id:
+                    format: uuid
+                    description: トーナメント ID
+                    type: string
+                  external_id:
+                    description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
+                    type: string
+                  state:
+                    description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
+                      対戦済み, eliminated: 敗退, champion: 優勝"
+                    anyOf:
+                      - type: string
+                        enum:
+                          - pending
+                      - type: string
+                        enum:
+                          - ready
+                      - type: string
+                        enum:
+                          - in_progress
+                      - type: string
+                        enum:
+                          - battled
+                      - type: string
+                        enum:
+                          - eliminated
+                      - type: string
+                        enum:
+                          - champion
+                required:
+                  - id
+                  - tournament_id
+                  - external_id
+                  - state
   /tournaments/{id}/histories:
     get:
       summary: トーナメントの対戦結果を取得する
@@ -510,7 +624,6 @@ paths:
                     - winner
                     - loser
                     - created_at
-  /histories:
     post:
       summary: 対戦結果作成
       tags:
@@ -544,10 +657,6 @@ paths:
               description: トーナメントの履歴
               type: object
               properties:
-                tournament_id:
-                  format: uuid
-                  description: トーナメント ID
-                  type: string
                 winner:
                   type: object
                   properties:
@@ -577,11 +686,16 @@ paths:
                     - id
                     - score
               required:
-                - tournament_id
                 - winner
                 - loser
         required: true
         description: トーナメントの履歴
+      parameters:
+        - schema:
+            type: string
+          in: path
+          name: id
+          required: true
       responses:
         "200":
           description: OK
@@ -637,85 +751,7 @@ paths:
                   - winner
                   - loser
                   - created_at
-  /participants:
-    post:
-      summary: 参加者作成
-      tags:
-        - participant
-      description: |
-        
-        # 概要
-        参加者を作成します。
-
-        # 注意点
-         * トーナメントがreceptionの時のみ、参加者を作成できます。
-      requestBody:
-        content:
-          application/json:
-            schema:
-              description: 参加者
-              type: object
-              properties:
-                tournament_id:
-                  format: uuid
-                  description: トーナメント ID
-                  type: string
-                external_id:
-                  description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                  type: string
-              required:
-                - tournament_id
-                - external_id
-        required: true
-        description: 参加者
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  id:
-                    format: uuid
-                    description: 参加者ID
-                    type: string
-                  tournament_id:
-                    format: uuid
-                    description: トーナメント ID
-                    type: string
-                  external_id:
-                    description: 外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用
-                    type: string
-                  state:
-                    description: "参加者の状態 - pending: 参加待ち, ready: 準備完了, in_progress: 対戦中, battled:
-                      対戦済み, eliminated: 敗退, champion: 優勝"
-                    anyOf:
-                      - type: string
-                        enum:
-                          - pending
-                      - type: string
-                        enum:
-                          - ready
-                      - type: string
-                        enum:
-                          - in_progress
-                      - type: string
-                        enum:
-                          - battled
-                      - type: string
-                        enum:
-                          - eliminated
-                      - type: string
-                        enum:
-                          - champion
-                required:
-                  - id
-                  - tournament_id
-                  - external_id
-                  - state
-  /participants/{id}/ready:
+  /tournaments/{tournament_id}/participants/{participant_id}/ready:
     put:
       summary: 参加者のステータスをreadyにする
       tags:
@@ -733,9 +769,16 @@ paths:
             format: uuid
             type: string
           in: path
-          name: id
+          name: participant_id
           required: true
           description: 参加者ID
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: tournament_id
+          required: true
+          description: ID
       responses:
         "200":
           description: OK
@@ -751,7 +794,7 @@ paths:
                       - true
                 required:
                   - ok
-  /participants/{id}/cancel:
+  /tournaments/{tournament_id}/participants/{participant_id}/cancel:
     put:
       summary: 参加者のステータスをpendingにする
       tags:
@@ -769,9 +812,16 @@ paths:
             format: uuid
             type: string
           in: path
-          name: id
+          name: participant_id
           required: true
           description: 参加者ID
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: tournament_id
+          required: true
+          description: ID
       responses:
         "200":
           description: OK
@@ -787,7 +837,7 @@ paths:
                       - true
                 required:
                   - ok
-  /participants/battle:
+  /tournaments/{id}/participants/battle:
     put:
       summary: 参加者のステータスをin_progressにする
       tags:
@@ -795,7 +845,8 @@ paths:
       description: |
         
         # 概要
-        参加者のステータスをin_progressにします。
+        複数の参加者のステータスをin_progressにします。
+        参加者はready状態の2人指定する必要があります。
 
         # 注意点
          * stateがreadyの時のみ可能です。
@@ -809,6 +860,14 @@ paths:
                 format: uuid
                 description: 参加者ID
                 type: string
+      parameters:
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: id
+          required: true
+          description: ID
       responses:
         "200":
           description: OK

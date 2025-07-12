@@ -27,7 +27,8 @@
 				"usernamehw.errorlens",
 				"dbaeumer.vscode-eslint",
 				"streetsidesoftware.code-spell-checker",
-				"bierner.markdown-mermaid"
+				"bierner.markdown-mermaid",
+				"statelyai.stately-vscode"
 			]
 		}
 	},

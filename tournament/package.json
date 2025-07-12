@@ -6,11 +6,17 @@
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
     "dev": "bash scripts/development.sh",
-    "prisma:generate": "prisma generate --schema=src/infrastructure/SQLite/prisma/schema.prisma",
+    "prisma:generate": "prisma generate",
+    "prisma:studio": "prisma studio",
+    "prisma:migrate": "prisma migrate dev --name init",
     "download-openapi": "bash scripts/download_openapi.sh docs/openapi.json docs/openapi.yml"
   },
   "author": "",
   "license": "ISC",
+  "prisma": {
+    "schema": "src/infrastructure/Prisma/prisma/schema.prisma",
+    "seed": "ts-node src/infrastructure/Prisma/prisma/seed.ts"
+  },
   "dependencies": {
     "@fastify/error": "^4.2.0",
     "@fastify/swagger": "^9.5.1",
@@ -20,11 +26,14 @@
     "@prisma/client": "^6.11.0",
     "@sinclair/typebox": "^0.34.37",
     "fastify": "^5.4.0",
+    "lodash": "^4.17.21",
     "prisma": "^6.11.0",
+    "xstate": "^5.20.0",
     "zod": "^3.25.67"
   },
   "devDependencies": {
     "@mermaid-js/mermaid-cli": "^11.6.0",
+    "@types/lodash": "^4.17.20",
     "@types/node": "^24.0.3",
     "puppeteer": "^23.11.1",
     "ts-node-dev": "^2.0.0",
