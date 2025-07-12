@@ -9,6 +9,13 @@ help:
 	@echo "  make restart  - Restart all services"
 	@echo "  make stop     - Stop all services"
 	@echo "  make clean    - Remove all containers and volumes"
+	@echo ""
+	@echo "Prisma commands:"
+	@echo "  make prisma-studio   - Open Prisma Studio (http://localhost:5555)"
+	@echo "  make prisma-generate - Generate Prisma client"
+	@echo "  make prisma-migrate  - Run database migrations"
+	@echo "  make prisma-reset    - Reset database and run migrations"
+	@echo "  make prisma-seed     - Run database seed"
 
 
 # Start all services
@@ -90,4 +97,21 @@ game-clean:
 tournament-clean:
 	docker-compose stop tournament
 	docker-compose rm -f tournament
+
+# Prisma Studio
+prisma-studio:
+	docker-compose exec tournament npx prisma studio --hostname 0.0.0.0 --port 5555
+
+# Prisma commands
+prisma-generate:
+	docker-compose exec tournament npx prisma generate
+
+prisma-migrate:
+	docker-compose exec tournament npx prisma migrate dev
+
+prisma-reset:
+	docker-compose exec tournament npx prisma migrate reset
+
+prisma-seed:
+	docker-compose exec tournament npx prisma db seed
 
