@@ -10,7 +10,7 @@ const userDatabase: { [key: string]: { name: string; image: string } } = {
   
   // --- 2人用トーナメント ---
   const tournament2P_before = {
-    id: "9fd411f6-3ee4-4fc2-9cef-0ee952dc236e", owner_id: "player-a-id", name: "2-Player Tournament (Before)", state: "open", champion_id: "",
+    id: "9fd411f6-3ee4-4fc2-9cef-0ee952dc236e", owner_id: "player-a-id", name: "2-Player Tournament (Before)", description: "A small tournament for two", max_num: 2,  state: "open", champion_id: "",
     participants: [
       { id: "player-a-id", status: 'pending' },
       { id: "player-b-id", status: 'pending' }
@@ -27,7 +27,7 @@ const userDatabase: { [key: string]: { name: string; image: string } } = {
   
   // --- 3人用トーナメント ---
   const tournament3P_before = {
-    id: "031b1b96-4309-465d-915f-d43bdf22a955", owner_id: "player-a-id", name: "3-Player Tournament (Before)", state: "open", champion_id: "",
+    id: "031b1b96-4309-465d-915f-d43bdf22a955", owner_id: "player-a-id", name: "3-Player Tournament (Before)", description: "A small tournament for three", max_num: 3, state: "open", champion_id: "",
     participants: [
       { id: "player-a-id", status: 'pending' },
       { id: "player-b-id", status: 'pending' },
@@ -67,7 +67,12 @@ const userDatabase: { [key: string]: { name: string; image: string } } = {
       public handleLocation() {
           const path = window.location.pathname;
   
-          if (path.startsWith('/tournament/')) {
+          if (path.startsWith('/tournament/admin')) {
+            const parts = path.split('/');
+            const tournamentId = parts[3];
+            this.renderAdminScreen(tournamentId);
+          }
+          else if (path.startsWith('/tournament/')) {
               const parts = path.split('/');
               const participantCount = parseInt(parts[2]);
               const state = parts[3] || 'before';
@@ -288,6 +293,87 @@ const userDatabase: { [key: string]: { name: string; image: string } } = {
                 ${contentHTML}
             </div>
         `);
+    }
+
+    public handleAdminFormSubmit(event: SubmitEvent) {
+        event.preventDefault(); // ページリロードを防ぐ
+        const formData = new FormData(event.target as HTMLFormElement);
+        const updatedData = {
+            name: formData.get('name') as string,
+            description: formData.get('description') as string,
+            max_participants: parseInt(formData.get('max_participants') as string, 10),
+        };
+
+        this.currentTournamentData.name = updatedData.name;
+        this.currentTournamentData.description = updatedData.description;
+        this.currentTournamentData.max_participants = updatedData.max_participants;
+
+        alert('トーナメント情報を更新しました！');
+        this.renderAdminScreen(this.currentTournamentData.id);
+    }
+
+    public closeTournamentRegistration() {
+        if (confirm('本当に参加者の募集を締め切りますか？この操作は元に戻せません。')) {
+            this.currentTournamentData.state = 'ready_to_start';
+            alert('募集を締め切りました。トーナメントが開始可能です。');
+            this.renderAdminScreen(this.currentTournamentData.id);
+     }
+    }
+
+
+    private renderAdminScreen(tournamentId: string) {
+        // 表示中のトーナメントデータを取得（本来はAPIでIDから取得）
+        const tournamentData = this.currentTournamentData;
+        // オーナーでなければアクセス拒否
+        if (MY_USER_ID !== tournamentData.owner_id) {
+            this.render(`<div class="text-center text-red-500 font-bold">アクセス権がありません。</div>`);
+            return;
+        }
+
+    // 募集締め切りボタンのHTMLを条件によって変更
+        let closeButtonHTML = '';
+        if (tournamentData.state === 'open') {
+            closeButtonHTML = `
+                <div class="mt-8 border-t pt-6">
+                    <h3 class="text-lg font-semibold mb-2">募集を締め切る</h3>
+                    <p class="text-sm text-gray-400 mb-4">参加者を確定し、トーナメントを開始できる状態にします。</p>
+                    <button class="w-full px-4 py-2 bg-yellow-600 hover:bg-yellow-700 rounded text-white" onclick="router.closeTournamentRegistration()">
+                        募集を締め切る
+                    </button>
+                </div>
+            `;
+        } else {
+            closeButtonHTML = `<div class="mt-8 text-center text-green-400 font-bold">参加者の募集は締め切られています。</div>`;
+        }
+
+        const contentHTML = `
+            <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-6">トーナメント管理</h2>
+            
+                <form onsubmit="router.handleAdminFormSubmit(event)">
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-300 mb-1">トーナメント名</label>
+                        <input type="text" id="name" name="name" value="${tournamentData.name}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div class="mb-4">
+                        <label for="description" class="block text-sm font-medium text-gray-300 mb-1">説明</label>
+                        <textarea id="description" name="description" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">${tournamentData.description}</textarea>
+                    </div>
+                    <div class="mb-6">
+                        <label for="max_participants" class="block text-sm font-medium text-gray-300 mb-1">最大参加人数</label>
+                        <input type="number" id="max_participants" name="max_participants" value="${tournamentData.max_participants}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                
+                    <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-bold">
+                        変更を保存
+                    </button>
+                </form>
+
+                ${closeButtonHTML}
+            </div>
+        `;
+
+        this.render(contentHTML);
     }
 
     // --- 各画面の描画メソッド（Tailwind CSS版） ---
