@@ -1,4 +1,4 @@
-import { TournamentApplicationService } from "../application/TournamentApplicationServiceFacade";
+import { TournamentApplicationService } from "../../application/service/tournament/TournamentApplicationServiceFacade";
 
 
 export interface IDIMachine {
