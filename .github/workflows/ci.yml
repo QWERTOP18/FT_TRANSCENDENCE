@@ -46,6 +46,7 @@ jobs:
           echo "❌ Frontend service is not responding"
           echo "Frontend logs:"
           docker compose logs --tail=10 frontend
+          exit 1
         fi
         
         echo ""
@@ -56,6 +57,7 @@ jobs:
           echo "❌ Game service is not responding"
           echo "Game logs:"
           docker compose logs --tail=10 game
+          exit 1
         fi
         
         echo ""
@@ -66,13 +68,14 @@ jobs:
           echo "❌ Tournament service is not responding"
           echo "Tournament logs:"
           docker compose logs --tail=10 tournament
+          exit 1
         fi
         
         echo ""
         echo "=== Service Response Summary ==="
-        echo "Frontend: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo "FAILED")"
-        echo "Game: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/ping || echo "FAILED")"
-        echo "Tournament: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 || echo "FAILED")"
+        echo "Frontend: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)"
+        echo "Game: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/ping)"
+        echo "Tournament: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)"
     
     - name: Check service logs
       run: |
