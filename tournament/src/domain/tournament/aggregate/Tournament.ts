@@ -59,6 +59,8 @@ export class Tournament {
 	public open() {
 		if (this._props.state.equals(new TournamentState('reception')) == false)
 			throw new UsageError('予約中のトーナメントのみ開催できます');
+		if (this._props.participants.length < 2)
+			throw new UsageError('開催するためには二人以上の参加が必要です')
 		this._props.state = new TournamentState('open');
 	}
 
