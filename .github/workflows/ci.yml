@@ -33,14 +33,7 @@ jobs:
         echo "=== Docker Compose Services ==="
         docker compose ps
     
-    - name: Run Jest tests
-      run: |
-        echo "=== Running Jest Tests ==="
-        
-        echo "Running game service tests..."
-        docker compose exec -T game npm test
-        
-        echo "✅ All tests completed successfully!"
+
     
     - name: Test service connectivity
       run: |

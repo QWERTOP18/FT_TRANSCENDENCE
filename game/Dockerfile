@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 WORKDIR /workspace/game
 COPY package*.json ./
 
-RUN npm install
+RUN npm install --include=dev
 COPY . .
 
 RUN npm run build
