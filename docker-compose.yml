@@ -66,7 +66,6 @@ services:
     environment:
       - NODE_ENV=development
       - DATABASE_URL=file:/app/prisma/dev.db
-    command: sh -c "npx prisma generate && npx prisma migrate deploy && npm run dev"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8080"]
       interval: 30s
