@@ -1,0 +1,12 @@
+name: Cleanup
+runs:
+  using: composite
+  steps:
+    - name: Cleanup
+      shell: bash
+      run: |
+        echo "Stopping services..."
+        docker compose down -v
+        
+        echo "Cleaning up images..."
+        docker image prune -f 
