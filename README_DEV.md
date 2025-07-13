@@ -60,7 +60,6 @@ make up
 - `make game-logs` - Show game logs
 - `make tournament-logs` - Show tournament logs
 
-
 ## Prisma Studio
 
 To access Prisma Studio for database management:
