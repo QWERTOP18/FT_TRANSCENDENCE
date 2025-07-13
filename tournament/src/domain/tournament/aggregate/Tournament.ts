@@ -12,6 +12,7 @@ export type TournamentValue = {
 	championId?: ParticipantId,
 	name: string,
 	description: string,
+	max_num: number,
 	state: TournamentState,
 	participants: Array<Participant>,
 	histories: Array<History>
@@ -25,6 +26,7 @@ export class Tournament {
 	static create(props: {
 		name?: string,
 		description?: string,
+		max_num: number,
 		ownerExternalId: string
 	}) {
 		const tournamentId = new TournamentId();
@@ -35,6 +37,7 @@ export class Tournament {
 			championId: undefined,
 			name: props.name ?? '',
 			description: props.description ?? '',
+			max_num: props.max_num,
 			state: new TournamentState('reception'),
 			participants: [owner],
 			histories: []
@@ -70,6 +73,7 @@ export class Tournament {
 			throw new UsageError("すでに登録されています。")
 		if (this.canModifyTournament() == false)
 			throw new UsageError("開催中のため参加者を追加することはできません。")
+		// TODO: 最大人数超えたときの処理
 		this._props.participants.push(participant);
 	}
 
@@ -196,6 +200,10 @@ export class Tournament {
 
 	get description() {
 		return this._props.description;
+	}
+
+	get max_num() {
+		return this._props.max_num;
 	}
 
 	get state() {

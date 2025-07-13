@@ -11,6 +11,7 @@ export class TournamentDTO {
 		public championId: string | undefined,
 		public name: string,
 		public description: string,
+		public max_num: number,
 		public state: TournamentStateValue,
 		public participants: ParticipantDTO[],
 		public histories: HistoryDTO[]
@@ -22,6 +23,7 @@ export class TournamentDTO {
 		championId?: string,
 		name: string,
 		description: string,
+		max_num: number,
 		state: TournamentStateValue,
 		participants: ParticipantDTO[],
 		histories: HistoryDTO[]
@@ -32,6 +34,7 @@ export class TournamentDTO {
 			props.championId,
 			props.name,
 			props.description,
+			props.max_num,
 			props.state,
 			props.participants,
 			props.histories
@@ -45,6 +48,7 @@ export class TournamentDTO {
 			championId: tournament.championId?.value,
 			name: tournament.name,
 			description: tournament.description,
+			max_num: tournament.max_num,
 			state: tournament.state.value,
 			participants: tournament.participants
 				.map(participant => ParticipantDTO.fromDomain(participant)),
