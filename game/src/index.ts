@@ -29,11 +29,10 @@ async function main() {
     return "pong\n";
   });
 
-  await app.listen({ port: 4000 });
-  const server = app.server;
-
+  await app.listen({ port: Number(process.env.PORT) || 4000, host: "0.0.0.0" });
+  console.log(`Game server is running on http://localhost:${process.env.PORT || 4000}`);
   // WebSocketサーバ・ルーム管理をGameGatewayに委譲
-  new GameGateway(server);
+  new GameGateway(app.server);
 }
 
 main();
