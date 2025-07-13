@@ -68,6 +68,8 @@ export class Tournament {
 			throw new UsageError("トーナメントIDと参加者のIDが一致しません")
 		if (this.getParticipant(participant))
 			throw new UsageError("すでに登録されています。")
+		if (this.canModifyTournament() == false)
+			throw new UsageError("開催中のため参加者を追加することはできません。")
 		this._props.participants.push(participant);
 	}
 
@@ -148,6 +150,10 @@ export class Tournament {
 		if (battledParticipants.length != 1)
 			throw new UsageError("バトル済みの参加者が1人ではありません");
 		return true;
+	}
+
+	public canModifyTournament() {
+		return this._props.state.equals(new TournamentState("reception"));
 	}
 
 	private changeParticipantState(participant: Participant, state: ParticipantState) {
