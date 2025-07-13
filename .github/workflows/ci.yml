@@ -26,21 +26,51 @@ jobs:
         docker compose up -d
         
         echo "Waiting for services to be ready..."
-        sleep 45
+        timeout 60 bash -c 'until curl -f -s http://localhost:3000 > /dev/null; do sleep 2; done' || echo "Frontend service timeout"
+        timeout 60 bash -c 'until curl -f -s http://localhost:4000/ping > /dev/null; do sleep 2; done' || echo "Game service timeout"
+        timeout 60 bash -c 'until curl -f -s http://localhost:8080 > /dev/null; do sleep 2; done' || echo "Tournament service timeout"
         
-        echo "Checking service status..."
+        echo "=== Docker Compose Services ==="
         docker compose ps
     
     - name: Test service connectivity
       run: |
-        echo "Testing frontend service..."
-        curl -f http://localhost:3000 || echo "Frontend service not ready"
+        echo "=== Service Connectivity Test ==="
         
-        echo "Testing game service..."
-        curl -f http://localhost:4000/ping || echo "Game service not ready"
+        echo "Testing frontend service (http://localhost:3000)..."
+        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:3000; then
+          echo "✅ Frontend service is responding correctly"
+        else
+          echo "❌ Frontend service is not responding"
+          echo "Frontend logs:"
+          docker compose logs --tail=10 frontend
+        fi
         
-        echo "Testing tournament service..."
-        curl -f http://localhost:8080 || echo "Tournament service not ready"
+        echo ""
+        echo "Testing game service (http://localhost:4000/ping)..."
+        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:4000/ping; then
+          echo "✅ Game service is responding correctly"
+        else
+          echo "❌ Game service is not responding"
+          echo "Game logs:"
+          docker compose logs --tail=10 game
+        fi
+        
+        echo ""
+        echo "Testing tournament service (http://localhost:8080)..."
+        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:8080; then
+          echo "✅ Tournament service is responding correctly"
+        else
+          echo "❌ Tournament service is not responding"
+          echo "Tournament logs:"
+          docker compose logs --tail=10 tournament
+        fi
+        
+        echo ""
+        echo "=== Service Response Summary ==="
+        echo "Frontend: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 || echo "FAILED")"
+        echo "Game: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/ping || echo "FAILED")"
+        echo "Tournament: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080 || echo "FAILED")"
     
     - name: Check service logs
       run: |
