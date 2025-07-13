@@ -1,26 +1,52 @@
-.PHONY: help up down logs clean restart stop
+default: help
 
-# Default target
+# =============================================================================
+# HELP
+# =============================================================================
+
+# Show help
 help:
-	@echo "Available commands:"
-	@echo "  make up       - Start all services"
-	@echo "  make down     - Stop all services"
-	@echo "  make logs     - Show logs from all services"
-	@echo "  make restart  - Restart all services"
-	@echo "  make stop     - Stop all services"
-	@echo "  make clean    - Remove all containers and volumes"
+	@echo "Basic commands:"
+	@echo "  make up                        - Start all services"
+	@echo "  make down                      - Stop all services"
+	@echo "  make logs                      - Show logs from all services"
+	@echo "  make restart                   - Restart all services"
+	@echo "  make stop                      - Stop all services"
+	@echo "  make clean                     - Remove all containers and volumes"
 	@echo ""
-	@echo "Prisma commands:"
-	@echo "  make prisma-studio   - Open Prisma Studio (http://localhost:5555)"
-	@echo "  make prisma-generate - Generate Prisma client"
-	@echo "  make prisma-migrate  - Run database migrations"
-	@echo "  make prisma-reset    - Reset database and run migrations"
-	@echo "  make prisma-seed     - Run database seed"
+	@echo "Service commands:"
+	@echo "  make logs-[service]            - Show [service] logs"
+	@echo "  make rebuild-[service]         - Rebuild [service]"
+	@echo ""
+	@echo "Database commands:"
+	@echo "  make [service]-prisma-studio   - Open [service] Prisma Studio"
+	@echo "  make [service]-prisma-generate - Generate [service] Prisma client"
+	@echo "  make [service]-prisma-migrate  - Run [service] database migrations"
+	@echo "  make [service]-prisma-reset    - Reset [service] database"
+	@echo "  make [service]-prisma-seed     - Run [service] database seed"
 
+
+# =============================================================================
+# DOCKER COMPOSE COMMANDS
+# =============================================================================
 
 # Start all services
 up:
 	docker-compose up -d
+	@echo "┌───────────────────────────────────────────────────────────────┐"
+	@echo "│                         BUILD SUCCESS                         │"
+	@echo "├───────────────────────────────────────────────────────────────┤"
+	@echo "│ Access Frontend    http://localhost:3000                      │"
+	@echo "│ Access Gateway     http://localhost:8000    Not implemented   │"
+	@echo "│ Access Auth        http://localhost:5000    Not implemented   │"
+	@echo "│ Access User        http://localhost:6000    Not implemented   │"
+	@echo "│ Access Game        http://localhost:4000/docs                 │"
+	@echo "│ Access Tournament  http://localhost:8080/                     │"
+	@echo "├───────────────────────────────────────────────────────────────┤"
+	@echo "│ Show logs with 'make logs'                                    │"
+	@echo "│ Show database with 'make [service]-prisma-studio'             │"
+	@echo "│ Stop with 'make stop' and remove containers with 'make clean' │"
+	@echo "└───────────────────────────────────────────────────────────────┘"
 
 # Stop all services
 down:
@@ -42,22 +68,19 @@ clean:
 	docker image prune -f --filter label=com.docker.compose.project=ft_transcendence
 
 
-# Individual service commands
-frontend-logs:
+# =============================================================================
+# SERVICE COMMANDS
+# =============================================================================
+
+# Individual service logs
+logs-frontend:
 	docker-compose logs -f frontend
 
-game-logs:
+logs-game:
 	docker-compose logs -f game
 
-tournament-logs:
+logs-tournament:
 	docker-compose logs -f tournament
-
-# Development commands
-dev-build:
-	docker-compose build --no-cache
-
-dev-up:
-	docker-compose up
 
 # Safe rebuild commands
 rebuild-frontend:
@@ -75,43 +98,55 @@ rebuild-tournament:
 	docker-compose build --no-cache tournament
 	docker-compose up -d tournament
 
-# Individual service commands
-frontend-up:
-	docker-compose up frontend
 
-game-up:
-	docker-compose up game
+# =============================================================================
+# DATABASE COMMANDS
+# =============================================================================
 
-tournament-up:
-	docker-compose up tournament
-
-# Individual service cleanup
-frontend-clean:
-	docker-compose stop frontend
-	docker-compose rm -f frontend
-
-game-clean:
-	docker-compose stop game
-	docker-compose rm -f game
-
-tournament-clean:
-	docker-compose stop tournament
-	docker-compose rm -f tournament
-
-# Prisma Studio
-prisma-studio:
+# Tournament Prisma commands
+tournament-prisma-studio:
 	docker-compose exec tournament npx prisma studio --hostname 0.0.0.0 --port 5555
 
-# Prisma commands
-prisma-generate:
+tournament-prisma-generate:
 	docker-compose exec tournament npx prisma generate
 
-prisma-migrate:
+tournament-prisma-migrate:
 	docker-compose exec tournament npx prisma migrate dev
 
-prisma-reset:
+tournament-prisma-reset:
 	docker-compose exec tournament npx prisma migrate reset
 
-prisma-seed:
+tournament-prisma-seed:
 	docker-compose exec tournament npx prisma db seed
 
+
+# =============================================================================
+# FUTURE SERVICE TEMPLATES
+# =============================================================================
+
+# Future service Prisma commands (commented out for reference)
+# User service Prisma commands
+# user-prisma-generate:
+# 	docker-compose exec user npx prisma generate
+#
+# user-prisma-migrate:
+# 	docker-compose exec user npx prisma migrate dev
+#
+# user-prisma-reset:
+# 	docker-compose exec user npx prisma migrate reset
+#
+# user-prisma-seed:
+# 	docker-compose exec user npx prisma db seed
+#
+# Auth service Prisma commands
+# auth-prisma-generate:
+# 	docker-compose exec auth npx prisma generate
+#
+# auth-prisma-migrate:
+# 	docker-compose exec auth npx prisma migrate dev
+#
+# auth-prisma-reset:
+# 	docker-compose exec auth npx prisma migrate reset
+#
+# auth-prisma-seed:
+# 	docker-compose exec auth npx prisma db seed

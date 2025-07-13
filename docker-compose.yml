@@ -77,4 +77,4 @@ volumes:
 
 networks:
   transcendence-network:
-    driver: bridge 
+    driver: bridge

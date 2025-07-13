@@ -2,28 +2,17 @@
 
 A multiplayer Pong game with tournament system built with TypeScript, Fastify, and WebSocket.
 
-## Services
+## Features
 
-This project consists of three main services:
 
-- **Frontend** (Port 3000): web interface
-- **Game** (Port 4000): WebSocket-based game server handling real-time gameplay
-- **Tournament** (Port 8080): Tournament management system with REST API
+## Quick Start
 
-## Project Structure
+### Prerequisites
 
-```
-FT_TRANSCENDENCE/
-├── frontend/          # React frontend application
-├── game/             # WebSocket game server
-├── tournament/       # Tournament management API
-├── docker-compose.yml # Docker orchestration
-└── Makefile         # Development commands
-```
+- Docker and Docker Compose
+- GNU Make
 
-## Setup
-
-### Quick Start
+### Installation
 
 1. Clone the repository:
 ```bash
@@ -36,41 +25,24 @@ cd FT_TRANSCENDENCE
 make up
 ```
 
-3. Access the applications:
-- Frontend: http://localhost:3000
-- Game API: http://localhost:4000/docs
-- Tournament API: http://localhost:8080/documentation
+3. Access the application:
+- http://localhost:3000
 
-### Development Commands
+## Development
 
-#### Docker Commands
+For detailed development documentation, see [README_DEV.md](./README_DEV.md).
+
+### Basic Commands
+
 - `make up` - Start all services
 - `make down` - Stop all services
 - `make logs` - Show logs from all services
 - `make restart` - Restart all services
-- `make stop` - Stop all services
-- `make clean` - Remove all containers and volumes
 
-#### Individual Service Commands
-- `make frontend-logs` - Show frontend logs
-- `make game-logs` - Show game logs
-- `make tournament-logs` - Show tournament logs
+## Technology Stack
 
-
-## Prisma Studio
-
-To access Prisma Studio for database management:
-
-```bash
-make prisma-studio
-```
-
-This will open Prisma Studio at http://localhost:5555, allowing you to view and manage the tournament database through a web interface.
-
-### Other Prisma Commands
-
-- `make prisma-generate` - Generate Prisma client
-- `make prisma-migrate` - Run database migrations  
-- `make prisma-reset` - Reset database and run migrations
-- `make prisma-seed` - Run database seed
-
+- **Frontend**: TypeScript, Tailwindcss
+- **Backend**: TypeScript, Fastify
+- **Database**: sqlite, Prisma ORM
+- **Real-time**: WebSocket
+- **Containerization**: Docker

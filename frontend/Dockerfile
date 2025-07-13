@@ -15,4 +15,4 @@ RUN npm run build:css
 
 EXPOSE 3000
 
-CMD ["npm", "start"] 
+CMD ["npm", "start"]
