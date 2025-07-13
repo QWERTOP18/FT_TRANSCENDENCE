@@ -1,3 +1,4 @@
+[![Docker Compose CI](https://github.com/QWERTOP18/FT_TRANSCENDENCE/actions/workflows/ci.yml/badge.svg)](https://github.com/QWERTOP18/FT_TRANSCENDENCE/actions/workflows/ci.yml)
 # FT_TRANSCENDENCE
 
 A multiplayer Pong game with tournament system built with TypeScript, Fastify, and WebSocket.
