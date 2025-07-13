@@ -73,7 +73,8 @@ export class Tournament {
 			throw new UsageError("すでに登録されています。")
 		if (this.canModifyTournament() == false)
 			throw new UsageError("開催中のため参加者を追加することはできません。")
-		// TODO: 最大人数超えたときの処理
+		if (this.max_num == this.participants.length)
+			throw new UsageError("これ以上参加者を追加することはできません。")
 		this._props.participants.push(participant);
 	}
 
