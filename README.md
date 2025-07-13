@@ -2,9 +2,6 @@
 
 A multiplayer Pong game with tournament system built with TypeScript, Fastify, and WebSocket.
 
-## Features
-
-
 ## Quick Start
 
 ### Prerequisites
@@ -16,7 +13,7 @@ A multiplayer Pong game with tournament system built with TypeScript, Fastify, a
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/QWERTOP18/FT_TRANSCENDENCE.git
 cd FT_TRANSCENDENCE
 ```
 

@@ -9,9 +9,6 @@ A multiplayer Pong game with tournament system built with TypeScript, Fastify, a
 This project consists of three main services:
 
 - **Frontend** (Port 3000): web interface
-- **API Gateway** (Port 8000): API gateway and routing
-- **Auth** (Port 5000): Authentication service
-- **User** (Port 6000): User Management service
 - **Game** (Port 4000): WebSocket-based game server handling real-time gameplay
 - **Tournament** (Port 8080): Tournament management system with REST API
 
@@ -34,7 +31,7 @@ FT_TRANSCENDENCE/
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/QWERTOP18/FT_TRANSCENDENCE.git
 cd FT_TRANSCENDENCE
 ```
 
@@ -69,15 +66,5 @@ make up
 To access Prisma Studio for database management:
 
 ```bash
-make prisma-studio
+make [service]-prisma-studio
 ```
-
-This will open Prisma Studio at http://localhost:5555, allowing you to view and manage the tournament database through a web interface.
-
-### Other Prisma Commands
-
-- `make prisma-generate` - Generate Prisma client
-- `make prisma-migrate` - Run database migrations  
-- `make prisma-reset` - Reset database and run migrations
-- `make prisma-seed` - Run database seed
-

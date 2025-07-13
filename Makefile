@@ -82,22 +82,6 @@ logs-game:
 logs-tournament:
 	docker-compose logs -f tournament
 
-# Safe rebuild commands
-rebuild-frontend:
-	docker-compose stop frontend
-	docker-compose build --no-cache frontend
-	docker-compose up -d frontend
-
-rebuild-game:
-	docker-compose stop game
-	docker-compose build --no-cache game
-	docker-compose up -d game
-
-rebuild-tournament:
-	docker-compose stop tournament
-	docker-compose build --no-cache tournament
-	docker-compose up -d tournament
-
 
 # =============================================================================
 # DATABASE COMMANDS
@@ -107,46 +91,8 @@ rebuild-tournament:
 tournament-prisma-studio:
 	docker-compose exec tournament npx prisma studio --hostname 0.0.0.0 --port 5555
 
-tournament-prisma-generate:
-	docker-compose exec tournament npx prisma generate
-
-tournament-prisma-migrate:
-	docker-compose exec tournament npx prisma migrate dev
-
 tournament-prisma-reset:
 	docker-compose exec tournament npx prisma migrate reset
 
 tournament-prisma-seed:
 	docker-compose exec tournament npx prisma db seed
-
-
-# =============================================================================
-# FUTURE SERVICE TEMPLATES
-# =============================================================================
-
-# Future service Prisma commands (commented out for reference)
-# User service Prisma commands
-# user-prisma-generate:
-# 	docker-compose exec user npx prisma generate
-#
-# user-prisma-migrate:
-# 	docker-compose exec user npx prisma migrate dev
-#
-# user-prisma-reset:
-# 	docker-compose exec user npx prisma migrate reset
-#
-# user-prisma-seed:
-# 	docker-compose exec user npx prisma db seed
-#
-# Auth service Prisma commands
-# auth-prisma-generate:
-# 	docker-compose exec auth npx prisma generate
-#
-# auth-prisma-migrate:
-# 	docker-compose exec auth npx prisma migrate dev
-#
-# auth-prisma-reset:
-# 	docker-compose exec auth npx prisma migrate reset
-#
-# auth-prisma-seed:
-# 	docker-compose exec auth npx prisma db seed

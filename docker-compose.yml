@@ -35,6 +35,7 @@ services:
     volumes:
       - ./game:/workspace/game
       - /workspace/game/node_modules
+
     environment:
       - NODE_ENV=development
       - PORT=4000
