@@ -14,20 +14,26 @@
 EOF
 
 function main() {
-  migrate
+  db_push
 	generate_prisma_client
+  prisma_seed
 	start_dev_server &
 	wait "$!"
 }
 
-function migrate() {
+function db_push() {
   echo "Generating database..."
-  npx prisma migrate dev
+  npx prisma db push
 }
 
 function generate_prisma_client() {
   echo "Running Prisma generate..."
   npx prisma generate
+}
+
+function prisma_seed() {
+  echo "Create seed..."
+  npx prisma db seed
 }
 
 function start_dev_server() {
