@@ -8,7 +8,7 @@ export function renderMatchmakingScreen(appElement: HTMLElement) {
             <h2 class="text-3xl font-bold text-center mb-6">Matchmaking</h2>
             <p class="text-center text-gray-400 mb-6">下のボタンを押して、対戦待機キューに参加します。</p>
             <div class="text-center">
-                <button class="px-8 py-4 text-xl font-bold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700" onclick="window.router.findMatch()">
+                <button class="px-8 py-4 text-xl font-bold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700" onclick="window.router.callFindMatch()">
                     Find Match
                 </button>
             </div>
