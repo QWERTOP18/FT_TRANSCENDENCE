@@ -3,10 +3,16 @@ import { GameRoutes } from "./presentation/api/route";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { GameGateway } from "./presentation/gateway/GameGateway";
+import cors from "@fastify/cors";
 
 async function main() {
   const app = fastify();
 
+
+  await app.register(cors, {
+    origin: "*",
+    credentials: true,
+  });
   await app.register(swagger, {
     openapi: {
       info: {
