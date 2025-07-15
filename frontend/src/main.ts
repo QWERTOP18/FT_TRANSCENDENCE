@@ -94,6 +94,7 @@ const userDatabase: { [key: string]: { name: string; image: string } } = {
               }
           } else {
               switch (path) {
+                case '/matchmaking': this.renderMatchmakingScreen(); break;
                   case '/game': this.renderGameScreen(); break;
                   case '/win': this.renderResultScreen({ ...gameEndState, winner: MY_USERNAME, loser: 'opponent' }); break;
                   case '/lose': this.renderResultScreen({ ...gameEndState, winner: 'opponent', loser: MY_USERNAME }); break;
@@ -293,6 +294,60 @@ const userDatabase: { [key: string]: { name: string; image: string } } = {
                 ${contentHTML}
             </div>
         `);
+    }
+
+    private renderMatchmakingScreen() {
+        const content = `
+            <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white max-w-2xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-6">Matchmaking</h2>
+                <p class="text-center text-gray-400 mb-6">下のボタンを押して、対戦待機キューに参加します。</p>
+                <div class="text-center">
+                    <button class="px-8 py-4 text-xl font-bold text-white bg-blue-600 rounded-lg shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-4 focus:ring-blue-300" onclick="router.findMatch()">
+                        Find Match
+                    </button>
+                </div>
+                <div class="mt-8">
+                    <h3 class="text-lg font-semibold mb-2">API Response:</h3>
+                    <pre id="response-data" class="bg-black p-4 rounded-md text-sm text-green-400 whitespace-pre-wrap">ここに結果が表示されます...</pre>
+                </div>
+            </div>
+        `;
+        this.render(content);
+    }
+
+    /**
+     * gameサービスのエンドポイントを叩く
+     */
+    public async findMatch() {
+        const responseDisplay = document.getElementById('response-data');
+        if (!responseDisplay) return;
+
+        responseDisplay.textContent = 'Requesting...';
+
+        try {
+            // ★★★ fetch APIを使ってPOSTリクエストを送信 ★★★
+            const response = await fetch('http://localhost:4000/ready', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                // 今回は2回叩く必要があるので、擬似的に毎回違うIDを送る
+                body: JSON.stringify({ user_id: `user-${Math.random()}` }),
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // レスポンスを整形して表示
+            responseDisplay.textContent = JSON.stringify(data, null, 2);
+
+        } catch (error) {
+            console.error('Fetch error:', error);
+            responseDisplay.textContent = `エラーが発生しました: ${error}`;
+        }
     }
 
     public handleAdminFormSubmit(event: SubmitEvent) {
