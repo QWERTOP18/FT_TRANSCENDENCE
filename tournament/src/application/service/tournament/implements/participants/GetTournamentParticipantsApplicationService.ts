@@ -1,7 +1,7 @@
-import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
-import { TournamentId } from "../../../../domain/tournament/value-objects/TournamentId";
-import { HistoryDTO } from "../../../dto/HistoryDTO";
-import { ParticipantDTO } from "../../../dto/ParticipantDTO";
+import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
+import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
+import { HistoryDTO } from "../../../../dto/HistoryDTO";
+import { ParticipantDTO } from "../../../../dto/ParticipantDTO";
 
 export type GetTournamentParticipantsApplicationServiceCommand = {
 	readonly tournamentId: string;

@@ -1,6 +1,6 @@
-import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
-import { NotFoundError } from "../../../../domain/tournament/TournamentError";
-import { TournamentId } from "../../../../domain/tournament/value-objects/TournamentId";
+import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
+import { NotFoundError } from "../../../../../domain/tournament/TournamentError";
+import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
 
 export type OpenTournamentApplicationServiceCommand = {
 	readonly tournamentId: string;

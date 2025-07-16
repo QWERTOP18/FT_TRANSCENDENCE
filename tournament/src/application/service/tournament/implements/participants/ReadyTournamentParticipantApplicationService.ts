@@ -1,7 +1,7 @@
-import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
-import { NotFoundError } from "../../../../domain/tournament/TournamentError";
-import { ParticipantId } from "../../../../domain/tournament/value-objects/ParticipantId";
-import { TournamentId } from "../../../../domain/tournament/value-objects/TournamentId";
+import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
+import { NotFoundError } from "../../../../../domain/tournament/TournamentError";
+import { ParticipantId } from "../../../../../domain/tournament/value-objects/ParticipantId";
+import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
 
 export type ReadyTournamentParticipantApplicationServiceCommand = {
 	readonly tournamentId: string;

@@ -1,8 +1,8 @@
-import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
-import { NotFoundError, UsageError } from "../../../../domain/tournament/TournamentError";
-import { ParticipantId } from "../../../../domain/tournament/value-objects/ParticipantId";
-import { ParticipantState } from "../../../../domain/tournament/value-objects/ParticipantState";
-import { TournamentId } from "../../../../domain/tournament/value-objects/TournamentId";
+import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
+import { NotFoundError, UsageError } from "../../../../../domain/tournament/TournamentError";
+import { ParticipantId } from "../../../../../domain/tournament/value-objects/ParticipantId";
+import { ParticipantState } from "../../../../../domain/tournament/value-objects/ParticipantState";
+import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
 
 
 export type CancelTournamentParticipantApplicationServiceCommand = {

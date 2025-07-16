@@ -1,14 +1,14 @@
-import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
-import { TournamentDomainService } from "../../../../domain/services/Tournament/TournamentDomainService";
-import { Tournament } from "../../../../domain/tournament/aggregate/Tournament";
-import { History } from "../../../../domain/tournament/entities/History";
-import { InternalError, NotFoundError } from "../../../../domain/tournament/TournamentError";
-import { ParticipantId } from "../../../../domain/tournament/value-objects/ParticipantId";
-import { ParticipantScore } from "../../../../domain/tournament/value-objects/ParticipantScore";
-import { Score } from "../../../../domain/tournament/value-objects/Score";
-import { TournamentId } from "../../../../domain/tournament/value-objects/TournamentId";
-import { HistoryDTO } from "../../../dto/HistoryDTO";
-import { TournamentDTO } from "../../../dto/TournamentDTO";
+import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
+import { TournamentDomainService } from "../../../../../domain/services/Tournament/TournamentDomainService";
+import { Tournament } from "../../../../../domain/tournament/aggregate/Tournament";
+import { History } from "../../../../../domain/tournament/entities/History";
+import { InternalError, NotFoundError } from "../../../../../domain/tournament/TournamentError";
+import { ParticipantId } from "../../../../../domain/tournament/value-objects/ParticipantId";
+import { ParticipantScore } from "../../../../../domain/tournament/value-objects/ParticipantScore";
+import { Score } from "../../../../../domain/tournament/value-objects/Score";
+import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
+import { HistoryDTO } from "../../../../dto/HistoryDTO";
+import { TournamentDTO } from "../../../../dto/TournamentDTO";
 
 
 export type CreateTournamentHistoryApplicationServiceCommand = {
