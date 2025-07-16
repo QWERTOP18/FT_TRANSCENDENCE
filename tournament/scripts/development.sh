@@ -38,7 +38,7 @@ function prisma_seed() {
 
 function start_dev_server() {
   echo "Starting development server..."
-  ts-node-dev src/index.ts
+  tsx watch src/index.ts
 }
 
 main "$@"
