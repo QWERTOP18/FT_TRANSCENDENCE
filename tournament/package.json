@@ -15,7 +15,7 @@
   "license": "ISC",
   "prisma": {
     "schema": "src/infrastructure/Prisma/prisma/schema.prisma",
-    "seed": "ts-node src/infrastructure/Prisma/prisma/seed.ts"
+    "seed": "tsx src/infrastructure/Prisma/prisma/seed.ts"
   },
   "dependencies": {
     "@fastify/swagger": "^9.5.1",
