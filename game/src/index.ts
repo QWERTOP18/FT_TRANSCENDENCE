@@ -3,10 +3,16 @@ import { GameRoutes } from "./presentation/api/route";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { GameGateway } from "./presentation/gateway/GameGateway";
+import cors from "@fastify/cors";
 
 async function main() {
   const app = fastify();
 
+
+  await app.register(cors, {
+    origin: "*",
+    credentials: true,
+  });
   await app.register(swagger, {
     openapi: {
       info: {
@@ -29,11 +35,10 @@ async function main() {
     return "pong\n";
   });
 
-  await app.listen({ port: 4000 });
-  const server = app.server;
-
+  await app.listen({ port: Number(process.env.PORT) || 4000, host: "0.0.0.0" });
+  console.log(`Game server is running on http://localhost:${process.env.PORT || 4000}`);
   // WebSocketサーバ・ルーム管理をGameGatewayに委譲
-  new GameGateway(server);
+  new GameGateway(app.server);
 }
 
 main();
