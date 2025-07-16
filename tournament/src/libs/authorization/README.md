@@ -50,15 +50,15 @@
 	const ruleEdit: Rule<AppUser, AppData> = (user: AppUser, resource: AppData) => user.id === resource.ownerId;
 	const ruleDelete: Rule<AppUser, AppData> = (user: AppUser, resource: AppData) => user.id === resource.ownerId;
 	const rulePublish: Rule<AppUser, AppData> = (user: AppUser, resource: AppData) => user.role === "admin";
-	const rules: RuleSet<AppUser, AppData> = {
+	const rules = {
 		edit: ruleEdit,
 		delete: ruleDelete,
 		publish: rulePublish,
-	};
+	} satisfies RuleSet<AppUser, AppData>;
 
 	const appUser: AppUser = { id: 1, role: "admin" };
-	const authorizer: Authorizer<RuleSet<AppUser, AppData>> = new Authorizer(rules);
-	const authUser: AuthUser<RuleSet<AppUser, AppData>> = authorizer.createPolicyUser(appUser);
+	const authorizer: Authorizer<typeof rules> = new Authorizer(rules);
+	const authUser: AuthUser<typeof rules> = authorizer.createPolicyUser(appUser);
 
 	// 補完される ✅
 	const appData1: AppData = { ownerId: 1 };
@@ -68,5 +68,4 @@
 	// authUser.can("archive", { ownerId: 1 }); // ❌ コンパイルエラー: "archive" は存在しない
 
 })();
-
 ```
