@@ -1,17 +1,13 @@
-import { Tournament } from "../../../domain/tournament/aggregate/Tournament";
 import { Participant } from "../../../domain/tournament/entities/Participant";
 import { Authorizer } from "../../../libs/authorization/src/Authorizer";
 import { RuleSet } from "../../../libs/authorization/src/RuleSet";
 import { AppUser } from "../actors/AppUser";
 import { CheckParticipant } from "../rules/CheckParticipant";
-import { CheckTournamentOwner } from "../rules/CheckTournamentOwner";
 
 const ParticipantAuthorizationRules = {
-	create: (user: AppUser, resource: Tournament) => {
-		return CheckTournamentOwner.execute(resource, user);
-	},
-	delete: (user: AppUser, resource: Tournament) => {
-		return CheckTournamentOwner.execute(resource, user);
+	create: (user: AppUser, resource: Participant) => true,
+	delete: (user: AppUser, resource: Participant) => {
+		return CheckParticipant.execute(user, resource);
 	},
 	read: (user: AppUser, resource: Participant) => {
 		return true
