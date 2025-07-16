@@ -1,6 +1,6 @@
 import { History } from "../entities/History";
 import { Participant } from "../entities/Participant";
-import { UsageError } from "../TournamentError";
+import { InternalError, UsageError } from "../TournamentError";
 import { ParticipantId } from "../value-objects/ParticipantId";
 import { ParticipantState } from "../value-objects/ParticipantState";
 import { TournamentId } from "../value-objects/TournamentId";
@@ -185,6 +185,12 @@ export class Tournament {
 		return this._props.participants.filter((p) => p.state.equals(state));
 	}
 
+	public getOwner() {
+		const owner = this.getParticipantById(this._props.ownerId);
+		if (!owner)
+			throw new InternalError("存在するはずのオーナーが存在しません");
+		return owner;
+	}
 	get id() {
 		return this._props.id;
 	}
