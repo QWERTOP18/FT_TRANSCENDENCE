@@ -15,3 +15,4 @@ export const UsageError = createTournamentError("TRT_ERR_USAGE");
 export const RepositoryError = createTournamentError("TRT_ERR_REPOSITORY");
 export const InternalError = createTournamentError("TRT_ERR_INTERNAL")
 export const NotFoundError = createTournamentError("TRT_ERR_NOTFOUND");
+export const PermissionError = createTournamentError("TRT_ERR_PERMISSION");
