@@ -1,5 +1,5 @@
 import { Participant } from "../../../domain/tournament/entities/Participant";
-import { AppUser } from "../AppUser";
+import { AppUser } from "../actors/AppUser";
 
 
 export class CheckParticipant {

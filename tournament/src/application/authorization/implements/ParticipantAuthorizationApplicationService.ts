@@ -2,7 +2,7 @@ import { Tournament } from "../../../domain/tournament/aggregate/Tournament";
 import { Participant } from "../../../domain/tournament/entities/Participant";
 import { Authorizer } from "../../../libs/authorization/src/Authorizer";
 import { RuleSet } from "../../../libs/authorization/src/RuleSet";
-import { AppUser } from "../AppUser";
+import { AppUser } from "../actors/AppUser";
 import { CheckParticipant } from "../rules/CheckParticipant";
 import { CheckTournamentOwner } from "../rules/CheckTournamentOwner";
 
@@ -17,7 +17,9 @@ const ParticipantAuthorizationRules = {
 		return true
 	},
 	update: (user: AppUser, resource: Participant) => {
-		return CheckParticipant.execute(user, resource);
+		return (
+			CheckParticipant.execute(user, resource)
+		);
 	},
 } satisfies RuleSet<AppUser, Participant>;
 

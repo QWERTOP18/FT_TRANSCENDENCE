@@ -1,5 +1,5 @@
 import { Tournament } from "../../../domain/tournament/aggregate/Tournament";
-import { AppUser } from "../AppUser";
+import { AppUser } from "../actors/AppUser";
 
 
 export class CheckTournamentOwner {
