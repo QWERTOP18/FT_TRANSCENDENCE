@@ -7,6 +7,7 @@ import { OKJson } from "../../json/OKJson";
 import { OKSchema } from "../../schemas/OtherSchema";
 import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
 import { TournamentIdSchema } from "../../schemas/TournamentSchema";
+import { MediatorTokenHeaderSchema } from "../../schemas/headers/MediatorTokenHeaderSchema";
 
 const description = `
 # 概要
@@ -24,7 +25,9 @@ const RouteSchema = {
 	}),
 	Querystring: undefined,
 	Body: Type.Array(ParticipantIdSchema()),
-	Headers: undefined,
+	Headers: Type.Intersect([
+		MediatorTokenHeaderSchema()
+	]),
 	Reply: {
 		200: OKSchema(),
 	}
@@ -46,6 +49,7 @@ export function BattleParticipantRoute(fastify: FastifyInstance) {
 			description,
 			tags: ["participant"],
 			summary: "参加者のステータスをin_progressにする",
+			headers: RouteSchema.Headers,
 			params: RouteSchema.Params,
 			body: RouteSchema.Body,
 			response: {
@@ -61,6 +65,9 @@ export function BattleParticipantRoute(fastify: FastifyInstance) {
 			tournamentId: request.params.id,
 			firstParticipantId: request.body[0],
 			secondParticipantId: request.body[1],
+			appMediator: {
+				mediatorToken: request.headers["x-mediator-token"]
+			}
 		});
 		reply.status(200).send(OKJson);
 	})

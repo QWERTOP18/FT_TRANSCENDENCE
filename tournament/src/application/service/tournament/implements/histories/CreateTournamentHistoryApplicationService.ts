@@ -1,14 +1,13 @@
 import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
-import { TournamentDomainService } from "../../../../../domain/services/Tournament/TournamentDomainService";
-import { Tournament } from "../../../../../domain/tournament/aggregate/Tournament";
 import { History } from "../../../../../domain/tournament/entities/History";
-import { InternalError, NotFoundError } from "../../../../../domain/tournament/TournamentError";
+import { NotFoundError, PermissionError } from "../../../../../domain/tournament/TournamentError";
 import { ParticipantId } from "../../../../../domain/tournament/value-objects/ParticipantId";
 import { ParticipantScore } from "../../../../../domain/tournament/value-objects/ParticipantScore";
 import { Score } from "../../../../../domain/tournament/value-objects/Score";
 import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
+import { AppMediator } from "../../../../authorization/actors/AppMediator";
+import { AuthorizationApplicationService } from "../../../../authorization/AuthorizationApplicationService";
 import { HistoryDTO } from "../../../../dto/HistoryDTO";
-import { TournamentDTO } from "../../../../dto/TournamentDTO";
 
 
 export type CreateTournamentHistoryApplicationServiceCommand = {
@@ -21,20 +20,24 @@ export type CreateTournamentHistoryApplicationServiceCommand = {
 		id: string;
 		score: number;
 	};
+	appMediator: AppMediator;
 };
 
 export class CreateTournamentHistoryApplicationService {
 	constructor(private readonly repositoryFactory: IRepositoryFactory) { }
 
 	async execute(command: CreateTournamentHistoryApplicationServiceCommand) {
-		return this.repositoryFactory.transaction(async (repository) => {
+		return await this.repositoryFactory.transaction(async (repository) => {
+			const authApp = new AuthorizationApplicationService();
+			const authUser = authApp.createPolicyMediator(command.appMediator);
+			if (authUser.can('anything', {}) == false)
+				throw new PermissionError('権限がありません');
 			const history = this.createHistoryFromCommand(command);
 			const tournament = await repository.find(history.tournamentId);
 			if (tournament == null)
 				throw new NotFoundError("トーナメントが見つかりませんでした。");
-			console.log("トーナメントID, 履歴ID", tournament.id.value, history.tournamentId.toString());
 			tournament.addHistory(history);
-			repository.update(tournament);
+			await repository.update(tournament);
 			return HistoryDTO.fromDomain(history);
 		});
 	}

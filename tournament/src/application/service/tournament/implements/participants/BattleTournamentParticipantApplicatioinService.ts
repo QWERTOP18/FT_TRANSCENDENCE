@@ -1,12 +1,15 @@
 import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
-import { NotFoundError } from "../../../../../domain/tournament/TournamentError";
+import { NotFoundError, PermissionError } from "../../../../../domain/tournament/TournamentError";
 import { ParticipantId } from "../../../../../domain/tournament/value-objects/ParticipantId";
 import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
+import { AppMediator } from "../../../../authorization/actors/AppMediator";
+import { AuthorizationApplicationService } from "../../../../authorization/AuthorizationApplicationService";
 
 export type BattleTournamentParticipantApplicationServiceCommand = {
 	readonly tournamentId: string;
 	readonly firstParticipantId: string;
 	readonly secondParticipantId: string;
+	readonly appMediator: AppMediator;
 }
 
 export class BattleTournamentParticipantApplicationService {
@@ -14,6 +17,10 @@ export class BattleTournamentParticipantApplicationService {
 
 	async execute(command: BattleTournamentParticipantApplicationServiceCommand) {
 		return this.repositoryFactory.transaction(async (repository) => {
+			const authApp = new AuthorizationApplicationService();
+			const authUser = authApp.createPolicyMediator(command.appMediator);
+			if (authUser.can('anything', {}) == false)
+				throw new PermissionError('権限がありません');
 			const tournamentId = new TournamentId(command.tournamentId);
 			const firstParticipantId = new ParticipantId(command.firstParticipantId);
 			const secondParticipantId = new ParticipantId(command.secondParticipantId);
