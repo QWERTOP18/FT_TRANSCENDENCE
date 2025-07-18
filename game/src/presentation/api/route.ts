@@ -1,9 +1,9 @@
 import { FastifyInstance } from "fastify";
 import { CreateRoomRoute } from "./room/CreateRoomRoute";
 import { ReadyRoute } from "./ready/ReadyRoute";
+import { GameGateway } from "../gateway/GameGateway";
 
-export function GameRoutes(fastify: FastifyInstance) {
-  const routes = [CreateRoomRoute, ReadyRoute] as const;
-
-  routes.forEach((route) => fastify.register(route));
+export function GameRoutes(fastify: FastifyInstance, gameGateway: GameGateway) {
+  CreateRoomRoute(fastify, gameGateway);
+  ReadyRoute(fastify, gameGateway);
 }

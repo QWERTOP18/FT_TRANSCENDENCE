@@ -29,7 +29,8 @@ async function main() {
     },
   });
 
-  app.register(GameRoutes);
+  const gameGateway = new GameGateway(app.server);
+  GameRoutes(app, gameGateway);
 
   app.get("/ping", async (request, reply) => {
     return "pong\n";
@@ -37,8 +38,6 @@ async function main() {
 
   await app.listen({ port: Number(process.env.PORT) || 4000, host: "0.0.0.0" });
   console.log(`Game server is running on http://localhost:${process.env.PORT || 4000}`);
-  // WebSocketサーバ・ルーム管理をGameGatewayに委譲
-  new GameGateway(app.server);
 }
 
 main();
