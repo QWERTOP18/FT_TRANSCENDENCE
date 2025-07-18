@@ -28,7 +28,8 @@
 				"dbaeumer.vscode-eslint",
 				"streetsidesoftware.code-spell-checker",
 				"bierner.markdown-mermaid",
-				"statelyai.stately-vscode"
+				"statelyai.stately-vscode",
+				"vitest.explorer"
 			]
 		}
 	},
