@@ -1,10 +1,15 @@
 import Fastify from 'fastify';
 import { TournamentAPIRoutes } from './routes/route';
+import cors from '@fastify/cors'
 
 
 async function wakeupServer() {
 	const fastify = Fastify();
 
+	await fastify.register(cors, {
+		origin: "*",
+		credentials: true,
+	});
 	fastify.register(TournamentAPIRoutes);
 
 	return await fastify.listen({
