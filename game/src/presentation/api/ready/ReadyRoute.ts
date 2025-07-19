@@ -2,6 +2,7 @@ import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { GameRoomSchema } from "../../schemas/GameRoomSchema";
 import { GameRoom } from "../../../domain/GameRoom";
+import { GameGateway } from "../../gateway/GameGateway";
 
 const description = `
 # 概要
@@ -14,7 +15,7 @@ const description = `
 // グローバルな状態管理（実際の本番では適切な状態管理を使用）
 let readyUsers: Set<string> = new Set();
 
-export function ReadyRoute(fastify: FastifyInstance) {
+export function ReadyRoute(fastify: FastifyInstance, gameGateway: GameGateway) {
   fastify.post(
     "/ready",
     {
@@ -46,7 +47,7 @@ export function ReadyRoute(fastify: FastifyInstance) {
 
       // 二人揃った場合、部屋を作成
       if (readyCount === 2) {
-        const room = new GameRoom();
+        const room = gameGateway.createRoom();
         const roomData = room.toSchema();
         
         // ready状態をリセット
