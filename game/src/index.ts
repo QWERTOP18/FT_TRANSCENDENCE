@@ -8,7 +8,6 @@ import cors from "@fastify/cors";
 async function main() {
   const app = fastify();
 
-
   await app.register(cors, {
     origin: "*",
     credentials: true,

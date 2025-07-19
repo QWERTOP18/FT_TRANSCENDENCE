@@ -66,7 +66,8 @@ restart: down up
 # Clean up containers and volumes
 clean:
 	docker-compose down -v
-	docker image prune -f --filter label=com.docker.compose.project=ft_transcendence
+	docker compose down --rmi all
+# docker image prune -f --filter label=com.docker.compose.project=ft_transcendence
 
 
 # =============================================================================
