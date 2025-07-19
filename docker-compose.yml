@@ -26,6 +26,22 @@ services:
     networks:
       - transcendence-network
 
+  # Gateway service
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./gateway:/app
+      - /app/dist
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    networks:
+      - transcendence-network
+
   # Game service
   game:
     build:
