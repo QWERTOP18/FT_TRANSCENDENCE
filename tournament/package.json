@@ -29,6 +29,8 @@
   "devDependencies": {
     "@types/lodash": "^4.17.20",
     "@types/node": "^24.0.3",
+    "puppeteer": "^23.11.1",
+    "vitest": "^3.2.4",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   }
