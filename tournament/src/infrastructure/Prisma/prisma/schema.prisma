@@ -14,6 +14,7 @@ model Tournament {
   champion_id String?
   name        String
   description String
+  max_num     Int
   owner_id    String
   state       State
 

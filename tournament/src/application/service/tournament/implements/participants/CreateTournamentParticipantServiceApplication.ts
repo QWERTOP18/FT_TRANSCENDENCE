@@ -1,8 +1,8 @@
-import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
-import { Participant } from "../../../../domain/tournament/entities/Participant";
-import { NotFoundError } from "../../../../domain/tournament/TournamentError";
-import { TournamentId } from "../../../../domain/tournament/value-objects/TournamentId";
-import { ParticipantDTO } from "../../../dto/ParticipantDTO";
+import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
+import { Participant } from "../../../../../domain/tournament/entities/Participant";
+import { NotFoundError } from "../../../../../domain/tournament/TournamentError";
+import { TournamentId } from "../../../../../domain/tournament/value-objects/TournamentId";
+import { ParticipantDTO } from "../../../../dto/ParticipantDTO";
 
 
 export type CreateTournamentParticipantServiceApplicationCommand = {

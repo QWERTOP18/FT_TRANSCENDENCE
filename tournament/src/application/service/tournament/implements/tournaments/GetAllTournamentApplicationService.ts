@@ -1,5 +1,5 @@
-import { IRepositoryFactory } from "../../../../domain/interfaces/IRepositoryFactory";
-import { TournamentDTO } from "../../../dto/TournamentDTO";
+import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepositoryFactory";
+import { TournamentDTO } from "../../../../dto/TournamentDTO";
 
 export type GetAllTournamentApplicationServiceCommand = {
 }

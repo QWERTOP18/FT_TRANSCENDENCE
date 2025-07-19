@@ -7,6 +7,8 @@ import { ToStatic } from "../../../types/ToStatic";
 import { DIContainer } from "../../../classes/DIContainer";
 import { HistoryDTO } from "../../../../application/dto/HistoryDTO";
 import { HistoryDTO2JSON } from "../../classes/HistoryDTO2JSON";
+import { ExternalIdHeaderSchema } from "../../schemas/headers/ExternalIdHeaderSchema";
+import { MediatorTokenHeaderSchema } from "../../schemas/headers/MediatorTokenHeaderSchema";
 
 const description = `
 # 概要
@@ -37,7 +39,9 @@ const RouteSchema = {
 	}),
 	Querystring: undefined,
 	Body: Type.Pick(HistorySchema(), ['winner', 'loser']),
-	Headers: undefined,
+	Headers: Type.Intersect([
+		MediatorTokenHeaderSchema()
+	]),
 	Reply: {
 		200: HistorySchema({ description: "OK" }),
 	}
@@ -60,6 +64,7 @@ export function CreateHistoryRoute(fastify: FastifyInstance) {
 			tags: ["histories"],
 			summary: "対戦結果作成",
 			body: RouteSchema.Body,
+			headers: RouteSchema.Headers,
 			response: {
 				200: RouteSchema.Reply[200]
 			}
@@ -76,6 +81,9 @@ export function CreateHistoryRoute(fastify: FastifyInstance) {
 				id: request.body.winner.id,
 				score: request.body.winner.score,
 			},
+			appMediator: {
+				mediatorToken: request.headers["x-mediator-token"]
+			}
 		});
 		reply.status(200).send(HistoryDTO2JSON.toJSON(historyDTO));
 	})
