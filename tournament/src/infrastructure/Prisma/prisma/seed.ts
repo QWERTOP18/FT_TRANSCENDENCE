@@ -19,6 +19,7 @@ async function seed() {
 			id: tournamentIds.id1,
 			name: "Sample Tournament",
 			description: "This is a sample tournament.",
+			max_num: 8,
 			owner_id: participants.owner1.id,
 			state: "reception",
 			participants: {

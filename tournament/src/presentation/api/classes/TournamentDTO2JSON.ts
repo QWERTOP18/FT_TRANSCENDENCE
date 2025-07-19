@@ -8,6 +8,7 @@ export class TournamentDTO2JSON {
 		return {
 			id: DTO.id,
 			name: DTO.name,
+			max_num: DTO.max_num,
 			champion_id: DTO.championId ?? '',
 			owner_id: DTO.ownerId,
 			description: DTO.description,

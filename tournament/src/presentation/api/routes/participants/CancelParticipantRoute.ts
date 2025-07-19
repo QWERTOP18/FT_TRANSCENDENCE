@@ -6,6 +6,7 @@ import { OKJson } from "../../json/OKJson";
 import { OKSchema } from "../../schemas/OtherSchema";
 import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
 import { TournamentIdSchema } from "../../schemas/TournamentSchema";
+import { ExternalIdHeaderSchema } from "../../schemas/headers/ExternalIdHeaderSchema";
 
 const description = `
 # 概要
@@ -23,7 +24,9 @@ const RouteSchema = {
 	}),
 	Querystring: undefined,
 	Body: undefined,
-	Headers: undefined,
+	Headers: Type.Intersect([
+		ExternalIdHeaderSchema()
+	]),
 	Reply: {
 		200: OKSchema(),
 	}
@@ -45,6 +48,7 @@ export function CancelParticipantRoute(fastify: FastifyInstance) {
 			description,
 			tags: ["participant"],
 			summary: "参加者のステータスをpendingにする",
+			headers: RouteSchema.Headers,
 			params: RouteSchema.Params,
 			response: {
 				200: RouteSchema.Reply[200]
@@ -56,6 +60,9 @@ export function CancelParticipantRoute(fastify: FastifyInstance) {
 		await appService.cancelParticipant({
 			participantId: request.params.participant_id,
 			tournamentId: request.params.tournament_id,
+			appUser: {
+				externalId: request.headers["x-external-id"]
+			}
 		});
 		reply.status(200).send(OKJson);
 	})

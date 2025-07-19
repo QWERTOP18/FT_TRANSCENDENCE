@@ -29,6 +29,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 				owner_id: tournament.ownerId.value,
 				name: tournament.name,
 				description: tournament.description,
+				max_num: tournament.max_num,
 				state: tournament.state.value,
 				champion_id: tournament.championId?.value ?? null,
 				histories: {
@@ -60,6 +61,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 				owner_id: tournament.ownerId.value,
 				name: tournament.name,
 				description: tournament.description,
+				max_num: tournament.max_num,
 				state: tournament.state.value,
 				champion_id: tournament.championId?.value ?? null,
 				histories: {
@@ -118,6 +120,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 			ownerId: new ParticipantId(tournamentData.owner_id),
 			name: tournamentData.name,
 			description: tournamentData.description,
+			max_num: tournamentData.max_num,
 			state: new TournamentState(tournamentData.state),
 			championId: tournamentData.champion_id && new ParticipantId(tournamentData.champion_id) || undefined,
 			histories: tournamentData.histories.map(history => History.reconstruct({
@@ -156,6 +159,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 			ownerId: new ParticipantId(tournament.owner_id),
 			name: tournament.name,
 			description: tournament.description,
+			max_num: tournament.max_num,
 			state: new TournamentState(tournament.state),
 			championId: tournament.champion_id && new ParticipantId(tournament.champion_id) || undefined,
 			histories: tournament.histories.map(history => History.reconstruct({

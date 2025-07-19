@@ -6,6 +6,7 @@ import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ToStatic } from "../../../types/ToStatic";
 import { DIContainer } from "../../../classes/DIContainer";
 import { OKJson } from "../../json/OKJson";
+import { ExternalIdHeaderSchema } from "../../schemas/headers/ExternalIdHeaderSchema";
 
 const description = `
 # 概要
@@ -19,7 +20,9 @@ const RouteSchema = {
 	Params: Type.Pick(TournamentSchema(), ['id']),
 	Querystring: undefined,
 	Body: undefined,
-	Headers: undefined,
+	Headers: Type.Intersect([
+		ExternalIdHeaderSchema()
+	]),
 	Reply: {
 		200: OKSchema(),
 	}
@@ -44,6 +47,7 @@ export function OpenTournamentRoute(fastify: FastifyInstance) {
 			tags: ["tournament"],
 			summary: "トーナメントを開始する",
 			params: RouteSchema.Params,
+			headers: RouteSchema.Headers,
 			response: {
 				200: RouteSchema.Reply[200]
 			},
@@ -51,7 +55,12 @@ export function OpenTournamentRoute(fastify: FastifyInstance) {
 	}, async (request, reply) => {
 		const appService = DIContainer.applicationService();
 
-		await appService.openTournament({ tournamentId: request.params.id });
+		await appService.openTournament({
+			tournamentId: request.params.id,
+			appUser: {
+				externalId: request.headers["x-external-id"]
+			}
+		});
 		reply.status(200).send(OKJson);
 	})
 

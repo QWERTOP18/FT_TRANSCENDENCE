@@ -1,6 +1,6 @@
 import { History } from "../entities/History";
 import { Participant } from "../entities/Participant";
-import { UsageError } from "../TournamentError";
+import { InternalError, UsageError } from "../TournamentError";
 import { ParticipantId } from "../value-objects/ParticipantId";
 import { ParticipantState } from "../value-objects/ParticipantState";
 import { TournamentId } from "../value-objects/TournamentId";
@@ -12,6 +12,7 @@ export type TournamentValue = {
 	championId?: ParticipantId,
 	name: string,
 	description: string,
+	max_num: number,
 	state: TournamentState,
 	participants: Array<Participant>,
 	histories: Array<History>
@@ -25,6 +26,7 @@ export class Tournament {
 	static create(props: {
 		name?: string,
 		description?: string,
+		max_num: number,
 		ownerExternalId: string
 	}) {
 		const tournamentId = new TournamentId();
@@ -35,6 +37,7 @@ export class Tournament {
 			championId: undefined,
 			name: props.name ?? '',
 			description: props.description ?? '',
+			max_num: props.max_num,
 			state: new TournamentState('reception'),
 			participants: [owner],
 			histories: []
@@ -56,6 +59,8 @@ export class Tournament {
 	public open() {
 		if (this._props.state.equals(new TournamentState('reception')) == false)
 			throw new UsageError('予約中のトーナメントのみ開催できます');
+		if (this._props.participants.length < 2)
+			throw new UsageError('開催するためには二人以上の参加が必要です')
 		this._props.state = new TournamentState('open');
 	}
 
@@ -68,6 +73,10 @@ export class Tournament {
 			throw new UsageError("トーナメントIDと参加者のIDが一致しません")
 		if (this.getParticipant(participant))
 			throw new UsageError("すでに登録されています。")
+		if (this.canModifyTournament() == false)
+			throw new UsageError("開催中のため参加者を追加することはできません。")
+		if (this.max_num == this.participants.length)
+			throw new UsageError("これ以上参加者を追加することはできません。")
 		this._props.participants.push(participant);
 	}
 
@@ -150,6 +159,10 @@ export class Tournament {
 		return true;
 	}
 
+	public canModifyTournament() {
+		return this._props.state.equals(new TournamentState("reception"));
+	}
+
 	private changeParticipantState(participant: Participant, state: ParticipantState) {
 		const target = this.getParticipant(participant);
 		if (!target)
@@ -172,6 +185,12 @@ export class Tournament {
 		return this._props.participants.filter((p) => p.state.equals(state));
 	}
 
+	public getOwner() {
+		const owner = this.getParticipantById(this._props.ownerId);
+		if (!owner)
+			throw new InternalError("存在するはずのオーナーが存在しません");
+		return owner;
+	}
 	get id() {
 		return this._props.id;
 	}
@@ -190,6 +209,10 @@ export class Tournament {
 
 	get description() {
 		return this._props.description;
+	}
+
+	get max_num() {
+		return this._props.max_num;
 	}
 
 	get state() {
