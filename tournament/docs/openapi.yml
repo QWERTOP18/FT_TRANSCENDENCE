@@ -124,6 +124,10 @@ paths:
                     name:
                       description: トーナメント名
                       type: string
+                    max_num:
+                      description: トーナメントの最大参加人数
+                      minimum: 2
+                      type: number
                     description:
                       description: トーナメントの説明
                       type: string
@@ -158,6 +162,7 @@ paths:
                     - champion_id
                     - owner_id
                     - name
+                    - max_num
                     - state
                     - participants
                     - histories
@@ -188,8 +193,13 @@ paths:
                     description:
                       description: トーナメントの説明
                       type: string
+                    max_num:
+                      description: トーナメントの最大参加人数
+                      minimum: 2
+                      type: number
                   required:
                     - name
+                    - max_num
                 - type: object
                   properties:
                     ownerExternalId:
@@ -222,6 +232,10 @@ paths:
                   name:
                     description: トーナメント名
                     type: string
+                  max_num:
+                    description: トーナメントの最大参加人数
+                    minimum: 2
+                    type: number
                   description:
                     description: トーナメントの説明
                     type: string
@@ -256,6 +270,7 @@ paths:
                   - champion_id
                   - owner_id
                   - name
+                  - max_num
                   - state
                   - participants
                   - histories
@@ -303,6 +318,10 @@ paths:
                   name:
                     description: トーナメント名
                     type: string
+                  max_num:
+                    description: トーナメントの最大参加人数
+                    minimum: 2
+                    type: number
                   description:
                     description: トーナメントの説明
                     type: string
@@ -337,6 +356,7 @@ paths:
                   - champion_id
                   - owner_id
                   - name
+                  - max_num
                   - state
                   - participants
                   - histories
@@ -385,6 +405,12 @@ paths:
           name: id
           required: true
           description: トーナメントID
+        - schema:
+            type: string
+          in: header
+          name: X-External-Id
+          required: true
+          description: 外部ID
       responses:
         "200":
           description: OK
@@ -693,6 +719,12 @@ paths:
       parameters:
         - schema:
             type: string
+          in: header
+          name: X-Mediator-Token
+          required: true
+          description: 調停者（スーパーユーザ）であることを示すトークン。
+        - schema:
+            type: string
           in: path
           name: id
           required: true
@@ -761,6 +793,9 @@ paths:
         # 概要
         参加者のステータスをreadyにします。
 
+        # 権限
+         *
+
         # 注意点
          * sateがpendingの時のみ可能です。
          * トーナメントがopenの時のみ可能です。
@@ -779,6 +814,12 @@ paths:
           name: tournament_id
           required: true
           description: ID
+        - schema:
+            type: string
+          in: header
+          name: X-External-Id
+          required: true
+          description: 外部ID
       responses:
         "200":
           description: OK
@@ -822,6 +863,12 @@ paths:
           name: tournament_id
           required: true
           description: ID
+        - schema:
+            type: string
+          in: header
+          name: X-External-Id
+          required: true
+          description: 外部ID
       responses:
         "200":
           description: OK
@@ -868,6 +915,12 @@ paths:
           name: id
           required: true
           description: ID
+        - schema:
+            type: string
+          in: header
+          name: X-Mediator-Token
+          required: true
+          description: 調停者（スーパーユーザ）であることを示すトークン。
       responses:
         "200":
           description: OK
