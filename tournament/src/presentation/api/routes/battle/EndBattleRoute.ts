@@ -65,7 +65,18 @@ export function EndBattleRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, async (request, reply) => {
-		const appService = DIContainer.applicationService();
+		const battleService = DIContainer.battleService();
+		await battleService.endBattle({
+			tournament_id: request.params.id,
+			winner: {
+				id: request.body.winner.id,
+				score: request.body.winner.score,
+			},
+			loser: {
+				id: request.body.loser.id,
+				score: request.body.loser.score,
+			},
+		});
 		// TODO: ここでサービスを作って呼び出す。
 		reply.status(200).send(OKJson);
 	})

@@ -1,5 +1,6 @@
 import { IRepositoryFactory } from "../../../domain/interfaces/IRepositoryFactory";
 import { CancelBattleParticipantApplicationService, CancelBattleParticipantApplicationServiceCommand } from "./implements/CancelBattleApplicationService";
+import { EndBattleApplicationService, EndBattleApplicationServiceCommand } from "./implements/EndBattleApplicationService";
 import { StartBattleParticipantApplicationService, StartBattleParticipantApplicationServiceCommand } from "./implements/StartBattleApplicationService";
 
 
@@ -17,6 +18,11 @@ export class BattleApplicationServiceFacade {
 
 	async cancelBattle(command: CancelBattleParticipantApplicationServiceCommand) {
 		const service = new CancelBattleParticipantApplicationService(this.props.repositoryFactory);
+		return await service.execute(command);
+	}
+
+	async endBattle(command: EndBattleApplicationServiceCommand) {
+		const service = new EndBattleApplicationService(this.props.repositoryFactory);
 		return await service.execute(command);
 	}
 }

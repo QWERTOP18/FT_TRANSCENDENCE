@@ -107,6 +107,29 @@ export class Tournament {
 		this.changeParticipantState(participant2, new ParticipantState('pending'));
 	}
 
+	public endBattle(history: History) {
+		this.addHistory(history);
+		if (this.isOverRound() == false)
+			return;
+		if (this.canSetChampion()) {
+			this.setChampion();
+			this.close();
+		}
+		else {
+			this.reRound();
+			if (this.shouldCarryUpOneParticipant())
+				this.carryUpOneParticipant();
+		}
+	}
+
+	private shouldCarryUpOneParticipant() {
+		const pendingParticipants = this.getParticipantsByState(new ParticipantState('pending'));
+		if (pendingParticipants.length == 0)
+			return false;
+		if (pendingParticipants.length % 2 != 1)
+			return false;
+		return true;
+	}
 
 	public reRound() {
 		if (this._props.state.equals(new TournamentState('open')) == false)
