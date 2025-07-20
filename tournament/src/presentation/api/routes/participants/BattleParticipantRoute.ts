@@ -10,6 +10,8 @@ import { TournamentIdSchema } from "../../schemas/TournamentSchema";
 import { MediatorTokenHeaderSchema } from "../../schemas/headers/MediatorTokenHeaderSchema";
 
 const description = `
+> 廃止予定です。 /tournaments/{id}/battle/start を使用してください。
+
 # 概要
 複数の参加者のステータスをin_progressにします。
 参加者はready状態の2人指定する必要があります。

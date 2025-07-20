@@ -6,13 +6,15 @@ import { OKJson } from "../../json/OKJson";
 import { HistoryIdSchema } from "../../schemas/HistorySchema";
 import { OKSchema } from "../../schemas/OtherSchema";
 import { TournamentIdSchema } from "../../schemas/TournamentSchema";
+import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
 
 const description = `
 # 概要
-in_progressのユーザー2名をreadyに戻す。
+in_progressのユーザー2名を in_progress に戻す。
 
 # 注意点
- * close状態のトーナメントでは作成できません。
+ * close状態のトーナメントでは使用できません。
+ * /tournaments/{id}/battle/start で使用した参加者IDの組み合わせでなくても動作します。
 `
 
 const RouteSchema = {
@@ -20,7 +22,7 @@ const RouteSchema = {
 		id: TournamentIdSchema(),
 	}),
 	Querystring: undefined,
-	Body: Type.Array(HistoryIdSchema(), { minItems: 2, maxItems: 2 }),
+	Body: Type.Array(ParticipantIdSchema(), { minItems: 2, maxItems: 2 }),
 	Headers: undefined,
 	Reply: {
 		200: OKSchema(),

@@ -11,6 +11,8 @@ import { ExternalIdHeaderSchema } from "../../schemas/headers/ExternalIdHeaderSc
 import { MediatorTokenHeaderSchema } from "../../schemas/headers/MediatorTokenHeaderSchema";
 
 const description = `
+> 廃止予定です。 /tournaments/{id}/battle/end を使用してください。
+
 # 概要
 対戦結果を作成します。
 対戦結果を作成すると、各参加者は以下のステータスになります。
