@@ -1,14 +1,11 @@
+import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import { TournamentIdSchema, TournamentSchema } from "../../schemas/TournamentSchema";
-import { NotImplementedError } from "../../classes/errors/error";
-import { Parameters, Type } from "@sinclair/typebox";
-import { HistorySchema } from "../../schemas/HistorySchema";
-import { ToStatic } from "../../../types/ToStatic";
 import { DIContainer } from "../../../classes/DIContainer";
-import { HistoryDTO } from "../../../../application/dto/HistoryDTO";
-import { HistoryDTO2JSON } from "../../classes/HistoryDTO2JSON";
-import { ExternalIdHeaderSchema } from "../../schemas/headers/ExternalIdHeaderSchema";
-import { MediatorTokenHeaderSchema } from "../../schemas/headers/MediatorTokenHeaderSchema";
+import { ToStatic } from "../../../types/ToStatic";
+import { OKJson } from "../../json/OKJson";
+import { HistorySchema } from "../../schemas/HistorySchema";
+import { OKSchema } from "../../schemas/OtherSchema";
+import { TournamentIdSchema } from "../../schemas/TournamentSchema";
 
 const description = `
 # 概要
@@ -33,17 +30,16 @@ pendingの参加者が奇数の場合はランダムで、一人だけstateがba
  * close状態のトーナメントでは作成できません。
 `
 
+// TODO: HistoryからBattleSchemaに変更すること。
 const RouteSchema = {
 	Params: Type.Object({
 		id: TournamentIdSchema(),
 	}),
 	Querystring: undefined,
 	Body: Type.Pick(HistorySchema(), ['winner', 'loser']),
-	Headers: Type.Intersect([
-		MediatorTokenHeaderSchema()
-	]),
+	Headers: undefined,
 	Reply: {
-		200: HistorySchema({ description: "OK" }),
+		200: OKSchema(),
 	}
 } as const;
 
@@ -57,34 +53,20 @@ type RouteSchemaType = {
 	};
 }
 
-export function CreateHistoryRoute(fastify: FastifyInstance) {
-	fastify.post<RouteSchemaType>('/tournaments/:id/histories', {
+export function EndBattleRoute(fastify: FastifyInstance) {
+	fastify.post<RouteSchemaType>('/tournaments/:id/battle/end', {
 		schema: {
 			description,
-			tags: ["histories"],
-			summary: "対戦結果作成",
+			tags: ["battle"],
+			summary: "対戦終了",
 			body: RouteSchema.Body,
-			headers: RouteSchema.Headers,
 			response: {
 				200: RouteSchema.Reply[200]
 			}
 		}
 	}, async (request, reply) => {
 		const appService = DIContainer.applicationService();
-		const historyDTO = await appService.createHistory({
-			tournament_id: request.params.id,
-			loser: {
-				id: request.body.loser.id,
-				score: request.body.loser.score,
-			},
-			winner: {
-				id: request.body.winner.id,
-				score: request.body.winner.score,
-			},
-			appMediator: {
-				mediatorToken: request.headers["x-mediator-token"]
-			}
-		});
-		reply.status(200).send(HistoryDTO2JSON.toJSON(historyDTO));
+		// TODO: ここでサービスを作って呼び出す。
+		reply.status(200).send(OKJson);
 	})
 }

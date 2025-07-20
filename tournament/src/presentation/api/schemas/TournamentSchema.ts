@@ -11,6 +11,7 @@ export function TournamentSchema(options?: ObjectOptions) {
 		champion_id: ParticipantIdSchema({ description: "優勝者の参加者ID", nullable: true }),
 		owner_id: ParticipantIdSchema({ description: "トーナメントのオーナー参加者ID" }),
 		name: Type.String({ description: "トーナメント名" }),
+		max_num: Type.Number({ description: "トーナメントの最大参加人数", minimum: 2 }),
 		description: Type.Optional(Type.String({ description: "トーナメントの説明" })),
 		state: TournamentStatusSchema(),
 		participants: Type.Array(ParticipantIdSchema(), { description: "参加者リスト" }),

@@ -1,15 +1,15 @@
 import { IRepositoryFactory } from "../../../domain/interfaces/IRepositoryFactory";
-import { BattleTournamentParticipantApplicationService, BattleTournamentParticipantApplicationServiceCommand } from "./implements/BattleTournamentParticipantApplicatioinService";
-import { CancelTournamentParticipantApplicationService, CancelTournamentParticipantApplicationServiceCommand } from "./implements/CancelTournamentParticipantApplicationService";
-import { CreateTournamentApplicationService, CreateTournamentApplicationServiceCommand } from "./implements/CreateTournamentApplicationService";
-import { CreateTournamentHistoryApplicationService, CreateTournamentHistoryApplicationServiceCommand } from "./implements/CreateTournamentHistoryApplicationService";
-import { CreateTournamentParticipantServiceApplication, CreateTournamentParticipantServiceApplicationCommand } from "./implements/CreateTournamentParticipantServiceApplication";
-import { GetAllTournamentApplicationService, GetAllTournamentApplicationServiceCommand } from "./implements/GetAllTournamentApplicationService";
-import { GetTournamentApplicationService, GetTournamentApplicationServiceCommand } from "./implements/GetTournamentApplicationService";
-import { GetTournamentHistoriesApplicationService, GetTournamentHistoriesApplicationServiceCommand } from "./implements/GetTournamentHistoriesApplicationService";
-import { GetTournamentParticipantsApplicationService, GetTournamentParticipantsApplicationServiceCommand } from "./implements/GetTournamentParticipantsApplicationService";
-import { OpenTournamentApplicationService, OpenTournamentApplicationServiceCommand } from "./implements/OpenTournamentApplicationService";
-import { ReadyTournamentParticipantApplicationService, ReadyTournamentParticipantApplicationServiceCommand } from "./implements/ReadyTournamentParticipantApplicationService";
+import { BattleTournamentParticipantApplicationService, BattleTournamentParticipantApplicationServiceCommand } from "./implements/participants/BattleTournamentParticipantApplicatioinService";
+import { CancelTournamentParticipantApplicationService, CancelTournamentParticipantApplicationServiceCommand } from "./implements/participants/CancelTournamentParticipantApplicationService";
+import { CreateTournamentApplicationService, CreateTournamentApplicationServiceCommand } from "./implements/tournaments/CreateTournamentApplicationService";
+import { CreateTournamentHistoryApplicationService, CreateTournamentHistoryApplicationServiceCommand } from "./implements/histories/CreateTournamentHistoryApplicationService";
+import { CreateTournamentParticipantServiceApplication, CreateTournamentParticipantServiceApplicationCommand } from "./implements/participants/CreateTournamentParticipantServiceApplication";
+import { GetAllTournamentApplicationService, GetAllTournamentApplicationServiceCommand } from "./implements/tournaments/GetAllTournamentApplicationService";
+import { GetTournamentApplicationService, GetTournamentApplicationServiceCommand } from "./implements/tournaments/GetTournamentApplicationService";
+import { GetTournamentHistoriesApplicationService, GetTournamentHistoriesApplicationServiceCommand } from "./implements/histories/GetTournamentHistoriesApplicationService";
+import { GetTournamentParticipantsApplicationService, GetTournamentParticipantsApplicationServiceCommand } from "./implements/participants/GetTournamentParticipantsApplicationService";
+import { OpenTournamentApplicationService, OpenTournamentApplicationServiceCommand } from "./implements/tournaments/OpenTournamentApplicationService";
+import { ReadyTournamentParticipantApplicationService, ReadyTournamentParticipantApplicationServiceCommand } from "./implements/participants/ReadyTournamentParticipantApplicationService";
 
 
 export type TournamentApplicationServiceProps = {

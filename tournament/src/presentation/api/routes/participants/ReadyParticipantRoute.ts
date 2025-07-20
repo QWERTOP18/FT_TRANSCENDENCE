@@ -1,16 +1,19 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
-import { NotImplementedError } from "../../classes/errors/error";
-import { ParticipantIdSchema, ParticipantSchema } from "../../schemas/ParticipantSchema";
-import { OKSchema } from "../../schemas/OtherSchema";
-import { ToStatic } from "../../../types/ToStatic";
 import { DIContainer } from "../../../classes/DIContainer";
-import { TournamentIdSchema } from "../../schemas/TournamentSchema";
+import { ToStatic } from "../../../types/ToStatic";
 import { OKJson } from "../../json/OKJson";
+import { ExternalIdHeaderSchema } from "../../schemas/headers/ExternalIdHeaderSchema";
+import { OKSchema } from "../../schemas/OtherSchema";
+import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
+import { TournamentIdSchema } from "../../schemas/TournamentSchema";
 
 const description = `
 # 概要
 参加者のステータスをreadyにします。
+
+# 権限
+ *
 
 # 注意点
  * sateがpendingの時のみ可能です。
@@ -24,7 +27,9 @@ const RouteSchema = {
 	}),
 	Querystring: undefined,
 	Body: undefined,
-	Headers: undefined,
+	Headers: Type.Intersect([
+		ExternalIdHeaderSchema()
+	]),
 	Reply: {
 		200: OKSchema(),
 	}
@@ -46,6 +51,7 @@ export function ReadyParticipantRoute(fastify: FastifyInstance) {
 			description,
 			tags: ["participant"],
 			summary: "参加者のステータスをreadyにする",
+			headers: RouteSchema.Headers,
 			params: RouteSchema.Params,
 			response: {
 				200: RouteSchema.Reply[200]
@@ -57,6 +63,9 @@ export function ReadyParticipantRoute(fastify: FastifyInstance) {
 		await appService.readyParticipant({
 			participantId: request.params.participant_id,
 			tournamentId: request.params.tournament_id,
+			appUser: {
+				externalId: request.headers["x-external-id"]
+			}
 		});
 		reply.status(200).send(OKJson)
 	})

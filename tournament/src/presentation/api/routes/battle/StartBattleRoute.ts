@@ -2,12 +2,10 @@ import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { DIContainer } from "../../../classes/DIContainer";
 import { ToStatic } from "../../../types/ToStatic";
-import { UsageError } from "../../classes/errors/error";
 import { OKJson } from "../../json/OKJson";
 import { OKSchema } from "../../schemas/OtherSchema";
 import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
 import { TournamentIdSchema } from "../../schemas/TournamentSchema";
-import { MediatorTokenHeaderSchema } from "../../schemas/headers/MediatorTokenHeaderSchema";
 
 const description = `
 # 概要
@@ -19,15 +17,14 @@ const description = `
  * トーナメントがopenの時のみ可能です。
 `
 
+// TODO: BattleSchemaを適用する
 const RouteSchema = {
 	Params: Type.Object({
 		id: TournamentIdSchema(),
 	}),
 	Querystring: undefined,
 	Body: Type.Array(ParticipantIdSchema()),
-	Headers: Type.Intersect([
-		MediatorTokenHeaderSchema()
-	]),
+	Headers: undefined,
 	Reply: {
 		200: OKSchema(),
 	}
@@ -43,13 +40,12 @@ type RouteSchemaType = {
 	};
 }
 
-export function BattleParticipantRoute(fastify: FastifyInstance) {
-	fastify.put<RouteSchemaType>('/tournaments/:id/participants/battle', {
+export function StartBattleRoute(fastify: FastifyInstance) {
+	fastify.put<RouteSchemaType>('/tournaments/:id/battle/start', {
 		schema: {
 			description,
-			tags: ["participant"],
+			tags: ["battle"],
 			summary: "参加者のステータスをin_progressにする",
-			headers: RouteSchema.Headers,
 			params: RouteSchema.Params,
 			body: RouteSchema.Body,
 			response: {
@@ -58,17 +54,7 @@ export function BattleParticipantRoute(fastify: FastifyInstance) {
 		}
 	}, async (request, reply) => {
 		const appService = DIContainer.applicationService();
-
-		if (request.body.length !== 2)
-			throw new UsageError();
-		await appService.battleParticipant({
-			tournamentId: request.params.id,
-			firstParticipantId: request.body[0],
-			secondParticipantId: request.body[1],
-			appMediator: {
-				mediatorToken: request.headers["x-mediator-token"]
-			}
-		});
+		// TODO: ここでサービスを作って呼び出す。
 		reply.status(200).send(OKJson);
 	})
 }

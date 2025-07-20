@@ -3,30 +3,25 @@ import { FastifyInstance } from "fastify";
 import { DIContainer } from "../../../classes/DIContainer";
 import { ToStatic } from "../../../types/ToStatic";
 import { OKJson } from "../../json/OKJson";
+import { HistoryIdSchema } from "../../schemas/HistorySchema";
 import { OKSchema } from "../../schemas/OtherSchema";
-import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
 import { TournamentIdSchema } from "../../schemas/TournamentSchema";
-import { ExternalIdHeaderSchema } from "../../schemas/headers/ExternalIdHeaderSchema";
 
 const description = `
 # 概要
-参加者のステータスをpendingにします。
+in_progressのユーザー2名をreadyに戻す。
 
 # 注意点
- * stateがreadyの時のみ可能です。
- * トーナメントがopenの時のみ可能です。
+ * close状態のトーナメントでは作成できません。
 `
 
 const RouteSchema = {
 	Params: Type.Object({
-		participant_id: ParticipantIdSchema(),
-		tournament_id: TournamentIdSchema(),
+		id: TournamentIdSchema(),
 	}),
 	Querystring: undefined,
-	Body: undefined,
-	Headers: Type.Intersect([
-		ExternalIdHeaderSchema()
-	]),
+	Body: Type.Array(HistoryIdSchema(), { minItems: 2, maxItems: 2 }),
+	Headers: undefined,
 	Reply: {
 		200: OKSchema(),
 	}
@@ -42,28 +37,20 @@ type RouteSchemaType = {
 	};
 }
 
-export function CancelParticipantRoute(fastify: FastifyInstance) {
-	fastify.put<RouteSchemaType>('/tournaments/:tournament_id/participants/:participant_id/cancel', {
+export function CancelBattleRoute(fastify: FastifyInstance) {
+	fastify.put<RouteSchemaType>('/tournaments/:id/battle/cancel', {
 		schema: {
 			description,
-			tags: ["participant"],
-			summary: "参加者のステータスをpendingにする",
-			headers: RouteSchema.Headers,
-			params: RouteSchema.Params,
+			tags: ["battle"],
+			summary: "対戦を取り消す",
+			body: RouteSchema.Body,
 			response: {
 				200: RouteSchema.Reply[200]
 			}
 		}
 	}, async (request, reply) => {
 		const appService = DIContainer.applicationService();
-
-		await appService.cancelParticipant({
-			participantId: request.params.participant_id,
-			tournamentId: request.params.tournament_id,
-			appUser: {
-				externalId: request.headers["x-external-id"]
-			}
-		});
+		// TODO: ここでサービスを作って呼び出す。
 		reply.status(200).send(OKJson);
 	})
 }
