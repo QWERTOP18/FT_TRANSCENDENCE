@@ -23,7 +23,7 @@ const RouteSchema = {
 		id: TournamentIdSchema(),
 	}),
 	Querystring: undefined,
-	Body: Type.Array(ParticipantIdSchema()),
+	Body: Type.Array(ParticipantIdSchema(), { minItems: 2, maxItems: 2 }),
 	Headers: undefined,
 	Reply: {
 		200: OKSchema(),

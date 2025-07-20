@@ -25,7 +25,7 @@ export class StartBattleParticipantApplicationService {
 			const secondParticipant = tournament.getParticipantById(secondParticipantId);
 			if (!firstParticipant || !secondParticipant)
 				throw new NotFoundError("参加者が見つかりませんでした。");
-			tournament.start(firstParticipant, secondParticipant);
+			tournament.startBattle(firstParticipant, secondParticipant);
 			await repository.update(tournament);
 		});
 	}
