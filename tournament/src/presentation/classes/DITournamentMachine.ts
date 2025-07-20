@@ -1,3 +1,4 @@
+import { BattleApplicationService } from "../../application/service/battle/BattleApplicationService";
 import { TournamentApplicationService } from "../../application/service/tournament/TournamentApplicationServiceFacade";
 import { PrismaClientProvider } from "../../infrastructure/Prisma/PrismaClientProvider";
 import { PrismaRepositoryFactory } from "../../infrastructure/Prisma/PrismaReopsitoryFactory";
@@ -9,6 +10,14 @@ export class DITournamentMachine implements IDIMachine {
 	applicationService() {
 		return () => {
 			return new TournamentApplicationService({
+				repositoryFactory: new PrismaRepositoryFactory(new PrismaClientProvider())
+			});
+		}
+	}
+
+	battleService() {
+		return () => {
+			return new BattleApplicationService({
 				repositoryFactory: new PrismaRepositoryFactory(new PrismaClientProvider())
 			});
 		}
