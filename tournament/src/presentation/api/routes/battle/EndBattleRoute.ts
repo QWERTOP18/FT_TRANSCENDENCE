@@ -30,7 +30,6 @@ pendingの参加者が奇数の場合はランダムで、一人だけstateがba
  * close状態のトーナメントでは作成できません。
 `
 
-// TODO: HistoryからBattleSchemaに変更すること。
 const RouteSchema = {
 	Params: Type.Object({
 		id: TournamentIdSchema(),
@@ -77,7 +76,6 @@ export function EndBattleRoute(fastify: FastifyInstance) {
 				score: request.body.loser.score,
 			},
 		});
-		// TODO: ここでサービスを作って呼び出す。
 		reply.status(200).send(OKJson);
 	})
 }

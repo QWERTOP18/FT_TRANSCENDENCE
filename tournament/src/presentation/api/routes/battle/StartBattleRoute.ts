@@ -17,7 +17,6 @@ const description = `
  * トーナメントがopenの時のみ可能です。
 `
 
-// TODO: BattleSchemaを適用する
 const RouteSchema = {
 	Params: Type.Object({
 		id: TournamentIdSchema(),
