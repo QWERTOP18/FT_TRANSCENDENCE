@@ -93,6 +93,14 @@ export class Tournament {
 		this.changeParticipantState(participant2, new ParticipantState('in_progress'));
 	}
 
+	public cancelBattle(participant1: Participant, participant2: Participant) {
+		if (participant1.equals(participant2))
+			throw new UsageError("同じ参加者を指定することはできません");
+		this.changeParticipantState(participant1, new ParticipantState('pending'));
+		this.changeParticipantState(participant2, new ParticipantState('pending'));
+	}
+
+
 	public reRound() {
 		if (this._props.state.equals(new TournamentState('open')) == false)
 			throw new UsageError("開催中のトーナメントでのみ再ラウンドできます");

@@ -49,8 +49,12 @@ export function CancelBattleRoute(fastify: FastifyInstance) {
 			}
 		}
 	}, async (request, reply) => {
-		const appService = DIContainer.applicationService();
-		// TODO: ここでサービスを作って呼び出す。
+		const battleService = DIContainer.battleService();
+		await battleService.cancelBattle({
+			tournamentId: request.params.id,
+			firstParticipantId: request.body[0],
+			secondParticipantId: request.body[1],
+		});
 		reply.status(200).send(OKJson);
 	})
 }

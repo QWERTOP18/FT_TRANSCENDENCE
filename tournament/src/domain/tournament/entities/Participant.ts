@@ -38,7 +38,7 @@ export class Participant {
 		const stateTransitions = {
 			pending: ['ready', 'battled'],
 			ready: ['in_progress', 'pending'],
-			in_progress: ['battled', 'eliminated'],
+			in_progress: ['pending', 'battled', 'eliminated'],
 			battled: ['pending', 'champion'],
 			eliminated: [],
 			champion: []
@@ -47,6 +47,10 @@ export class Participant {
 		const canBecome = stateTransitions[this._props.state.value]
 			.some((value) => state.equals(new ParticipantState(value)));
 		return canBecome;
+	}
+
+	public equals(participant: Participant) {
+		return this._props.id.equals(participant.id);
 	}
 
 	/** ゲッター */
