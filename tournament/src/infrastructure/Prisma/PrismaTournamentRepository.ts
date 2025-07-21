@@ -46,6 +46,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 					create: tournament.participants.map(participant => ({
 						id: participant.id.value,
 						external_id: participant.externalId,
+						name: participant.name,
 						state: participant.state.value,
 					}))
 				}
@@ -89,11 +90,13 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 						where: { id: participant.id.value },
 						update: {
 							external_id: participant.externalId,
+							name: participant.name,
 							state: participant.state.value,
 						},
 						create: {
 							id: participant.id.value,
 							external_id: participant.externalId,
+							name: participant.name,
 							state: participant.state.value,
 						},
 					})),
@@ -139,6 +142,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 			participants: tournamentData.participants.map(participant => Participant.reconstruct({
 				id: new ParticipantId(participant.id),
 				externalId: participant.external_id,
+				name: participant.name,
 				tournamentId: new TournamentId(participant.tournament_id),
 				state: new ParticipantState(participant.state)
 			}))
@@ -178,6 +182,7 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 			participants: tournament.participants.map(participant => Participant.reconstruct({
 				id: new ParticipantId(participant.id),
 				externalId: participant.external_id,
+				name: participant.name,
 				tournamentId: new TournamentId(participant.tournament_id),
 				state: new ParticipantState(participant.state)
 			}))

@@ -4,6 +4,7 @@ import { DIContainer } from "../../../classes/DIContainer";
 import { ToStatic } from "../../../types/ToStatic";
 import { TournamentDTO2JSON } from "../../classes/TournamentDTO2JSON";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { ParticipantIdSchema } from "../../schemas/ParticipantSchema";
 
 const description = `
 # 概要
@@ -21,7 +22,8 @@ const RouteSchema = {
 	Body: Type.Intersect([
 		Type.Pick(TournamentSchema(), ['name', 'description', 'max_num']),
 		Type.Object({
-			ownerExternalId: Type.String({ description: "トーナメントのオーナーの外部ID" }),
+			ownerExternalId: ParticipantIdSchema({ description: "トーナメントのオーナーの外部ID" }),
+			ownerName: Type.String({ description: "トーナメントのオーナーの名前" }),
 		})
 	]),
 	Headers: undefined,

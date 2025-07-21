@@ -10,6 +10,7 @@ export type CreateTournamentApplicationServiceCommand = {
 	readonly description?: string;
 	readonly max_num: number;
 	readonly ownerExternalId: string;
+	readonly ownerName: string;
 }
 
 export class CreateTournamentApplicationService {
@@ -21,7 +22,8 @@ export class CreateTournamentApplicationService {
 				name: command.name,
 				description: command.description,
 				max_num: command.max_num,
-				ownerExternalId: command.ownerExternalId
+				ownerExternalId: command.ownerExternalId,
+				ownerName: command.ownerName,
 			});
 			const domainService = new TournamentDomainService(repository);
 			const isDuplicated = await domainService.checkDuplicatedTournamentId(tournament.id);

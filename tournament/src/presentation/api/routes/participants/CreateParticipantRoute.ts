@@ -19,7 +19,7 @@ const RouteSchema = {
 		id: TournamentIdSchema(),
 	}),
 	Querystring: undefined,
-	Body: Type.Pick(ParticipantSchema(), ['external_id']),
+	Body: Type.Pick(ParticipantSchema(), ['external_id', 'name']),
 	Headers: undefined,
 	Reply: {
 		200: ParticipantSchema({ description: "OK" }),
@@ -52,6 +52,7 @@ export function CreateParticipantRoute(fastify: FastifyInstance) {
 		const participantDTO = await appService.createParticipant({
 			tournament_id: request.params.id,
 			external_id: request.body.external_id,
+			name: request.body.name,
 		});
 		reply.status(200).send(ParticipantDTO2JSON.toJSON(participantDTO));
 	})

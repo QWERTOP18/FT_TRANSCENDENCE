@@ -8,6 +8,7 @@ import { ParticipantDTO } from "../../../../dto/ParticipantDTO";
 export type CreateTournamentParticipantServiceApplicationCommand = {
 	tournament_id: string;
 	external_id: string,
+	name: string;
 };
 
 export class CreateTournamentParticipantServiceApplication {
@@ -27,7 +28,7 @@ export class CreateTournamentParticipantServiceApplication {
 
 	createParticipantFromCommand(command: CreateTournamentParticipantServiceApplicationCommand) {
 		const tournamentId = new TournamentId(command.tournament_id);
-		const participant = Participant.create(tournamentId, command.external_id);
+		const participant = Participant.create(tournamentId, command.external_id, command.name);
 		return participant;
 	}
 }

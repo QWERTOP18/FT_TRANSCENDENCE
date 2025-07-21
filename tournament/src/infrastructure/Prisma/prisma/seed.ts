@@ -7,7 +7,7 @@ async function main() {
 async function seed() {
 	const prisma = new PrismaClient();
 	const participants = {
-		owner1: { id: '697a1e3f-85a9-47f8-8106-b684328ba106', external_id: "owner-1", state: "pending" }
+		owner1: { id: '697a1e3f-85a9-47f8-8106-b684328ba106', name: "tanaka", external_id: "owner-1", state: "pending" }
 	} as const;
 	const tournamentIds = {
 		id1: "df6065be-4e09-4346-99e6-5aa5200cd0c5"

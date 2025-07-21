@@ -27,10 +27,11 @@ export class Tournament {
 		name?: string,
 		description?: string,
 		max_num: number,
-		ownerExternalId: string
+		ownerExternalId: string,
+		ownerName: string,
 	}) {
 		const tournamentId = new TournamentId();
-		const owner = Participant.create(tournamentId, props.ownerExternalId)
+		const owner = Participant.create(tournamentId, props.ownerExternalId, props.ownerName)
 		return new Tournament({
 			id: new TournamentId(),
 			ownerId: owner.id,
