@@ -39,6 +39,8 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - TOURNAMENT_URL=http://tournament:8080
+      - GAME_URL=http://game:4000
     networks:
       - transcendence-network
 
