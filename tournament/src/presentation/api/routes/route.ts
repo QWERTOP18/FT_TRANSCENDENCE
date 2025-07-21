@@ -5,6 +5,7 @@ import { ParticipantRoutes } from "./participants/ParticipantRoutes";
 import fastifySwagger from "@fastify/swagger";
 import { openapiConfig } from "../openapiConfig";
 import fastifySwaggerUi from "@fastify/swagger-ui";
+import { BattleRoutes } from "./battle/BattleRoutes";
 
 export function TournamentAPIRoutes(fastify: FastifyInstance) {
 	fastify.setErrorHandler((err, request, reply) => {
@@ -41,4 +42,5 @@ export function TournamentAPIRoutes(fastify: FastifyInstance) {
 	fastify.register(TournamentRoutes);
 	fastify.register(HistoryRoutes);
 	fastify.register(ParticipantRoutes);
+	fastify.register(BattleRoutes);
 }

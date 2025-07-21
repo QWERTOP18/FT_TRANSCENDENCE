@@ -124,6 +124,10 @@ paths:
                     name:
                       description: トーナメント名
                       type: string
+                    max_num:
+                      description: トーナメントの最大参加人数
+                      minimum: 2
+                      type: number
                     description:
                       description: トーナメントの説明
                       type: string
@@ -158,6 +162,7 @@ paths:
                     - champion_id
                     - owner_id
                     - name
+                    - max_num
                     - state
                     - participants
                     - histories
@@ -188,8 +193,13 @@ paths:
                     description:
                       description: トーナメントの説明
                       type: string
+                    max_num:
+                      description: トーナメントの最大参加人数
+                      minimum: 2
+                      type: number
                   required:
                     - name
+                    - max_num
                 - type: object
                   properties:
                     ownerExternalId:
@@ -222,6 +232,10 @@ paths:
                   name:
                     description: トーナメント名
                     type: string
+                  max_num:
+                    description: トーナメントの最大参加人数
+                    minimum: 2
+                    type: number
                   description:
                     description: トーナメントの説明
                     type: string
@@ -256,6 +270,7 @@ paths:
                   - champion_id
                   - owner_id
                   - name
+                  - max_num
                   - state
                   - participants
                   - histories
@@ -303,6 +318,10 @@ paths:
                   name:
                     description: トーナメント名
                     type: string
+                  max_num:
+                    description: トーナメントの最大参加人数
+                    minimum: 2
+                    type: number
                   description:
                     description: トーナメントの説明
                     type: string
@@ -337,6 +356,7 @@ paths:
                   - champion_id
                   - owner_id
                   - name
+                  - max_num
                   - state
                   - participants
                   - histories
@@ -385,6 +405,12 @@ paths:
           name: id
           required: true
           description: トーナメントID
+        - schema:
+            type: string
+          in: header
+          name: X-External-Id
+          required: true
+          description: 外部ID
       responses:
         "200":
           description: OK
@@ -630,6 +656,345 @@ paths:
         - histories
       description: |
         
+        > 廃止予定です。 /tournaments/{id}/battle/end を使用してください。
+
+        # 概要
+        対戦結果を作成します。
+        対戦結果を作成すると、各参加者は以下のステータスになります。
+
+        loserのstateはeliminatedになります。
+
+        winnerのstateは、battledになります。
+        ただし、条件によっては、次の表のように変更されます。
+
+        | 条件 | 次のstate |
+        | --- | --- |
+        | 自分以外の全参加者がeliminatedになった場合 | champion |
+        | 全参加者のstateがeliminatedもしくはbattledになった場合 | battledの参加者はpendingになります。 |
+
+        pendingの参加者が奇数の場合はランダムで、一人だけstateがbattledになります。
+
+        また、championが決まった場合は、トーナメントのstateをcloseに変更します。
+
+        # 注意点
+         * close状態のトーナメントでは作成できません。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              description: トーナメントの履歴
+              type: object
+              properties:
+                winner:
+                  type: object
+                  properties:
+                    id:
+                      format: uuid
+                      description: 勝者の参加者ID
+                      type: string
+                    score:
+                      minimum: 0
+                      description: スコア
+                      type: number
+                  required:
+                    - id
+                    - score
+                loser:
+                  type: object
+                  properties:
+                    id:
+                      format: uuid
+                      description: 敗者の参加者ID
+                      type: string
+                    score:
+                      minimum: 0
+                      description: スコア
+                      type: number
+                  required:
+                    - id
+                    - score
+              required:
+                - winner
+                - loser
+        required: true
+        description: トーナメントの履歴
+      parameters:
+        - schema:
+            type: string
+          in: header
+          name: X-Mediator-Token
+          required: true
+          description: 調停者（スーパーユーザ）であることを示すトークン。
+        - schema:
+            type: string
+          in: path
+          name: id
+          required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  id:
+                    format: uuid
+                    description: 履歴ID
+                    type: string
+                  tournament_id:
+                    format: uuid
+                    description: トーナメント ID
+                    type: string
+                  winner:
+                    type: object
+                    properties:
+                      id:
+                        format: uuid
+                        description: 勝者の参加者ID
+                        type: string
+                      score:
+                        minimum: 0
+                        description: スコア
+                        type: number
+                    required:
+                      - id
+                      - score
+                  loser:
+                    type: object
+                    properties:
+                      id:
+                        format: uuid
+                        description: 敗者の参加者ID
+                        type: string
+                      score:
+                        minimum: 0
+                        description: スコア
+                        type: number
+                    required:
+                      - id
+                      - score
+                  created_at:
+                    description: 履歴の作成日時
+                    format: date-time
+                    type: string
+                required:
+                  - id
+                  - tournament_id
+                  - winner
+                  - loser
+                  - created_at
+  /tournaments/{tournament_id}/participants/{participant_id}/ready:
+    put:
+      summary: 参加者のステータスをreadyにする
+      tags:
+        - participant
+      description: |
+        
+        # 概要
+        参加者のステータスをreadyにします。
+
+        # 権限
+         *
+
+        # 注意点
+         * sateがpendingの時のみ可能です。
+         * トーナメントがopenの時のみ可能です。
+      parameters:
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: participant_id
+          required: true
+          description: 参加者ID
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: tournament_id
+          required: true
+          description: ID
+        - schema:
+            type: string
+          in: header
+          name: X-External-Id
+          required: true
+          description: 外部ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    enum:
+                      - true
+                required:
+                  - ok
+  /tournaments/{tournament_id}/participants/{participant_id}/cancel:
+    put:
+      summary: 参加者のステータスをpendingにする
+      tags:
+        - participant
+      description: |
+        
+        # 概要
+        参加者のステータスをpendingにします。
+
+        # 注意点
+         * stateがreadyの時のみ可能です。
+         * トーナメントがopenの時のみ可能です。
+      parameters:
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: participant_id
+          required: true
+          description: 参加者ID
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: tournament_id
+          required: true
+          description: ID
+        - schema:
+            type: string
+          in: header
+          name: X-External-Id
+          required: true
+          description: 外部ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    enum:
+                      - true
+                required:
+                  - ok
+  /tournaments/{id}/participants/battle:
+    put:
+      summary: 参加者のステータスをin_progressにする
+      tags:
+        - participant
+      description: |
+        
+        > 廃止予定です。 /tournaments/{id}/battle/start を使用してください。
+
+        # 概要
+        複数の参加者のステータスをin_progressにします。
+        参加者はready状態の2人指定する必要があります。
+
+        # 注意点
+         * stateがreadyの時のみ可能です。
+         * トーナメントがopenの時のみ可能です。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                format: uuid
+                description: 参加者ID
+                type: string
+      parameters:
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: id
+          required: true
+          description: ID
+        - schema:
+            type: string
+          in: header
+          name: X-Mediator-Token
+          required: true
+          description: 調停者（スーパーユーザ）であることを示すトークン。
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    enum:
+                      - true
+                required:
+                  - ok
+  /tournaments/{id}/battle/start:
+    put:
+      summary: 参加者のステータスをin_progressにする
+      tags:
+        - battle
+      description: |
+        
+        # 概要
+        複数の参加者のステータスをin_progressにします。
+        参加者はready状態の2人指定する必要があります。
+
+        # 注意点
+         * stateがreadyの時のみ可能です。
+         * トーナメントがopenの時のみ可能です。
+      requestBody:
+        content:
+          application/json:
+            schema:
+              minItems: 2
+              maxItems: 2
+              type: array
+              items:
+                format: uuid
+                description: 参加者ID
+                type: string
+      parameters:
+        - schema:
+            format: uuid
+            type: string
+          in: path
+          name: id
+          required: true
+          description: ID
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                description: OK
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    enum:
+                      - true
+                required:
+                  - ok
+  /tournaments/{id}/battle/end:
+    post:
+      summary: 対戦終了
+      tags:
+        - battle
+      description: |
+        
         # 概要
         対戦結果を作成します。
         対戦結果を作成すると、各参加者は以下のステータスになります。
@@ -705,156 +1070,32 @@ paths:
                 description: OK
                 type: object
                 properties:
-                  id:
-                    format: uuid
-                    description: 履歴ID
-                    type: string
-                  tournament_id:
-                    format: uuid
-                    description: トーナメント ID
-                    type: string
-                  winner:
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 勝者の参加者ID
-                        type: string
-                      score:
-                        minimum: 0
-                        description: スコア
-                        type: number
-                    required:
-                      - id
-                      - score
-                  loser:
-                    type: object
-                    properties:
-                      id:
-                        format: uuid
-                        description: 敗者の参加者ID
-                        type: string
-                      score:
-                        minimum: 0
-                        description: スコア
-                        type: number
-                    required:
-                      - id
-                      - score
-                  created_at:
-                    description: 履歴の作成日時
-                    format: date-time
-                    type: string
-                required:
-                  - id
-                  - tournament_id
-                  - winner
-                  - loser
-                  - created_at
-  /tournaments/{tournament_id}/participants/{participant_id}/ready:
-    put:
-      summary: 参加者のステータスをreadyにする
-      tags:
-        - participant
-      description: |
-        
-        # 概要
-        参加者のステータスをreadyにします。
-
-        # 注意点
-         * sateがpendingの時のみ可能です。
-         * トーナメントがopenの時のみ可能です。
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: participant_id
-          required: true
-          description: 参加者ID
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: tournament_id
-          required: true
-          description: ID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
                   ok:
                     type: boolean
                     enum:
                       - true
                 required:
                   - ok
-  /tournaments/{tournament_id}/participants/{participant_id}/cancel:
+  /tournaments/{id}/battle/cancel:
     put:
-      summary: 参加者のステータスをpendingにする
+      summary: 対戦を取り消す
       tags:
-        - participant
-      description: |
+        - battle
+      description: |+
         
         # 概要
-        参加者のステータスをpendingにします。
+        in_progressのユーザー2名を in_progress に戻す。
 
         # 注意点
-         * stateがreadyの時のみ可能です。
-         * トーナメントがopenの時のみ可能です。
-      parameters:
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: participant_id
-          required: true
-          description: 参加者ID
-        - schema:
-            format: uuid
-            type: string
-          in: path
-          name: tournament_id
-          required: true
-          description: ID
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                description: OK
-                type: object
-                properties:
-                  ok:
-                    type: boolean
-                    enum:
-                      - true
-                required:
-                  - ok
-  /tournaments/{id}/participants/battle:
-    put:
-      summary: 参加者のステータスをin_progressにする
-      tags:
-        - participant
-      description: |
-        
-        # 概要
-        複数の参加者のステータスをin_progressにします。
-        参加者はready状態の2人指定する必要があります。
+         * close状態のトーナメントでは使用できません。
+         * /tournaments/{id}/battle/start で使用した参加者IDの組み合わせでなくても動作します。
 
-        # 注意点
-         * stateがreadyの時のみ可能です。
-         * トーナメントがopenの時のみ可能です。
       requestBody:
         content:
           application/json:
             schema:
+              minItems: 2
+              maxItems: 2
               type: array
               items:
                 format: uuid
@@ -862,12 +1103,10 @@ paths:
                 type: string
       parameters:
         - schema:
-            format: uuid
             type: string
           in: path
           name: id
           required: true
-          description: ID
       responses:
         "200":
           description: OK

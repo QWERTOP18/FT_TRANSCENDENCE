@@ -1,18 +1,25 @@
-import { TournamentApplicationService } from "../../application/service/tournament/TournamentApplicationServiceFacade";
 import { IDIMachine } from "../interfaces/IDIMachine";
 
 
 export class DIContainer {
 
-	private static _applicationService: () => TournamentApplicationService;
+	private static diMachine: IDIMachine;
 
 	public static injectDIMachine(diMachine: IDIMachine) {
-		this._applicationService = diMachine.applicationService();
+		this.diMachine = diMachine;
 	}
 
 	public static applicationService() {
-		if (this._applicationService == undefined)
+		if (this.diMachine == undefined)
 			throw new Error("DIContainer: 依存が注入されていません")
-		return this._applicationService();
+		const applicationServiceFactory = this.diMachine.applicationService();
+		return applicationServiceFactory();
+	}
+
+	public static battleService() {
+		if (this.diMachine == undefined)
+			throw new Error("DIContainer: 依存が注入されていません")
+		const battleServiceFactory = this.diMachine.battleService();
+		return battleServiceFactory();
 	}
 }
