@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { HistorySchema, ErrorSchema } from "../../schemas/TournamentSchema";
+import { HistorySchema } from "../../schemas/TournamentSchema";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { getTournamentHistory } from "../../../../domain/tournament/getTournamentHistory";
 
 export default function GetTournamentHistory(fastify: FastifyInstance) {

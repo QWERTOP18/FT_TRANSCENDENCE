@@ -58,6 +58,7 @@
     "split2": "^4.2.0",
     "thread-stream": "^3.1.0",
     "toad-cache": "^3.7.0",
+    "uuid": "^11.0.5",
     "ws": "^8.18.3"
   },
   "keywords": [],

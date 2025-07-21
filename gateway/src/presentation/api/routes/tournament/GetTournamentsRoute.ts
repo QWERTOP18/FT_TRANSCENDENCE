@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { TournamentSchema, ErrorSchema } from "../../schemas/TournamentSchema";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { getTournaments } from "../../../../domain/tournament/getTournaments";
 
 const description = `

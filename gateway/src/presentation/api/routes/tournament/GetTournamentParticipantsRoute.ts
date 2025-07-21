@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { ParticipantSchema, ErrorSchema } from "../../schemas/TournamentSchema";
+import { ParticipantSchema } from "../../schemas/TournamentSchema";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { getTournamentParticipants } from "../../../../domain/tournament/getTournamentParticipants";
 
 export default function GetTournamentParticipants(fastify: FastifyInstance) {

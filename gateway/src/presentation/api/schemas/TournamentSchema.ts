@@ -58,10 +58,3 @@ export const HistorySchema = () => {
     ),
   });
 };
-
-export type ErrorSchema = Static<ReturnType<typeof ErrorSchema>>;
-export const ErrorSchema = () => {
-  return Type.Object({
-    error: Type.String({ description: "エラーメッセージ" }),
-  });
-};

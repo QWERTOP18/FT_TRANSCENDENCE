@@ -2,7 +2,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import axios from "axios";
 import { config } from "../../../../config/config";
 import { Type } from "@sinclair/typebox";
-import { TournamentSchema, ErrorSchema } from "../../schemas/TournamentSchema";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { getTournament } from "../../../../domain/tournament/getTournament";
 
 export default function GetTournament(fastify: FastifyInstance) {

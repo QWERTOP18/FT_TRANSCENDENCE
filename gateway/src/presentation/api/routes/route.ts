@@ -3,6 +3,7 @@ import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { TournamentRoutes } from "./tournament/TournamentRoutes";
+import { AuthRoutes } from "./auth/AuthRoute";
 
 export async function Routes(app: FastifyInstance) {
   await app.register(cors, {
@@ -30,6 +31,8 @@ export async function Routes(app: FastifyInstance) {
 
   // Register tournament routes first
   await app.register(TournamentRoutes);
+
+  await app.register(AuthRoutes);
 
   app.get("/", (request, reply) => {
     reply.redirect("/docs");

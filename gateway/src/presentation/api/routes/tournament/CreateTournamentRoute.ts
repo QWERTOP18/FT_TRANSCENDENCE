@@ -2,8 +2,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import {
   TournamentSchema,
   CreateTournamentSchema,
-  ErrorSchema,
 } from "../../schemas/TournamentSchema";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { createTournament } from "../../../../domain/tournament/createTournament";
 
 export default function CreateTournament(fastify: FastifyInstance) {
