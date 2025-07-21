@@ -20,9 +20,9 @@ const RouteSchema = {
 	Params: undefined,
 	Querystring: undefined,
 	Body: Type.Intersect([
-		Type.Pick(TournamentSchema(), ['name', 'description', 'max_num']),
+		Type.Pick(TournamentSchema(), ['name', 'description', 'max_num', 'rule']),
 		Type.Object({
-			ownerExternalId: ParticipantIdSchema({ description: "トーナメントのオーナーの外部ID" }),
+			ownerExternalId: Type.String({ description: "トーナメントのオーナーの外部ID" }),
 			ownerName: Type.String({ description: "トーナメントのオーナーの名前" }),
 		})
 	]),

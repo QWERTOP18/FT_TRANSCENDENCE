@@ -17,6 +17,7 @@ model Tournament {
   max_num     Int
   owner_id    String
   state       State
+  rule        TournamentRule
 
   participants Participant[]
   histories    History[]
@@ -58,6 +59,10 @@ enum State {
   reception
   open
   close
+}
+
+enum TournamentRule {
+  simple
 }
 
 enum ParticipantState {

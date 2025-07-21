@@ -4,6 +4,7 @@ import { InternalError, UsageError } from "../TournamentError";
 import { ParticipantId } from "../value-objects/ParticipantId";
 import { ParticipantState } from "../value-objects/ParticipantState";
 import { TournamentId } from "../value-objects/TournamentId";
+import { TournamentRule } from "../value-objects/TournamentRule";
 import { TournamentState } from "../value-objects/TournamentState";
 
 export type TournamentValue = {
@@ -14,6 +15,7 @@ export type TournamentValue = {
 	description: string,
 	max_num: number,
 	state: TournamentState,
+	rule: TournamentRule,
 	participants: Array<Participant>,
 	histories: Array<History>
 }
@@ -29,6 +31,7 @@ export class Tournament {
 		max_num: number,
 		ownerExternalId: string,
 		ownerName: string,
+		rule: TournamentRule,
 	}) {
 		const tournamentId = new TournamentId();
 		const owner = Participant.create(tournamentId, props.ownerExternalId, props.ownerName)
@@ -40,6 +43,7 @@ export class Tournament {
 			description: props.description ?? '',
 			max_num: props.max_num,
 			state: new TournamentState('reception'),
+			rule: props.rule,
 			participants: [owner],
 			histories: []
 		});
@@ -256,6 +260,10 @@ export class Tournament {
 
 	get state() {
 		return this._props.state;
+	}
+
+	get rule() {
+		return this._props.rule;
 	}
 
 	get participants() {

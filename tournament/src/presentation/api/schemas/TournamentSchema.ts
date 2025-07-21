@@ -13,6 +13,7 @@ export function TournamentSchema(options?: ObjectOptions) {
 		name: Type.String({ description: "トーナメント名" }),
 		max_num: Type.Number({ description: "トーナメントの最大参加人数", minimum: 2 }),
 		description: Type.Optional(Type.String({ description: "トーナメントの説明" })),
+		rule: TournamentRuleSchema({ description: "トーナメントのルール" }),
 		state: TournamentStatusSchema(),
 		participants: Type.Array(ParticipantIdSchema(), { description: "参加者リスト" }),
 		histories: Type.Array(HistoryIdSchema(), { description: "トーナメントの履歴" }),
@@ -28,6 +29,17 @@ export function TournamentStatusSchema(options?: SchemaOptions) {
 		Type.Literal('close'),
 	], {
 		description: "トーナメントの状況 - reception: 受付中, open: 開催中, close: 終了",
+		...options
+	})
+}
+
+// トーナメントルール
+export type TournamentRuleSchema = Static<ReturnType<typeof TournamentRuleSchema>>
+export function TournamentRuleSchema(options?: SchemaOptions) {
+	return Type.Union([
+		Type.Literal('simple'),
+	], {
+		description: "トーナメントのルール - simple: シンプルなルール",
 		...options
 	})
 }

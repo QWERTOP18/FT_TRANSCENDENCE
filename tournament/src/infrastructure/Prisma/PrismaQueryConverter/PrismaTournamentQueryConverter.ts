@@ -5,6 +5,7 @@ import { PrismaParticipantQueryConverter } from "./PrismaParticipantQueryConvert
 import { TournamentId } from "../../../domain/tournament/value-objects/TournamentId";
 import { ParticipantId } from "../../../domain/tournament/value-objects/ParticipantId";
 import { TournamentState } from "../../../domain/tournament/value-objects/TournamentState";
+import { TournamentRule } from "../../../domain/tournament/value-objects/TournamentRule";
 
 
 export class PrismaTournamentQueryConverter {
@@ -16,6 +17,7 @@ export class PrismaTournamentQueryConverter {
 			description: tournament.description,
 			max_num: tournament.max_num,
 			state: tournament.state.value,
+			rule: tournament.rule.value,
 			champion_id: tournament.championId?.value ?? null,
 			histories: {
 				create: tournament.histories
@@ -62,6 +64,7 @@ export class PrismaTournamentQueryConverter {
 			description: tournament.description,
 			max_num: tournament.max_num,
 			state: new TournamentState(tournament.state),
+			rule: new TournamentRule(tournament.rule),
 			championId: tournament.champion_id && new ParticipantId(tournament.champion_id) || undefined,
 			histories: tournament.histories
 				.map(history => PrismaHistoryQueryConverter.toDomain(history)),

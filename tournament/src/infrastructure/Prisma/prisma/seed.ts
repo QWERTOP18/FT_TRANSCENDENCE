@@ -1,33 +1,32 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClientProvider } from "../PrismaClientProvider";
+import { PrismaTournamentQueryConverter } from "../PrismaQueryConverter/PrismaTournamentQueryConverter";
+import { PrismaRepositoryFactory } from "../PrismaReopsitoryFactory";
 
 async function main() {
 	await seed();
 }
 
 async function seed() {
-	const prisma = new PrismaClient();
-	const participants = {
-		owner1: { id: '697a1e3f-85a9-47f8-8106-b684328ba106', name: "tanaka", external_id: "owner-1", state: "pending" }
-	} as const;
 	const tournamentIds = {
 		id1: "df6065be-4e09-4346-99e6-5aa5200cd0c5"
 	}
-	await prisma.tournament.upsert({
-		where: { id: tournamentIds.id1 },
-		update: {},
-		create: {
-			id: tournamentIds.id1,
-			name: "Sample Tournament",
-			description: "This is a sample tournament.",
-			max_num: 8,
-			owner_id: participants.owner1.id,
-			state: "reception",
-			participants: {
-				create: [
-					participants.owner1
-				]
-			}
-		}
+	const tournament = PrismaTournamentQueryConverter.toDomain({
+		id: tournamentIds.id1,
+		owner_id: "697a1e3f-85a9-47f8-8106-b684328ba106",
+		name: "Sample Tournament",
+		description: "This is a simple tournament.",
+		max_num: 8,
+		state: "reception",
+		rule: "simple",
+		champion_id: null,
+		histories: [],
+		participants: [
+			{ external_id: "owner-1", id: "697a1e3f-85a9-47f8-8106-b684328ba106", name: "tanaka", state: "pending", tournament_id: tournamentIds.id1 }
+		],
+	})
+	const prismaFactory = new PrismaRepositoryFactory(new PrismaClientProvider());
+	await prismaFactory.transaction(async (repository) => {
+		await repository.upsert(tournament);
 	});
 }
 

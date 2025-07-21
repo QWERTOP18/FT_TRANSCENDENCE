@@ -28,6 +28,14 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 		});
 	}
 
+	async upsert(tournament: Tournament): Promise<void> {
+		await this._client.tournament.upsert({
+			where: { id: tournament.id.value },
+			update: PrismaTournamentQueryConverter.update(tournament),
+			create: PrismaTournamentQueryConverter.create(tournament),
+		});
+	}
+
 	async find(tournamentId: TournamentId): Promise<Tournament | null> {
 		const tournamentData = await this._client.tournament.findUnique({
 			where: { id: tournamentId.value },
