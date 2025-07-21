@@ -1,0 +1,22 @@
+{
+  "name": "sample-3d",
+  "version": "1.0.0",
+  "description": "フロントエンドとpackage.json周りが競合しそうなので一旦別で作成",
+  "main": "index.js",
+  "scripts": {
+    "start": "serve",
+    "build": "cp index.html dist/index.html && esbuild index.ts --bundle --outfile=index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@babylonjs/core": "^8.17.1",
+    "@babylonjs/materials": "^8.17.1"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.8",
+    "serve": "^14.2.4",
+    "typescript": "^5.8.3"
+  }
+}
