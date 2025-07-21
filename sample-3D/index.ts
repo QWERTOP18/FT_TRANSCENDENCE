@@ -15,7 +15,26 @@ class Playground {
 
 	static instance: Playground | null;
 
-	constructor(private props: PongProps) { }
+	constructor(public props: PongProps) { }
+
+	public setPosition(props: {
+		packPosition?: { x: number, z: number },
+		bottomBarPosition?: { x: number, z: number },
+		topBarPosition?: { x: number, z: number },
+	}) {
+		if (props.packPosition) {
+			this.props.pack.position.x = props.packPosition.x;
+			this.props.pack.position.z = props.packPosition.z;
+		}
+		if (props.bottomBarPosition) {
+			this.props.bottomBar.position.x = props.bottomBarPosition.x;
+			this.props.bottomBar.position.z = props.bottomBarPosition.z;
+		}
+		if (props.topBarPosition) {
+			this.props.topBar.position.x = props.topBarPosition.x;
+			this.props.topBar.position.z = props.topBarPosition.z;
+		}
+	}
 
 	public static CreateScene(engine: Engine, canvas: HTMLCanvasElement): Scene {
 		// This creates a basic Babylon Scene object (non-mesh)
@@ -49,7 +68,7 @@ class Playground {
 		camera.setTarget(Vector3.Zero());
 
 		// This attaches the camera to the canvas
-		camera.attachControl(canvas, true);
+		// camera.attachControl(canvas, true);
 		return camera;
 	}
 
@@ -152,6 +171,37 @@ const scene = Playground.CreateScene(engine, canvas); //Call the createScene fun
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
 	scene.render();
+});
+
+canvas.addEventListener("keydown", (event: KeyboardEvent) => {
+	if (!Playground.instance) {
+		return ;
+	}
+	if (event.key === "ArrowUp") {
+		// Move pack up
+		Playground.instance.props.pack.position.z += 0.1;
+	} else if (event.key === "ArrowDown") {
+		// Move pack down
+		Playground.instance.props.pack.position.z -= 0.1;
+	} else if (event.key === "ArrowLeft") {
+		// Move pack left
+		Playground.instance.props.pack.position.x -= 0.1;
+	} else if (event.key === "ArrowRight") {
+		// Move pack right
+		Playground.instance.props.pack.position.x += 0.1;
+	}
+	else if (event.key == "a") {
+		Playground.instance.props.bottomBar.position.x -= 0.1;
+	}
+	else if (event.key == "d") {
+		Playground.instance.props.bottomBar.position.x += 0.1;
+	}
+	else if (event.key == "q") {
+		Playground.instance.props.topBar.position.x -= 0.1;
+	}
+	else if (event.key == "e") {
+		Playground.instance.props.topBar.position.x += 0.1;
+	}
 });
 
 // Watch for browser/canvas resize events
