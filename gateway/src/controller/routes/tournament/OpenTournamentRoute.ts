@@ -1,24 +1,22 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import axios from "axios";
-import { config } from "../../../../config/config";
 import { Type } from "@sinclair/typebox";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
-import { getTournament } from "../../../../domain/tournament/getTournament";
+import { tournamentService } from "../../../service/tournament/TournamentService";
 
-export default function GetTournament(fastify: FastifyInstance) {
-  fastify.get(
-    "/tournaments/:id",
+export default function OpenTournament(fastify: FastifyInstance) {
+  fastify.put(
+    "/tournaments/:id/open",
     {
       schema: {
         tags: ["Tournament"],
-        summary: "特定のトーナメントを取得",
+        summary: "トーナメントを開始",
         params: Type.Object({
           id: Type.String({ description: "トーナメントID" }),
         }),
         response: {
           200: TournamentSchema(),
-          404: ErrorSchema(),
+          400: ErrorSchema(),
           500: ErrorSchema(),
         },
       },
@@ -26,10 +24,10 @@ export default function GetTournament(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { id } = request.params as { id: string };
       try {
-        const tournament = await getTournament(id);
+        const tournament = await tournamentService.openTournament(id);
         return tournament;
       } catch (error) {
-        reply.status(500).send({ error: "Failed to fetch tournament" });
+        reply.status(500).send({ error: "Failed to open tournament" });
       }
     }
   );

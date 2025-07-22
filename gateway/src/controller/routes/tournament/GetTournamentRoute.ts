@@ -1,22 +1,22 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { HistorySchema } from "../../schemas/TournamentSchema";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
-import { getTournamentHistory } from "../../../../domain/tournament/getTournamentHistory";
+import { tournamentService } from "../../../service/tournament/TournamentService";
 
-export default function GetTournamentHistory(fastify: FastifyInstance) {
+export default function GetTournament(fastify: FastifyInstance) {
   fastify.get(
-    "/tournaments/:id/history",
+    "/tournaments/:id",
     {
       schema: {
         tags: ["Tournament"],
-        summary: "履歴を取得",
+        summary: "特定のトーナメントを取得",
         params: Type.Object({
           id: Type.String({ description: "トーナメントID" }),
         }),
         response: {
-          200: Type.Array(HistorySchema()),
-          404: ErrorSchema(),
+          200: TournamentSchema(),
+          400: ErrorSchema(),
           500: ErrorSchema(),
         },
       },
@@ -24,10 +24,10 @@ export default function GetTournamentHistory(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { id } = request.params as { id: string };
       try {
-        const history = await getTournamentHistory(id);
-        return history;
+        const tournament = await tournamentService.getTournament(id);
+        return tournament;
       } catch (error) {
-        reply.status(500).send({ error: "Failed to fetch tournament history" });
+        reply.status(500).send({ error: "Failed to fetch tournament" });
       }
     }
   );

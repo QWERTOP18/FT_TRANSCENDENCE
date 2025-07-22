@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
 import { UserSchema } from "../../schemas/UserSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
-import { createUser } from "../../../../domain/auth/createUser";
+import { createUser } from "../../../service/auth/createUser";
 
 export default function CreateUser(fastify: FastifyInstance) {
   fastify.post(
@@ -13,8 +13,6 @@ export default function CreateUser(fastify: FastifyInstance) {
         summary: "ユーザーを作成",
         body: Type.Object({
           name: Type.String({ description: "ユーザー名" }),
-          //   email: Type.String({ description: "メールアドレス" }),
-          //   password: Type.String({ description: "パスワード" }),
         }),
         response: {
           200: UserSchema(),

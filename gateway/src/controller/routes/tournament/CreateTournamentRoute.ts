@@ -4,7 +4,7 @@ import {
   CreateTournamentSchema,
 } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
-import { createTournament } from "../../../../domain/tournament/createTournament";
+import { tournamentService } from "../../../service/tournament/TournamentService";
 
 export default function CreateTournament(fastify: FastifyInstance) {
   fastify.post(
@@ -28,11 +28,11 @@ export default function CreateTournament(fastify: FastifyInstance) {
         max_num: number;
       };
       try {
-        const tournament = await createTournament({
+        const tournament = await tournamentService.createTournament(
           name,
           description,
-          max_num,
-        });
+          max_num
+        );
         return tournament;
       } catch (error) {
         reply.status(500).send({ error: "Failed to create tournament" });

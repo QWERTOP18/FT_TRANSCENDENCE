@@ -2,7 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
 import { ParticipantSchema } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
-import { getTournamentParticipants } from "../../../../domain/tournament/getTournamentParticipants";
+import { tournamentService } from "../../../service/tournament/TournamentService";
 
 export default function GetTournamentParticipants(fastify: FastifyInstance) {
   fastify.get(
@@ -16,7 +16,7 @@ export default function GetTournamentParticipants(fastify: FastifyInstance) {
         }),
         response: {
           200: Type.Array(ParticipantSchema()),
-          404: ErrorSchema(),
+          400: ErrorSchema(),
           500: ErrorSchema(),
         },
       },
@@ -24,7 +24,8 @@ export default function GetTournamentParticipants(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { id } = request.params as { id: string };
       try {
-        const participants = await getTournamentParticipants(id);
+        const participants =
+          await tournamentService.getTournamentParticipants(id);
         return participants;
       } catch (error) {
         reply

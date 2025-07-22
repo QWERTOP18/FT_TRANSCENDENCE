@@ -1,5 +1,5 @@
 import fastify from "fastify";
-import { Routes as routes } from "./presentation/api/routes/route";
+import { Routes as routes } from "./controller/routes/route";
 import { config } from "./config/config";
 
 async function main() {
