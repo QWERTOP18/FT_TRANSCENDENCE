@@ -1,28 +1,34 @@
-import { userDatabase, MY_USER_ID } from '../data/mockData';
-
 function render(appElement: HTMLElement, content: string) {
     appElement.innerHTML = content;
 }
 
-export function renderTournamentListScreen(appElement: HTMLElement, tournaments: any[]) {
-    const listHTML = tournaments.map(t => `
-        <div class="bg-gray-700 p-4 rounded-lg mb-4 flex justify-between items-center transition hover:bg-gray-600 shadow-lg">
-            <div>
-                <h3 class="text-xl font-bold text-white">${t.name}</h3>
-                <p class="text-gray-400">${t.description}</p>
+export function renderTournamentListScreen(appElement: HTMLElement, tournaments: any[], MY_USER_ID: string, userDatabase: any) {
+    const listHTML = tournaments.map(t => {
+        const adminButtonHTML = t.owner_id === MY_USER_ID ?
+            `<button class="mt-2 block w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/admin/${t.id}')">
+                管理する
+            </button>` : '';
+
+        return `
+            <div class="bg-gray-700 p-4 rounded-lg mb-4 flex justify-between items-center transition hover:bg-gray-600 shadow-lg">
+                <div>
+                    <h3 class="text-xl font-bold text-white">${t.name}</h3>
+                    <p class="text-gray-400">${t.description}</p>
+                </div>
+                <div class="text-right">
+                    <span class="text-sm font-semibold px-3 py-1 rounded-full ${
+                        t.state === 'open' ? 'bg-green-500 text-white' :
+                        t.state === 'reception' ? 'bg-yellow-500 text-black' :
+                        'bg-gray-500 text-white'
+                    }">${t.state}</span>
+                    <button class="mt-2 block w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/detail/${t.id}')">
+                        詳細を見る
+                    </button>
+                    ${adminButtonHTML}
+                </div>
             </div>
-            <div class="text-right">
-                <span class="text-sm font-semibold px-3 py-1 rounded-full ${
-                    t.state === 'open' ? 'bg-green-500 text-white' :
-                    t.state === 'reception' ? 'bg-yellow-500 text-black' :
-                    'bg-gray-500 text-white'
-                }">${t.state}</span>
-                <button class="mt-2 block w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/detail/${t.id}')">
-                    詳細を見る
-                </button>
-            </div>
-        </div>
-    `).join('');
+        `;
+    }).join('');
 
     const contentHTML = `
         <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
@@ -33,7 +39,7 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
     render(appElement, contentHTML);
 }
 
-export function renderTournamentScreen(appElement: HTMLElement, tournamentData: any) {
+export function renderTournamentScreen(appElement: HTMLElement, tournamentData: any, userDatabase: any, MY_USER_ID: string) {
     if (!tournamentData) {
         render(appElement, `<p class="text-red-500">Tournament data not found.</p>`);
         return;
@@ -78,7 +84,7 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
             const numParticipants = initialParticipants.length;
             let bracketSize = 2;
             while (bracketSize < numParticipants) { bracketSize *= 2; }
-            const players = [...initialParticipants];
+            const players = [...initialParticipants.map((p: any) => (typeof p === 'object' ? p.id : p))];
             while (players.length < bracketSize) { players.push(null); }
             const rounds: any[] = [];
             let currentRoundPlayers = [...players];
@@ -131,7 +137,7 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
     render(appElement, finalHTML);
 }
 
-export function renderAdminScreen(appElement: HTMLElement, tournamentData: any) {
+export function renderAdminScreen(appElement: HTMLElement, tournamentData: any, MY_USER_ID: string) {
     if (!tournamentData) {
         render(appElement, `<p class="text-red-500">Tournament data not found.</p>`);
         return;
