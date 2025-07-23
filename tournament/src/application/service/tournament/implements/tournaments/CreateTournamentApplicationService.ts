@@ -2,6 +2,7 @@ import { IRepositoryFactory } from "../../../../../domain/interfaces/IRepository
 import { TournamentDomainService } from "../../../../../domain/services/Tournament/TournamentDomainService";
 import { Tournament } from "../../../../../domain/tournament/aggregate/Tournament";
 import { InternalError } from "../../../../../domain/tournament/TournamentError";
+import { TournamentRule, TournamentRuleValue } from "../../../../../domain/tournament/value-objects/TournamentRule";
 import { TournamentDTO } from "../../../../dto/TournamentDTO";
 
 
@@ -10,6 +11,8 @@ export type CreateTournamentApplicationServiceCommand = {
 	readonly description?: string;
 	readonly max_num: number;
 	readonly ownerExternalId: string;
+	readonly ownerName: string;
+	readonly rule: TournamentRuleValue;
 }
 
 export class CreateTournamentApplicationService {
@@ -21,7 +24,9 @@ export class CreateTournamentApplicationService {
 				name: command.name,
 				description: command.description,
 				max_num: command.max_num,
-				ownerExternalId: command.ownerExternalId
+				rule: new TournamentRule(command.rule),
+				ownerExternalId: command.ownerExternalId,
+				ownerName: command.ownerName,
 			});
 			const domainService = new TournamentDomainService(repository);
 			const isDuplicated = await domainService.checkDuplicatedTournamentId(tournament.id);

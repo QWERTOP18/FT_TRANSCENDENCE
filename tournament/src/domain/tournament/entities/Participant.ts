@@ -6,6 +6,7 @@ import { TournamentId } from "../value-objects/TournamentId";
 export type ParticipantValue = {
 	readonly id: ParticipantId,
 	readonly tournamentId: TournamentId,
+	readonly name: string,
 	readonly externalId: string,
 	state: ParticipantState,
 }
@@ -15,10 +16,13 @@ export class Participant {
 
 	public static create(
 		tournamentId: TournamentId,
-		externalId: string) {
+		externalId: string,
+		name: string,
+	) {
 		return new Participant({
 			id: new ParticipantId(),
 			tournamentId,
+			name,
 			externalId,
 			state: new ParticipantState('pending'),
 		});
@@ -56,6 +60,9 @@ export class Participant {
 	/** ゲッター */
 	get id() {
 		return this._props.id;
+	}
+	get name() {
+		return this._props.name;
 	}
 	get tournamentId() {
 		return this._props.tournamentId;
