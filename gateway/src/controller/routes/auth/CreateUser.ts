@@ -3,14 +3,20 @@ import { Type } from "@sinclair/typebox";
 import { UserSchema } from "../../schemas/UserSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { createUser } from "../../../service/auth/createUser";
+import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 
 export default function CreateUser(fastify: FastifyInstance) {
+  const RouteSchema = {
+    Headers: UserIdHeaderSchema,
+  };
+
   fastify.post(
     "/auth/signup",
     {
       schema: {
         tags: ["Auth"],
         summary: "ユーザーを作成",
+        headers: RouteSchema.Headers,
         body: Type.Object({
           name: Type.String({ description: "ユーザー名" }),
         }),

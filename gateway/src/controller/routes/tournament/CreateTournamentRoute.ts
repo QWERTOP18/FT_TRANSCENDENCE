@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
 import { Type } from "@sinclair/typebox";
+import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 
 const description = `
   # 概要
@@ -23,7 +24,7 @@ const RouteSchema = {
       }),
     }),
   ]),
-  Headers: undefined,
+  Headers: UserIdHeaderSchema,
   Reply: {
     200: TournamentSchema({ description: "OK" }),
   },
@@ -37,21 +38,15 @@ export default function CreateTournament(fastify: FastifyInstance) {
         tags: ["Tournament"],
         summary: "トーナメントを作成",
         body: RouteSchema.Body,
+        headers: RouteSchema.Headers,
         response: {
           200: RouteSchema.Reply[200],
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { name, description, max_num } = request.body as {
-        name: string;
-        description: string;
-        max_num: number;
-      };
       try {
-        const tournament = await tournamentService.createTournament(
-          request.body
-        );
+        const tournament = await tournamentService.createTournament(request);
         return tournament;
       } catch (error) {
         console.log(error);

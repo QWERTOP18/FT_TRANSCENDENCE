@@ -2,7 +2,8 @@ import { Type } from "@sinclair/typebox";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { tournamentService } from "../../../service/tournament/TournamentService";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { OKSchema } from "../../schemas/OtherSchema";
+import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 
 const description = `
 # 概要
@@ -16,6 +17,7 @@ const RouteSchema = {
   Params: Type.Pick(TournamentSchema(), ["id"]),
   Querystring: undefined,
   Body: undefined,
+  Headers: UserIdHeaderSchema,
   Reply: {
     200: TournamentSchema(),
   },
@@ -30,19 +32,15 @@ export default function OpenTournament(fastify: FastifyInstance) {
         tags: ["Tournament"],
         summary: "トーナメントを開始",
         params: RouteSchema.Params,
+        headers: RouteSchema.Headers,
         response: {
-          200: OKSchema(),
+          200: RouteSchema.Reply[200],
+          404: ErrorSchema({ description: "見つからなかった" }),
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { id } = request.params as { id: string };
-      try {
-        const tournament = await tournamentService.openTournament(id);
-        return tournament;
-      } catch (error) {
-        reply.status(500).send({ error: "Failed to open tournament" });
-      }
+      return await tournamentService.openTournament(request);
     }
   );
 }

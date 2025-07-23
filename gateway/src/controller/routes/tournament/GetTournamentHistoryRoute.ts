@@ -3,6 +3,7 @@ import { Type } from "@sinclair/typebox";
 import { HistorySchema } from "../../schemas/HistorySchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 
 const description = `
 # 概要
@@ -15,7 +16,7 @@ const RouteSchema = {
   Params: Type.Pick(TournamentSchema(), ["id"]),
   Querystring: undefined,
   Body: undefined,
-  Headers: undefined,
+  Headers: UserIdHeaderSchema,
   Reply: {
     200: Type.Array(HistorySchema(), { description: "トーナメントの対戦結果" }),
   },
@@ -26,18 +27,19 @@ export default function GetTournamentHistory(fastify: FastifyInstance) {
     "/tournaments/:id/history",
     {
       schema: {
+        description,
         tags: ["Tournament"],
         summary: "履歴を取得",
         params: RouteSchema.Params,
+        headers: RouteSchema.Headers,
         response: {
           200: RouteSchema.Reply[200],
         },
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { id } = request.params as { id: string };
       try {
-        const history = await tournamentService.getTournamentHistory(id);
+        const history = await tournamentService.getTournamentHistory(request);
         return history;
       } catch (error) {
         reply.status(500).send({ error: "Failed to fetch tournament history" });

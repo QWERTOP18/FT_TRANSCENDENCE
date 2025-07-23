@@ -13,28 +13,42 @@ class TournamentService {
     return response.data;
   }
 
-  async getTournamentParticipants(id: string) {
-    const response = await axios.get(`${this.endpoint}/${id}/participants`);
+  async getTournamentParticipants(request: any) {
+    const id = request.params.id;
+    const response = await axios.get(`${this.endpoint}/${id}/participants`, {});
     return response.data;
   }
 
-  async getTournament(id: string) {
-    const response = await axios.get(`${this.endpoint}/${id}`);
+  async getTournament(request: any) {
+    const id = request.params.id;
+    const response = await axios.get(`${this.endpoint}/${id}`, {});
     return response.data;
   }
 
-  async openTournament(id: string) {
-    const response = await axios.put(`${this.endpoint}/${id}/open`);
+  async openTournament(request: any) {
+    const id = request.params.id;
+    const externalId = request.headers["x-user-id"];
+    console.log(externalId);
+    const response = await axios.put(
+      `${this.endpoint}/${id}/open`,
+      {},
+      {
+        headers: {
+          "x-external-id": externalId,
+        },
+      }
+    );
     return response.data;
   }
 
-  async createTournament(requestBody: any) {
-    const response = await axios.post(this.endpoint, requestBody);
+  async createTournament(request: any) {
+    const response = await axios.post(this.endpoint, request.body, {});
     return response.data;
   }
 
-  async getTournamentHistory(id: string) {
-    const response = await axios.get(`${this.endpoint}/${id}/history`);
+  async getTournamentHistory(request: any) {
+    const id = request.params.id;
+    const response = await axios.get(`${this.endpoint}/${id}/history`, {});
     return response.data;
   }
 }

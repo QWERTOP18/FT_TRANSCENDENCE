@@ -3,6 +3,7 @@ import { Type } from "@sinclair/typebox";
 import { tournamentService } from "../../../service/tournament/TournamentService";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 
 const description = `
 # 概要
@@ -15,7 +16,7 @@ const RouteSchema = {
   Params: Type.Pick(TournamentSchema(), ["id"]),
   Querystring: undefined,
   Body: undefined,
-  Headers: undefined,
+  Headers: UserIdHeaderSchema,
   Reply: {
     200: TournamentSchema({ description: "OK" }),
     404: ErrorSchema({ description: "見つからなかった" }),
@@ -31,6 +32,7 @@ export default function GetTournament(fastify: FastifyInstance) {
         tags: ["Tournament"],
         summary: "特定のトーナメントを取得",
         params: RouteSchema.Params,
+        headers: RouteSchema.Headers,
         response: {
           200: RouteSchema.Reply[200],
           404: RouteSchema.Reply[404],
@@ -38,9 +40,8 @@ export default function GetTournament(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      const { id } = request.params as { id: string };
       try {
-        const tournament = await tournamentService.getTournament(id);
+        const tournament = await tournamentService.getTournament(request);
         return tournament;
       } catch (error) {
         console.error(error);
