@@ -16,8 +16,6 @@ PongGUI.loadGUI(scene).then(() => {
 	PongGUI.setScore(0, 0);
 });
 
-
-
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
 	scene.render();
@@ -27,25 +25,24 @@ canvas.addEventListener("keydown", (event: KeyboardEvent) => {
 	if (!Pong.instance) {
 		return ;
 	}
+	// Pack
 	if (event.key === "ArrowUp") {
-		// Move pack up
 		Pong.instance.props.pack.position.z += 0.1;
 	} else if (event.key === "ArrowDown") {
-		// Move pack down
 		Pong.instance.props.pack.position.z -= 0.1;
 	} else if (event.key === "ArrowLeft") {
-		// Move pack left
 		Pong.instance.props.pack.position.x -= 0.1;
 	} else if (event.key === "ArrowRight") {
-		// Move pack right
 		Pong.instance.props.pack.position.x += 0.1;
 	}
+	// Player
 	else if (event.key == "a") {
 		Pong.instance.props.bottomBar.position.x -= 0.1;
 	}
 	else if (event.key == "d") {
 		Pong.instance.props.bottomBar.position.x += 0.1;
 	}
+	// Opponent
 	else if (event.key == "q") {
 		Pong.instance.props.topBar.position.x -= 0.1;
 	}
