@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@babylonjs/core": "^8.17.1",
+    "@babylonjs/gui": "^8.17.2",
     "@babylonjs/materials": "^8.17.1"
   },
   "devDependencies": {

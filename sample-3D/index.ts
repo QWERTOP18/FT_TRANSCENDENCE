@@ -1,5 +1,6 @@
 import { Camera, Color3, CreateBox, CreateCylinder, Engine, FreeCamera, HemisphericLight, Light, Mesh, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 import { GradientMaterial, GridMaterial, SkyMaterial } from "@babylonjs/materials";
+import { PongGUI } from "./PongGUI";
 
 type PongProps = {
 	scene: Scene,
@@ -167,6 +168,11 @@ const engine = new Engine(canvas, true); // Generate the BABYLON 3D engine
 // Add your code here matching the playground format
 
 const scene = Playground.CreateScene(engine, canvas); //Call the createScene function
+PongGUI.loadGUI(scene).then(() => {
+	PongGUI.setScore(0, 0);
+});
+
+
 
 // Register a render loop to repeatedly render the scene
 engine.runRenderLoop(function () {
