@@ -14,11 +14,9 @@ export class PongGUI {
 
         if (opponentScoreText instanceof TextBlock) {
             opponentScoreText.text = opponentScore.toString();
-            alert('set opponent score: ' + opponentScore);
         }
         if (playerScoreText instanceof TextBlock) {
             playerScoreText.text = playerScore.toString();
-            alert('set player score: ' + playerScore);
         }
     }
 
