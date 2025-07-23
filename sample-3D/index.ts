@@ -1,57 +1,79 @@
 import { Engine } from "@babylonjs/core";
+import { PongBuilder } from "./PongBuilder";
 import { PongGUI } from "./PongGUI";
-import { Pong } from "./Pong";
 
-
-const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement | null; // Get the canvas element
-if (!canvas) {
-	throw new Error("Canvasエレメントが見つかりませんでした。");
-}
-const engine = new Engine(canvas, true); // Generate the BABYLON 3D engine
-
-// Add your code here matching the playground format
-
-const scene = Pong.CreateScene(engine, canvas); //Call the createScene function
-PongGUI.loadGUI(scene).then(() => {
-	PongGUI.setScore(0, 0);
-});
-
-// Register a render loop to repeatedly render the scene
-engine.runRenderLoop(function () {
-	scene.render();
-});
-
-canvas.addEventListener("keydown", (event: KeyboardEvent) => {
-	if (!Pong.instance) {
-		return ;
+(async () => {
+	// Canvasエレメントを取得
+	const canvas = document.getElementById("renderCanvas") as HTMLCanvasElement | null; // Get the canvas element
+	if (!canvas) {
+		throw new Error("Canvasエレメントが見つかりませんでした。");
 	}
-	// Pack
-	if (event.key === "ArrowUp") {
-		Pong.instance.props.pack.position.z += 0.1;
-	} else if (event.key === "ArrowDown") {
-		Pong.instance.props.pack.position.z -= 0.1;
-	} else if (event.key === "ArrowLeft") {
-		Pong.instance.props.pack.position.x -= 0.1;
-	} else if (event.key === "ArrowRight") {
-		Pong.instance.props.pack.position.x += 0.1;
-	}
-	// Player
-	else if (event.key == "a") {
-		Pong.instance.props.bottomBar.position.x -= 0.1;
-	}
-	else if (event.key == "d") {
-		Pong.instance.props.bottomBar.position.x += 0.1;
-	}
-	// Opponent
-	else if (event.key == "q") {
-		Pong.instance.props.topBar.position.x -= 0.1;
-	}
-	else if (event.key == "e") {
-		Pong.instance.props.topBar.position.x += 0.1;
-	}
-});
+	// Engineを生成
+	const engine = new Engine(canvas, true); // Generate the BABYLON 3D engine
 
-// Watch for browser/canvas resize events
-window.addEventListener("resize", function () {
-	engine.resize();
-});
+	// ゲーム画面とGUIの初期化
+	const pong = PongBuilder.CreatePong(engine, canvas);
+	const pongGui = await PongGUI.createPongGUI(pong.props.scene);
+	pongGui.setScore(0, 0);
+
+	// 継続的にシーンをレンダリングする
+	engine.runRenderLoop(function () {
+		pong.props.scene.render();
+	});
+
+	/**
+	 * サンプルの操作方法
+	 * ↑: パックを前に移動
+	 * ↓: パックを後ろに移動
+	 * ←: パックを左に移動
+	 * →: パックを右に移動
+	 * a: プレイヤーを左に移動
+	 * d: プレイヤーを右に移動
+	 * q: 相手を左に移動
+	 * e: 相手を右に移動
+	 * r: スコアをリセット
+	 * w: 相手のスコアを1点増やす
+	 * s: プレイヤーのスコアを1点増やす
+	 */
+	canvas.addEventListener("keydown", (event: KeyboardEvent) => {
+		// Pack
+		if (event.key === "ArrowUp") {
+			pong.props.pack.position.z += 0.1;
+		} else if (event.key === "ArrowDown") {
+			pong.props.pack.position.z -= 0.1;
+		} else if (event.key === "ArrowLeft") {
+			pong.props.pack.position.x -= 0.1;
+		} else if (event.key === "ArrowRight") {
+			pong.props.pack.position.x += 0.1;
+		}
+		// Player
+		else if (event.key == "a") {
+			pong.props.bottomBar.position.x -= 0.1;
+		}
+		else if (event.key == "d") {
+			pong.props.bottomBar.position.x += 0.1;
+		}
+		// Opponent
+		else if (event.key == "q") {
+			pong.props.topBar.position.x -= 0.1;
+		}
+		else if (event.key == "e") {
+			pong.props.topBar.position.x += 0.1;
+		}
+		// Score
+		else if (event.key == "r") {
+			pongGui.setScore(0, 0);
+		}
+		else if (event.key == "w") {
+			pongGui.setScore(pongGui.opponentScore + 1, pongGui.playerScore);
+		} else if (event.key == "s") {
+			pongGui.setScore(pongGui.opponentScore, pongGui.playerScore + 1);
+		}
+	});
+
+	// ウィンドウのリサイズイベントを監視して、エンジンをリサイズ
+	window.addEventListener("resize", function () {
+		engine.resize();
+	});
+
+})();

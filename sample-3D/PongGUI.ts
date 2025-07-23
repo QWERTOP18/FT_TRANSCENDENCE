@@ -3,27 +3,38 @@ import { AdvancedDynamicTexture, TextBlock } from "@babylonjs/gui";
 
 export class PongGUI {
 
-    static instance: PongGUI | null;
-    
+    public opponentScoreTextBlock: TextBlock;
+    public playerScoreTextBlock: TextBlock;
+    public opponentScore: number;
+    public playerScore: number;
+
     constructor(public advancedTexture: AdvancedDynamicTexture) {
+        
+        const opponentScoreTextBlock = this.advancedTexture.getControlByName("opponent-score");
+        const playerScoreTextBlock = this.advancedTexture.getControlByName("own-score");
+        if (!opponentScoreTextBlock || !playerScoreTextBlock) {
+            throw new Error("GUIのスコアテキストが見つかりません。");
+        }
+        if (!(opponentScoreTextBlock instanceof TextBlock)
+            || !(playerScoreTextBlock instanceof TextBlock)) {
+            throw new Error("GUIのスコアテキストがTextBlockではありません。");
+        }
+        this.opponentScoreTextBlock = opponentScoreTextBlock;
+        this.playerScoreTextBlock = playerScoreTextBlock;
+        this.opponentScore = 0;
+        this.playerScore = 0;
     }
 
-    public static setScore(opponentScore: number, playerScore: number) {
-        const opponentScoreText = this.instance?.advancedTexture.getControlByName("opponent-score");
-        const playerScoreText = this.instance?.advancedTexture.getControlByName("own-score");
-
-        if (opponentScoreText instanceof TextBlock) {
-            opponentScoreText.text = opponentScore.toString();
-        }
-        if (playerScoreText instanceof TextBlock) {
-            playerScoreText.text = playerScore.toString();
-        }
+    public setScore(opponentScore: number, playerScore: number) {
+        this.opponentScore = opponentScore;
+        this.playerScore = playerScore;
+        this.opponentScoreTextBlock.text = opponentScore.toString();
+        this.playerScoreTextBlock.text = playerScore.toString();
     }
 
-    static async loadGUI(scene: Scene) {
+    public static async createPongGUI(scene: Scene) {
         const advancedTexture = AdvancedDynamicTexture.CreateFullscreenUI("GUI", true, scene);
-        this.instance = new PongGUI(advancedTexture);
         const loadedGUI = await advancedTexture.parseFromURLAsync("/guiTexture.json");
-        return loadedGUI;
+        return new PongGUI(loadedGUI);
     }
 }
