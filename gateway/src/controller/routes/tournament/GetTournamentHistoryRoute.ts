@@ -1,8 +1,25 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { HistorySchema } from "../../schemas/TournamentSchema";
-import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { HistorySchema } from "../../schemas/HistorySchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
+
+const description = `
+# 概要
+トーナメントの対戦結果を取得します。
+
+# 注意点
+`;
+
+const RouteSchema = {
+  Params: Type.Pick(TournamentSchema(), ["id"]),
+  Querystring: undefined,
+  Body: undefined,
+  Headers: undefined,
+  Reply: {
+    200: Type.Array(HistorySchema(), { description: "トーナメントの対戦結果" }),
+  },
+} as const;
 
 export default function GetTournamentHistory(fastify: FastifyInstance) {
   fastify.get(
@@ -11,13 +28,9 @@ export default function GetTournamentHistory(fastify: FastifyInstance) {
       schema: {
         tags: ["Tournament"],
         summary: "履歴を取得",
-        params: Type.Object({
-          id: Type.String({ description: "トーナメントID" }),
-        }),
+        params: RouteSchema.Params,
         response: {
-          200: Type.Array(HistorySchema()),
-          400: ErrorSchema(),
-          500: ErrorSchema(),
+          200: RouteSchema.Reply[200],
         },
       },
     },

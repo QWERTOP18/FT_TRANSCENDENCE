@@ -1,10 +1,33 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import {
-  TournamentSchema,
-  CreateTournamentSchema,
-} from "../../schemas/TournamentSchema";
-import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
+import { Type } from "@sinclair/typebox";
+
+const description = `
+  # 概要
+  トーナメントを新規で作成します。
+
+  # 注意点
+  * 参加者の追加は別途、**参加者の作成**を行う必要があります。
+  * マッチの追加はできません。参加者の数に応じて自動的にマッチが作成されます。＜＝この仕様は要相談。例えばオートマッチ機能を作成する？
+  `;
+
+const RouteSchema = {
+  Params: undefined,
+  Querystring: undefined,
+  Body: Type.Intersect([
+    Type.Pick(TournamentSchema(), ["name", "description", "max_num"]),
+    Type.Object({
+      ownerExternalId: Type.String({
+        description: "トーナメントのオーナーの外部ID",
+      }),
+    }),
+  ]),
+  Headers: undefined,
+  Reply: {
+    200: TournamentSchema({ description: "OK" }),
+  },
+} as const;
 
 export default function CreateTournament(fastify: FastifyInstance) {
   fastify.post(
@@ -13,11 +36,9 @@ export default function CreateTournament(fastify: FastifyInstance) {
       schema: {
         tags: ["Tournament"],
         summary: "トーナメントを作成",
-        body: CreateTournamentSchema(),
+        body: RouteSchema.Body,
         response: {
-          201: TournamentSchema(),
-          400: ErrorSchema(),
-          500: ErrorSchema(),
+          200: RouteSchema.Reply[200],
         },
       },
     },
@@ -29,12 +50,11 @@ export default function CreateTournament(fastify: FastifyInstance) {
       };
       try {
         const tournament = await tournamentService.createTournament(
-          name,
-          description,
-          max_num
+          request.body
         );
         return tournament;
       } catch (error) {
+        console.log(error);
         reply.status(500).send({ error: "Failed to create tournament" });
       }
     }

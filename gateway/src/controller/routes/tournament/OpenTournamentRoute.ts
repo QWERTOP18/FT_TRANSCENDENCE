@@ -1,23 +1,37 @@
-import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
-import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { tournamentService } from "../../../service/tournament/TournamentService";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
+import { OKSchema } from "../../schemas/OtherSchema";
+
+const description = `
+# 概要
+トーナメントを開始します。
+stateをreceptionからopenに変更します。
+# 注意点
+* このトーナメントへの参加者が作成できなくなります。
+`;
+
+const RouteSchema = {
+  Params: Type.Pick(TournamentSchema(), ["id"]),
+  Querystring: undefined,
+  Body: undefined,
+  Reply: {
+    200: TournamentSchema(),
+  },
+} as const;
 
 export default function OpenTournament(fastify: FastifyInstance) {
   fastify.put(
     "/tournaments/:id/open",
     {
       schema: {
+        description,
         tags: ["Tournament"],
         summary: "トーナメントを開始",
-        params: Type.Object({
-          id: Type.String({ description: "トーナメントID" }),
-        }),
+        params: RouteSchema.Params,
         response: {
-          200: TournamentSchema(),
-          400: ErrorSchema(),
-          500: ErrorSchema(),
+          200: OKSchema(),
         },
       },
     },

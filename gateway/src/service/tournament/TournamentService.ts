@@ -28,12 +28,8 @@ class TournamentService {
     return response.data;
   }
 
-  async createTournament(name: string, description: string, max_num: number) {
-    const response = await axios.post(this.endpoint, {
-      name,
-      description,
-      max_num,
-    });
+  async createTournament(requestBody: any) {
+    const response = await axios.post(this.endpoint, requestBody);
     return response.data;
   }
 

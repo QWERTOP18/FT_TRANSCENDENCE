@@ -1,13 +1,24 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
-import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 
 const description = `
 # 概要
 トーナメント一覧を取得します。
 `;
+
+const RouteSchema = {
+  Querystring: undefined,
+  Body: undefined,
+  Params: Type.Object({}),
+  Headers: undefined,
+  Reply: {
+    200: Type.Array(TournamentSchema({ description: "トーナメントの一覧" })),
+    404: ErrorSchema({ description: "見つからなかった" }),
+  },
+} as const;
 
 export default function GetTournaments(fastify: FastifyInstance) {
   fastify.get(
@@ -17,10 +28,9 @@ export default function GetTournaments(fastify: FastifyInstance) {
         description,
         tags: ["Tournament"],
         summary: "トーナメント一覧を取得",
+        params: RouteSchema.Params,
         response: {
-          200: Type.Array(TournamentSchema()),
-          400: ErrorSchema(),
-          500: ErrorSchema(),
+          200: RouteSchema.Reply[200],
         },
       },
     },

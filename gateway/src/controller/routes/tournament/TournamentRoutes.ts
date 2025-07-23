@@ -13,7 +13,7 @@ export function TournamentRoutes(fastify: FastifyInstance) {
     CreateTournament,
     OpenTournament,
     GetTournamentParticipants,
-    GetTournamentHistory,
+    // GetTournamentHistory,
   ] as const;
 
   routes.forEach((route) => fastify.register(route));

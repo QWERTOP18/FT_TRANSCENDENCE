@@ -1,60 +1,64 @@
-import { ObjectOptions, ReturnType, Static, Type } from "@sinclair/typebox";
+import {
+  ObjectOptions,
+  SchemaOptions,
+  Static,
+  StringOptions,
+  Type,
+} from "@sinclair/typebox";
+import { HistoryIdSchema } from "./HistorySchema";
+import { UUIDSchema } from "./OtherSchema";
+import { ParticipantIdSchema } from "./ParticipantSchema";
 
+// トーナメント
 export type TournamentSchema = Static<ReturnType<typeof TournamentSchema>>;
-export const TournamentSchema = () => {
-  return Type.Object({
-    id: Type.String({ description: "トーナメントID" }),
-    name: Type.String({ description: "トーナメント名" }),
-    description: Type.String({ description: "トーナメントの説明" }),
-    max_num: Type.Number({ description: "最大参加者数" }),
-    state: Type.String({ description: "トーナメントの状態" }),
-    created_at: Type.Optional(
-      Type.String({ format: "date-time", description: "作成日時" })
-    ),
-  });
-};
+export function TournamentSchema(options?: ObjectOptions) {
+  return Type.Object(
+    {
+      id: TournamentIdSchema({ description: "トーナメントID" }),
+      champion_id: ParticipantIdSchema({
+        description: "優勝者の参加者ID",
+        nullable: true,
+      }),
+      owner_id: ParticipantIdSchema({
+        description: "トーナメントのオーナー参加者ID",
+      }),
+      name: Type.String({ description: "トーナメント名" }),
+      max_num: Type.Number({
+        description: "トーナメントの最大参加人数",
+        minimum: 2,
+      }),
+      description: Type.Optional(
+        Type.String({ description: "トーナメントの説明" })
+      ),
+      state: TournamentStatusSchema(),
+      participants: Type.Array(ParticipantIdSchema(), {
+        description: "参加者リスト",
+      }),
+      histories: Type.Array(HistoryIdSchema(), {
+        description: "トーナメントの履歴",
+      }),
+    },
+    { description: "トーナメント", ...options }
+  );
+}
 
-export type CreateTournamentSchema = Static<
-  ReturnType<typeof CreateTournamentSchema>
+// トーナメントステータス
+export type TournamentStatusSchema = Static<
+  ReturnType<typeof TournamentStatusSchema>
 >;
-export const CreateTournamentSchema = () => {
-  return Type.Object({
-    name: Type.String({ description: "トーナメント名" }),
-    description: Type.String({ description: "トーナメントの説明" }),
-    max_num: Type.Number({
-      description: "最大参加者数",
-      minimum: 2,
-      maximum: 32,
-    }),
-  });
-};
+export function TournamentStatusSchema(options?: SchemaOptions) {
+  return Type.Union(
+    [Type.Literal("reception"), Type.Literal("open"), Type.Literal("close")],
+    {
+      description:
+        "トーナメントの状況 - reception: 受付中, open: 開催中, close: 終了",
+      ...options,
+    }
+  );
+}
 
-export type ParticipantSchema = Static<ReturnType<typeof ParticipantSchema>>;
-export const ParticipantSchema = () => {
-  return Type.Object({
-    id: Type.String({ description: "参加者ID" }),
-    user_id: Type.String({ description: "ユーザーID" }),
-    tournament_id: Type.String({ description: "トーナメントID" }),
-    state: Type.String({ description: "参加者の状態" }),
-    score: Type.Optional(Type.Number({ description: "スコア" })),
-    created_at: Type.Optional(
-      Type.String({ format: "date-time", description: "参加日時" })
-    ),
-  });
-};
-
-export type HistorySchema = Static<ReturnType<typeof HistorySchema>>;
-export const HistorySchema = () => {
-  return Type.Object({
-    id: Type.String({ description: "履歴ID" }),
-    tournament_id: Type.String({ description: "トーナメントID" }),
-    winner_id: Type.String({ description: "勝者のユーザーID" }),
-    loser_id: Type.String({ description: "敗者のユーザーID" }),
-    winner_score: Type.Number({ description: "勝者のスコア" }),
-    loser_score: Type.Number({ description: "敗者のスコア" }),
-    round: Type.Number({ description: "ラウンド番号" }),
-    created_at: Type.Optional(
-      Type.String({ format: "date-time", description: "試合日時" })
-    ),
-  });
-};
+// トーナメントID
+export type TournamentIdSchema = Static<ReturnType<typeof TournamentIdSchema>>;
+export function TournamentIdSchema(options?: StringOptions) {
+  return UUIDSchema({ description: "ID", ...options });
+}
