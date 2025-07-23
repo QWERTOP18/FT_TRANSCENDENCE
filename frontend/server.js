@@ -5,7 +5,7 @@ const app = express();
 const port = 3000;
 
 // 1. まず 'dist' フォルダから静的ファイルを提供しようと試みる
-// ブラウザが /output.css や /main.js を要求した場合、ここでファイルが見つかり、応答が完了。
+// ブラウザが /style.css や /main.js を要求した場合、ここでファイルが見つかり、応答が完了。
 app.use(express.static(path.join(__dirname, 'dist')));
 
 // 2. 静的ファイルが見つからなかったリクエストは、すべてここに到達する
