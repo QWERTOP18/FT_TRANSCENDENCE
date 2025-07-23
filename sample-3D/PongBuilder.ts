@@ -5,7 +5,6 @@ import { Pong } from "./Pong";
 export class PongBuilder
 {
 	public static CreatePong(engine: Engine, canvas: HTMLCanvasElement): Pong {
-		// This creates a basic Babylon Scene object (non-mesh)
 		const scene = new Scene(engine);
 
 		const camera = this.CreateCamera(canvas, scene);
@@ -32,11 +31,8 @@ export class PongBuilder
 	public static CreateCamera(canvas: HTMLCanvasElement, scene?: Scene) {
 		const camera = new FreeCamera("camera1", new Vector3(0, 5, -25), scene);
 
-		// This targets the camera to scene origin
 		camera.setTarget(Vector3.Zero());
 
-		// This attaches the camera to the canvas
-		// camera.attachControl(canvas, true);
 		return camera;
 	}
 
@@ -54,11 +50,9 @@ export class PongBuilder
 		return pack;
 	}
 
-	// This creates a light, aiming 0,1,0 - to the sky (non-mesh)
 	public static CreateLight(scene?: Scene) {
 		const light = new HemisphericLight("light1", new Vector3(0, 1, 0), scene);
 
-		// Default intensity is 1. Let's dim the light a small amount
 		light.intensity = 1.0;
 
 		return light;
@@ -110,13 +104,11 @@ export class PongBuilder
 		return skybox;
 	}
 
-	// Our built-in 'ground' shape. Params: name, options, scene
 	public static CreateGround(scene?: Scene) {
 		const ground = MeshBuilder.CreateGround("ground", { width: 20, height: 30 }, scene);
 
 
 		const material = new GridMaterial("ground-material", scene);
-		// material.diffuseColor = Color3.Black();
 		material.mainColor = Color3.Black();
 		material.lineColor = Color3.White();
 		material.gridRatio = 20;
