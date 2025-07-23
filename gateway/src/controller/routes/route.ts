@@ -4,6 +4,7 @@ import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { TournamentRoutes } from "./tournament/TournamentRoutes";
 import { AuthRoutes } from "./auth/AuthRoute";
+import { BattleRoutes } from "./battle/BattleRoute";
 
 export async function Routes(app: FastifyInstance) {
   await app.register(cors, {
@@ -31,6 +32,8 @@ export async function Routes(app: FastifyInstance) {
 
   // Register tournament routes first
   await app.register(TournamentRoutes);
+
+  await app.register(BattleRoutes);
 
   await app.register(AuthRoutes);
 

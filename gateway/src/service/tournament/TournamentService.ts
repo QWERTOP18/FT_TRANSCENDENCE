@@ -25,6 +25,15 @@ class TournamentService {
     return response.data;
   }
 
+  async joinTournament(request: any) {
+    const id = request.params.id;
+    const externalId = request.headers["x-user-id"];
+    const response = await axios.post(`${this.endpoint}/${id}/participants`, {
+      external_id: externalId,
+    });
+    return response.data;
+  }
+
   async openTournament(request: any) {
     const id = request.params.id;
     const externalId = request.headers["x-user-id"];
@@ -42,7 +51,11 @@ class TournamentService {
   }
 
   async createTournament(request: any) {
-    const response = await axios.post(this.endpoint, request.body, {});
+    const ownerExternalId = request.headers["x-user-id"];
+    const response = await axios.post(this.endpoint, {
+      ...request.body,
+      ownerExternalId,
+    });
     return response.data;
   }
 

@@ -7,11 +7,11 @@ import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 
 const description = `
 # 概要
-ユーザーをready状態にします。
-frontendとwebsocket通信を開始します。
+ユーザーをcancel状態にします。
+frontendとwebsocket通信を終了します。
 
 # 注意点
- * sateがpendingの時のみ可能です。
+ * sateがreadyの時のみ可能です。
  * トーナメントがopenの時のみ可能です。
 `;
 
@@ -27,14 +27,14 @@ const RouteSchema = {
   },
 } as const;
 
-export default function ReadyBattle(fastify: FastifyInstance) {
+export default function CancelBattle(fastify: FastifyInstance) {
   fastify.post(
-    "/tournaments/:tournament_id/battle/ready",
+    "/tournaments/:tournament_id/battle/cancel",
     {
       schema: {
         description,
         tags: ["Battle"],
-        summary: "ユーザーをready状態にする",
+        summary: "ユーザーをpending状態にする",
         headers: RouteSchema.Headers,
         params: {
           type: "object",
@@ -46,7 +46,7 @@ export default function ReadyBattle(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      return battleService.readyBattle(request);
+      return battleService.cancelBattle(request);
     }
   );
 }
