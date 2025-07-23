@@ -1,8 +1,6 @@
 import { ValueObject } from "./ValueObject";
 
-export type TournamentRuleValue =
-	'simple'
-	;
+export type TournamentRuleValue = string;
 
 export class TournamentRule extends ValueObject<'TournamentRule', TournamentRuleValue> {
 

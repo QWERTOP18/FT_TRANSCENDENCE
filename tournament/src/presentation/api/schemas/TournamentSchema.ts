@@ -36,12 +36,7 @@ export function TournamentStatusSchema(options?: SchemaOptions) {
 // トーナメントルール
 export type TournamentRuleSchema = Static<ReturnType<typeof TournamentRuleSchema>>
 export function TournamentRuleSchema(options?: SchemaOptions) {
-	return Type.Union([
-		Type.Literal('simple'),
-	], {
-		description: "トーナメントのルール - simple: シンプルなルール",
-		...options
-	})
+	return Type.String({ description: "トーナメントのルール", ...options })
 }
 
 // トーナメントID
