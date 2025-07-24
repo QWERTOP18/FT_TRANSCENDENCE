@@ -30,6 +30,7 @@ export function TournamentSchema(options?: ObjectOptions) {
       description: Type.Optional(
         Type.String({ description: "トーナメントの説明" })
       ),
+      rule: TournamentRuleSchema({ description: "トーナメントのルール", default: "simple" }),
       state: TournamentStatusSchema(),
       participants: Type.Array(ParticipantIdSchema(), {
         description: "参加者リスト",
@@ -55,6 +56,12 @@ export function TournamentStatusSchema(options?: SchemaOptions) {
       ...options,
     }
   );
+}
+
+// トーナメントルール
+export type TournamentRuleSchema = Static<ReturnType<typeof TournamentRuleSchema>>
+export function TournamentRuleSchema(options?: SchemaOptions) {
+	return Type.String({ description: "トーナメントのルール", ...options })
 }
 
 // トーナメントID

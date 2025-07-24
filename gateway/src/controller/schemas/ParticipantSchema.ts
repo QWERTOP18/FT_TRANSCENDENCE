@@ -8,6 +8,7 @@ export const ParticipantSchema = (options?: ObjectOptions) => {
     {
       id: ParticipantIdSchema({ description: "参加者ID" }),
       tournament_id: TournamentIdSchema({ description: "トーナメント ID" }),
+      name: Type.String({ description: "参加者名" }),
       external_id: Type.String({
         description:
           "外部ID - トーナメントユーザーと外部のユーザー情報の紐付け用",

@@ -17,12 +17,7 @@ const RouteSchema = {
   Params: undefined,
   Querystring: undefined,
   Body: Type.Intersect([
-    Type.Pick(TournamentSchema(), ["name", "description", "max_num"]),
-    Type.Object({
-      ownerExternalId: Type.String({
-        description: "トーナメントのオーナーの外部ID",
-      }),
-    }),
+    Type.Pick(TournamentSchema(), ["name", "description", "max_num", "rule"]),
   ]),
   Headers: UserIdHeaderSchema,
   Reply: {

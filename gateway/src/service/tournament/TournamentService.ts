@@ -42,7 +42,21 @@ class TournamentService {
   }
 
   async createTournament(request: any) {
-    const response = await axios.post(this.endpoint, request.body, {});
+    const externalId = request.headers["x-user-id"];
+
+     console.log({
+      ...request.body,
+      ownerExternalId: externalId,
+      ownerName: "<TODO: Owner Name>"
+    })
+
+    // todo : ownerName should be passed from the request body or headers
+    const response = await axios.post(this.endpoint, {
+      ...request.body,
+      ownerExternalId: externalId,
+      ownerName: "<TODO: Owner Name>"
+    });
+
     return response.data;
   }
 
