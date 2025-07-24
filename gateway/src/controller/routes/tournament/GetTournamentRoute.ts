@@ -16,7 +16,7 @@ const description = `
 `;
 
 const RouteSchema = {
-  Params: TournamentIdSchema(),
+  Params: Type.Pick(TournamentSchema(), ["id"]),
   Querystring: undefined,
   Body: undefined,
   Headers: UserIdHeaderSchema,
