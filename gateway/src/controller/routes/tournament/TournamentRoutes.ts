@@ -5,6 +5,7 @@ import CreateTournament from "./CreateTournamentRoute";
 import OpenTournament from "./OpenTournamentRoute";
 import GetTournamentParticipants from "./GetTournamentParticipantsRoute";
 import GetTournamentHistory from "./GetTournamentHistoryRoute";
+import JoinTournament from "./JoinTournamentRoute";
 
 export function TournamentRoutes(fastify: FastifyInstance) {
   const routes = [
@@ -13,6 +14,7 @@ export function TournamentRoutes(fastify: FastifyInstance) {
     CreateTournament,
     OpenTournament,
     GetTournamentParticipants,
+    JoinTournament,
     // GetTournamentHistory,
   ] as const;
 

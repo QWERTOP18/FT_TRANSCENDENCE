@@ -40,6 +40,7 @@ export default function CreateTournament(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      console.log("CreateTournament request:", request.body);
       try {
         const tournament = await tournamentService.createTournament(request);
         return tournament;

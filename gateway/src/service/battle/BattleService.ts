@@ -9,14 +9,16 @@ class BattleService {
     this.endpoint = `${baseURL}/tournaments`;
   }
 
-  async readyBattle(tournamentId: string, userId: string) {
+  async readyBattle(request: any) {
+    const tournamentId = request.params.tournament_id;
+    const userId = request.headers["x-user-id"];
     const participantId = await this.getParticipantId(tournamentId, userId);
     const response = await axios.post(
       `${this.endpoint}/${tournamentId}/participants/${participantId}/ready`,
       undefined,
       {
         headers: {
-          "X-External-Id": userId,
+          "x-external-id": userId,
         },
       }
     );
@@ -28,23 +30,25 @@ class BattleService {
     return response.data;
   }
 
-  private async countReadyParticipants(tournamentId: string) {
-    const participants = await this.getParticipants(tournamentId);
-    return participants.filter((participant: any) => participant.ready).length;
-  }
-
-  private async cancelBattle(tournamentId: string, userId: string) {
+  async cancelBattle(request: any) {
+    const tournamentId = request.params.tournament_id;
+    const userId = request.headers["x-user-id"];
     const participantId = await this.getParticipantId(tournamentId, userId);
     const response = await axios.post(
       `${this.endpoint}/${tournamentId}/participants/${participantId}/cancel`,
       undefined,
       {
         headers: {
-          "X-External-Id": userId,
+          "x-external-id": userId,
         },
       }
     );
     return response.data;
+  }
+
+  private async countReadyParticipants(tournamentId: string) {
+    const participants = await this.getParticipants(tournamentId);
+    return participants.filter((participant: any) => participant.ready).length;
   }
 
   private async getParticipantId(tournamentId: string, userId: string) {
