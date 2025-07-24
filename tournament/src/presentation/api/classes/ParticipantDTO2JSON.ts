@@ -8,6 +8,7 @@ export class ParticipantDTO2JSON {
 		return {
 			id: DTO.id,
 			tournament_id: DTO.tournamentId,
+			name: DTO.name,
 			external_id: DTO.externalId,
 			state: DTO.state
 		}

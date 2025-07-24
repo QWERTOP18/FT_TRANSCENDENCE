@@ -6,6 +6,7 @@ export class ParticipantDTO {
 		public id: string,
 		public tournamentId: string,
 		public externalId: string,
+		public name: string,
 		public state: ParticipantStateValue
 	) { }
 
@@ -13,12 +14,14 @@ export class ParticipantDTO {
 		id: string,
 		tournamentId: string,
 		externalId: string,
+		name: string,
 		state: ParticipantStateValue,
 	}) {
 		return new ParticipantDTO(
 			props.id,
 			props.tournamentId,
 			props.externalId,
+			props.name,
 			props.state
 		);
 	}
@@ -28,6 +31,7 @@ export class ParticipantDTO {
 			id: participant.id.value,
 			tournamentId: participant.tournamentId.value,
 			externalId: participant.externalId,
+			name: participant.name,
 			state: participant.state.value,
 		});
 	}

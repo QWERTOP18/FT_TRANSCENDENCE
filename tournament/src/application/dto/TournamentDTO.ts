@@ -1,4 +1,5 @@
 import { Tournament } from "../../domain/tournament/aggregate/Tournament";
+import { TournamentRuleValue } from "../../domain/tournament/value-objects/TournamentRule";
 import { TournamentStateValue } from "../../domain/tournament/value-objects/TournamentState";
 import { HistoryDTO } from "./HistoryDTO";
 import { ParticipantDTO } from "./ParticipantDTO";
@@ -12,6 +13,7 @@ export class TournamentDTO {
 		public name: string,
 		public description: string,
 		public max_num: number,
+		public rule: TournamentRuleValue,
 		public state: TournamentStateValue,
 		public participants: ParticipantDTO[],
 		public histories: HistoryDTO[]
@@ -24,6 +26,7 @@ export class TournamentDTO {
 		name: string,
 		description: string,
 		max_num: number,
+		rule: TournamentRuleValue,
 		state: TournamentStateValue,
 		participants: ParticipantDTO[],
 		histories: HistoryDTO[]
@@ -35,6 +38,7 @@ export class TournamentDTO {
 			props.name,
 			props.description,
 			props.max_num,
+			props.rule,
 			props.state,
 			props.participants,
 			props.histories
@@ -49,6 +53,7 @@ export class TournamentDTO {
 			name: tournament.name,
 			description: tournament.description,
 			max_num: tournament.max_num,
+			rule: tournament.rule.value,
 			state: tournament.state.value,
 			participants: tournament.participants
 				.map(participant => ParticipantDTO.fromDomain(participant)),

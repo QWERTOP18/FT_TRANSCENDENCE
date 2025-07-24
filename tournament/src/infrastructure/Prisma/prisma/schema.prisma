@@ -17,6 +17,7 @@ model Tournament {
   max_num     Int
   owner_id    String
   state       State
+  rule        String @default("5point")
 
   participants Participant[]
   histories    History[]
@@ -27,6 +28,7 @@ model Tournament {
 model Participant {
   id            String           @id @default(uuid())
   external_id   String
+  name          String
   tournament_id String
   state         ParticipantState
 
