@@ -16,14 +16,7 @@ const description = `
 const RouteSchema = {
   Params: undefined,
   Querystring: undefined,
-  Body: Type.Intersect([
-    Type.Pick(TournamentSchema(), ["name", "description", "max_num"]),
-    Type.Object({
-      ownerExternalId: Type.String({
-        description: "トーナメントのオーナーの外部ID",
-      }),
-    }),
-  ]),
+  Body: Type.Pick(TournamentSchema(), ["name", "description", "max_num"]),
   Headers: UserIdHeaderSchema,
   Reply: {
     200: TournamentSchema({ description: "OK" }),
@@ -45,6 +38,7 @@ export default function CreateTournament(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
+      console.log("CreateTournament request:", request.body);
       try {
         const tournament = await tournamentService.createTournament(request);
         return tournament;

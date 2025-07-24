@@ -1,22 +1,19 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
 import { tournamentService } from "../../../service/tournament/TournamentService";
-import {
-  TournamentIdSchema,
-  TournamentSchema,
-} from "../../schemas/TournamentSchema";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 
 const description = `
 # 概要
-:idで指定されたトーナメントを取得します。
+:idで指定されたトーナメントに参加します。
 
 # 注意点
 `;
 
 const RouteSchema = {
-  Params: TournamentIdSchema(),
+  Params: Type.Pick(TournamentSchema(), ["id"]),
   Querystring: undefined,
   Body: undefined,
   Headers: UserIdHeaderSchema,
@@ -26,14 +23,14 @@ const RouteSchema = {
   },
 } as const;
 
-export default function GetTournament(fastify: FastifyInstance) {
-  fastify.get(
-    "/tournaments/:id",
+export default function JoinTournament(fastify: FastifyInstance) {
+  fastify.post(
+    "/tournaments/:id/join",
     {
       schema: {
         description,
         tags: ["Tournament"],
-        summary: "特定のトーナメントを取得",
+        summary: "トーナメントに参加",
         params: RouteSchema.Params,
         headers: RouteSchema.Headers,
         response: {
@@ -44,7 +41,7 @@ export default function GetTournament(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const tournament = await tournamentService.getTournament(request);
+        const tournament = await tournamentService.joinTournament(request);
         return tournament;
       } catch (error) {
         console.error(error);
