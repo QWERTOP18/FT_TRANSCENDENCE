@@ -25,7 +25,7 @@ export class PongGUI {
         this.playerScore = 0;
     }
 
-    public setScore(opponentScore: number, playerScore: number) {
+    public setScore(playerScore: number, opponentScore: number) {
         this.opponentScore = opponentScore;
         this.playerScore = playerScore;
         this.opponentScoreTextBlock.text = opponentScore.toString();

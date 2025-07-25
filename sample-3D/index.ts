@@ -1,6 +1,7 @@
 import { Engine } from "@babylonjs/core";
 import { PongBuilder } from "./PongBuilder";
 import { PongGUI } from "./PongGUI";
+import { ScoreBoardGUI } from "./ScoreBoardGUI";
 
 (async () => {
 	// Canvasエレメントを取得
@@ -15,6 +16,7 @@ import { PongGUI } from "./PongGUI";
 	const pong = PongBuilder.CreatePong(engine, canvas);
 	const pongGui = await PongGUI.createPongGUI(pong.props.scene);
 	pongGui.setScore(0, 0);
+	const scoreboard = await ScoreBoardGUI.createScoreBoardGUI(pong.props.scene);
 
 	// 継続的にシーンをレンダリングする
 	engine.runRenderLoop(function () {
@@ -63,11 +65,17 @@ import { PongGUI } from "./PongGUI";
 		// Score
 		else if (event.key == "r") {
 			pongGui.setScore(0, 0);
+			scoreboard.setScore(0, 0);
 		}
 		else if (event.key == "w") {
-			pongGui.setScore(pongGui.opponentScore + 1, pongGui.playerScore);
+			const newOpponentScore = pongGui.opponentScore + 1;
+			const newPlayerScore = pongGui.playerScore;
+			pongGui.setScore(newPlayerScore, newOpponentScore);
+			scoreboard.setScore(newPlayerScore, newOpponentScore);
+			scoreboard.animateScore(pong.props.scene);
 		} else if (event.key == "s") {
 			pongGui.setScore(pongGui.opponentScore, pongGui.playerScore + 1);
+			scoreboard.setScore(pongGui.playerScore + 1, pongGui.opponentScore);
 		}
 	});
 
