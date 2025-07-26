@@ -2,17 +2,17 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { Type } from "@sinclair/typebox";
 import { UserSchema } from "../../schemas/UserSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
-import { createUser } from "../../../service/auth/AuthService";
+import { authenticateUser } from "../../../service/auth/AuthService";
 import { handleServiceError } from "../../util/response";
-import { DuplicateError } from "../../../service/auth/AuthService";
+import { NotFoundError } from "../../../service/auth/AuthService";
 
-export default function CreateUser(fastify: FastifyInstance) {
+export default function AuthenticateUser(fastify: FastifyInstance) {
   fastify.post(
-    "/auth/signup",
+    "/auth/authenticate",
     {
       schema: {
         tags: ["Auth"],
-        summary: "ユーザーを作成",
+        summary: "ユーザーを認証",
         body: Type.Object({
           name: Type.String({ description: "ユーザー名" }),
         }),
@@ -26,13 +26,18 @@ export default function CreateUser(fastify: FastifyInstance) {
     async (request: FastifyRequest, reply: FastifyReply) => {
       const { name } = request.body as { name: string };
       try {
-        const user = await createUser(name);
+        const user = await authenticateUser(name);
         return user;
       } catch (error) {
-        if (error instanceof DuplicateError) {
-          reply.status(400).send({ error: "User already exists" });
+        if (error instanceof NotFoundError) {
+          reply.status(404).send({
+            code: error.code,
+            statusCode: 404,
+            error: error.name,
+            message: error.message,
+          });
         } else {
-          handleServiceError(error, reply, "Failed to create user");
+          handleServiceError(error, reply, "Failed to authenticate user");
         }
       }
     }
