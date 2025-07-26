@@ -2,6 +2,7 @@ import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { GameRoomSchema } from "../../schemas/GameRoomSchema";
 import { GameRoom } from "../../../domain/GameRoom";
+import { GameGateway } from "../../gateway/GameGateway";
 
 const description = `
 # 概要
@@ -11,7 +12,7 @@ WSSゲートウェイのルートです。二人の参加者から部屋を作�
 
 `;
 
-export function CreateRoomRoute(fastify: FastifyInstance) {
+export function CreateRoomRoute(fastify: FastifyInstance, gameGateway: GameGateway) {
   fastify.post(
     "/room",
     {
@@ -30,7 +31,7 @@ export function CreateRoomRoute(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       // GameRoomクラスで部屋インスタンスを生成し、スキーマ形式で返す
-      const room = new GameRoom();
+      const room = gameGateway.createRoom();
       return room.toSchema();
     }
   );

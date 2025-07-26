@@ -8,6 +8,7 @@ export class GameGateway {
 
   constructor(server: any) {
     this.wss = new WebSocketServer({ server });
+    this.setup();
   }
 
   getRooms() {
@@ -59,8 +60,8 @@ export class GameGateway {
             errorMessage = error;
           }
           room.gameState.handleError(
-            ws,
             errorMessage,
+            ws,
             room.player1,
             room.player2
           );
@@ -69,10 +70,6 @@ export class GameGateway {
       ws.on("close", () => {
         room.removeClient(ws);
         room.gameState.handleClose(ws, room.player1, room.player2);
-        // ルームが空になったら削除
-        if (room.isEmpty()) {
-          delete this.rooms[roomId];
-        }
       });
     });
 
@@ -80,19 +77,32 @@ export class GameGateway {
     setInterval(() => {
       for (const roomId in this.rooms) {
         const room = this.rooms[roomId];
-        room.gameState.update();
-        const state = room.gameState.getState();
+        const gameState = room.gameState;
+        gameState.update();
         // プレイヤー・観戦者全員に送信
         [room.player1, room.player2, ...room.watchers].forEach((client) => {
           if (client && client.readyState === 1) {
-            client.send(
-              JSON.stringify({
-                type: "gameState",
-                state: { ...state, roomId },
-              })
-            );
+            if (gameState.ifEnd()) {
+              client.send(
+                JSON.stringify({
+                  type: "gameEnd",
+                  state: gameState.endState(client == room.player2),
+                })
+              )
+            }
+            else {
+              client.send(
+                JSON.stringify({
+                  type: "gameState",
+                  state: gameState.getState(client == room.player2),
+                })
+              );
+            }
           }
         });
+        if (gameState.ifEnd()) {
+          delete this.rooms[roomId];
+        }
       }
     }, 1000 / 60);
   }

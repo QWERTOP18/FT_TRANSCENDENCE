@@ -44,12 +44,6 @@ export class GameRoom {
     }
   }
 
-  isEmpty() {
-    return (
-      this.player1 === null && this.player2 === null && this.watchers.size === 0
-    );
-  }
-
   toSchema(): GameRoomSchema {
     return {
       room_id: this.room_id,
