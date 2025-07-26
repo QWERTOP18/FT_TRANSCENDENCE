@@ -1,10 +1,40 @@
-function render(appElement: HTMLElement, content: string) {
+function render(appElement: HTMLElement, content: string): void {
     appElement.innerHTML = content;
 }
 
-export function renderTournamentListScreen(appElement: HTMLElement, tournaments: any[], MY_USER_ID: string, userDatabase: any) {
+/**
+ * 新しいトーナメントを作成するための画面を描画する
+ */
+export function renderCreateTournamentScreen(appElement: HTMLElement): void {
+    const contentHTML = `
+        <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white w-full max-w-lg mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-6">Create New Tournament</h2>
+            <form onsubmit="window.router.handleCreateTournament(event)">
+                <div class="mb-4">
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Tournament Name</label>
+                    <input type="text" id="name" name="name" required class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div class="mb-6">
+                    <label for="description" class="block text-sm font-medium text-gray-300 mb-1">Description</label>
+                    <textarea id="description" name="description" rows="4" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"></textarea>
+                </div>
+                <button type="submit" class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-bold">
+                    作成する
+                </button>
+            </form>
+        </div>
+    `;
+    render(appElement, contentHTML);
+}
+
+
+/**
+ * トーナメント一覧画面を描画する
+ */
+export function renderTournamentListScreen(appElement: HTMLElement, tournaments: any[], myUserId: string | null, userDatabase: any): void {
     const listHTML = tournaments.map(t => {
-        const adminButtonHTML = t.owner_id === MY_USER_ID ?
+        // 自分がオーナーのトーナメントにだけ「管理」ボタンを表示する
+        const adminButtonHTML = t.owner_id === myUserId ?
             `<button class="mt-2 block w-full px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/admin/${t.id}')">
                 管理する
             </button>` : '';
@@ -15,7 +45,7 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
                     <h3 class="text-xl font-bold text-white">${t.name}</h3>
                     <p class="text-gray-400">${t.description}</p>
                 </div>
-                <div class="text-right">
+                <div class="text-right w-32 flex-shrink-0">
                     <span class="text-sm font-semibold px-3 py-1 rounded-full ${
                         t.state === 'open' ? 'bg-green-500 text-white' :
                         t.state === 'reception' ? 'bg-yellow-500 text-black' :
@@ -32,134 +62,93 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
 
     const contentHTML = `
         <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-8">Tournament List</h2>
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Tournament List</h2>
+                <button class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-semibold" onclick="window.router.navigateTo('/tournaments/new')">
+                    新規作成
+                </button>
+            </div>
             ${listHTML}
         </div>
     `;
     render(appElement, contentHTML);
 }
 
-export function renderTournamentScreen(appElement: HTMLElement, tournamentData: any, userDatabase: any, MY_USER_ID: string) {
+/**
+ * トーナメント詳細画面を描画する
+ */
+export function renderTournamentScreen(appElement: HTMLElement, tournamentData: any, userDatabase: any, myUserId: string | null): void {
     if (!tournamentData) {
         render(appElement, `<p class="text-red-500">Tournament data not found.</p>`);
         return;
     }
-
-    const { name, participants: initialParticipants, histories, champion_id, state, owner_id } = tournamentData;
+    const { name, participants, histories, champion_id, state, owner_id } = tournamentData;
     let contentHTML;
 
     switch(state) {
         case 'reception': {
-            const participantsList = initialParticipants.map((p: any) => {
-                const user = userDatabase[p.id] || { name: 'Unknown User', image: '' };
-                return `<li class="flex items-center gap-4 py-2 px-4 bg-gray-700 rounded mb-2"><img src="${user.image}" class="player-avatar"><span>${user.name}</span></li>`;
+            const isParticipant = participants.some((p: any) => p.userId === myUserId);
+            const joinButtonHTML = !isParticipant ? `<button class="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white" onclick="window.router.handleJoinTournament('${tournamentData.id}')">トーナメントに参加する</button>` : `<p class="mt-6 text-green-400">あなたは既に参加しています。</p>`;
+            const participantsList = participants.map((p: any) => {
+                const user = userDatabase[p.userId] || { name: 'Unknown User', image: '' };
+                return `<li class="flex items-center gap-4 py-2 px-4 bg-gray-700 rounded mb-2"><img src="${user.image || ''}" class="player-avatar"><span>${user.name}</span></li>`;
             }).join('');
-            contentHTML = `
-                <div class="text-center">
-                    <p class="text-yellow-400 mb-4">オーナーがトーナメントを開始するのを待っています...</p>
-                    <h4 class="text-lg font-bold mb-2">現在の参加者 (${initialParticipants.length}人)</h4>
-                    <ul class="text-left max-w-xs mx-auto">${participantsList}</ul>
-                </div>`;
+            contentHTML = `<div class="text-center"><p class="text-yellow-400 mb-4">オーナーがトーナメントを開始するのを待っています...</p><h4 class="text-lg font-bold mb-2">現在の参加者 (${participants.length}人)</h4><ul class="text-left max-w-xs mx-auto">${participantsList}</ul>${joinButtonHTML}</div>`;
             break;
         }
-
         case 'open': {
-            const getPlayerHTML_interactive = (participant: any) => {
-                const { id, status } = participant;
-                const user = userDatabase[id] || { name: 'Unknown', image: '' };
-                return `<div class="matchup !flex-row justify-between items-center"><div class="player"><img src="${user.image}" class="player-avatar"><span>${user.name}</span></div><div class="flex items-center gap-4 ml-auto"><span class="status ${status === 'ready' ? 'text-green-400' : 'text-red-400'}">${status === 'ready' ? 'Ready' : 'Pending'}</span><button class="px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 rounded" onclick="window.router.togglePlayerStatus('${id}')">Toggle</button></div></div>`;
+            const getPlayerHTML = (participant: any) => {
+                const user = userDatabase[participant.userId] || { name: 'Unknown', image: '' };
+                const isLoser = participant.state === 'lose';
+                const button = !isLoser ? `<button class="px-3 py-1 text-sm bg-gray-500 hover:bg-gray-600 rounded" onclick="window.router.handleSetReady('${tournamentData.id}', '${participant.id}', '${participant.state}')">Toggle Ready</button>` : '<span class="text-red-500 font-semibold">敗退</span>';
+                return `<div class="matchup !flex-row justify-between items-center"><div class="player"><img src="${user.image || ''}" class="player-avatar"><span>${user.name}</span></div><div class="flex items-center gap-4 ml-auto"><span class="status ${participant.state === 'ready' ? 'text-green-400' : 'text-yellow-400'}">${participant.state}</span>${button}</div></div>`;
             };
-            const participantsListHTML = initialParticipants.map(getPlayerHTML_interactive).join('');
-            const allPlayersReady = initialParticipants.every((p: any) => p.status === 'ready');
-            const isOwner = MY_USER_ID === owner_id;
+            const participantsListHTML = participants.map(getPlayerHTML).join('');
+            const allPlayersReady = participants.every((p: any) => p.state === 'ready' || p.state === 'lose');
+            const isOwner = myUserId === owner_id;
             let startButtonHTML = '';
             if (allPlayersReady && isOwner) {
-                startButtonHTML = `<div class="mt-8 text-center animate-pulse"><button class="px-8 py-4 text-xl font-bold text-white bg-green-600 rounded-lg shadow-lg hover:bg-green-700" onclick="window.router.startTournament()">試合開始</button></div>`;
+                startButtonHTML = `<div class="mt-8 text-center animate-pulse"><button class="px-8 py-4 text-xl font-bold text-white bg-green-600 rounded-lg shadow-lg hover:bg-green-700" onclick="window.router.startBattle('${tournamentData.id}')">次の対戦を開始</button></div>`;
             }
             contentHTML = `<div class="w-full max-w-md mx-auto">${participantsListHTML}${startButtonHTML}</div>`;
             break;
         }
-
+        case 'in_progress': {
+             const battlers = participants.filter((p: any) => p.state === 'in_progress');
+             const waiters = participants.filter((p: any) => p.state !== 'in_progress' && p.state !== 'lose');
+             const battlersHTML = battlers.map((p: any) => `<li>${userDatabase[p.userId]?.name}</li>`).join('');
+             const waitersHTML = waiters.map((p: any) => `<li>${userDatabase[p.userId]?.name}</li>`).join('');
+             contentHTML = `<div class="flex justify-around"><div class="w-1/2 p-4"><h3>待機者</h3><ul>${waitersHTML}</ul></div><div class="w-1/2 p-4 border-l border-gray-600"><h3>対戦中</h3><ul>${battlersHTML}</ul></div></div>`;
+             break;
+        }
         case 'close': {
-            const numParticipants = initialParticipants.length;
-            let bracketSize = 2;
-            while (bracketSize < numParticipants) { bracketSize *= 2; }
-            const players = [...initialParticipants.map((p: any) => (typeof p === 'object' ? p.id : p))];
-            while (players.length < bracketSize) { players.push(null); }
-            const rounds: any[] = [];
-            let currentRoundPlayers = [...players];
-            while (currentRoundPlayers.length > 1) {
-                const round = { matches: [] as any[] };
-                for (let i = 0; i < currentRoundPlayers.length; i += 2) {
-                    round.matches.push({ player1: currentRoundPlayers[i], player2: currentRoundPlayers[i + 1], winner: null, score1: null, score2: null });
-                }
-                rounds.push(round);
-                currentRoundPlayers = new Array(currentRoundPlayers.length / 2).fill(null);
-            }
-            rounds.forEach((round, rIndex) => {
-                round.matches.forEach((match: any, mIndex: number) => {
-                    if (match.player1 && !match.player2) match.winner = match.player1;
-                    if (!match.player1 && match.player2) match.winner = match.player2;
-                    const history = histories.find((h: any) => (h.winner.id === match.player1 && h.loser.id === match.player2) || (h.winner.id === match.player2 && h.loser.id === match.player1));
-                    if (history) {
-                        match.winner = history.winner.id;
-                        if (history.winner.id === match.player1) {
-                            match.score1 = history.winner.score; match.score2 = history.loser.score;
-                        } else {
-                            match.score1 = history.loser.score; match.score2 = history.winner.score;
-                        }
-                    }
-                    if (match.winner && rounds[rIndex + 1]) {
-                        const nextMatchIndex = Math.floor(mIndex / 2);
-                        const playerSlot = mIndex % 2 === 0 ? 'player1' : 'player2';
-                        rounds[rIndex + 1].matches[nextMatchIndex][playerSlot] = match.winner;
-                    }
-                });
-            });
-            const getPlayerHTML_bracket = (playerId: string | null, score: number | null = null, isWinner = false) => {
-                if (!playerId) return `<div class="player text-gray-500">-- Bye --</div>`;
-                const user = userDatabase[playerId] || { name: 'Unknown', image: '' };
-                return `<div class="player ${isWinner ? 'font-bold text-yellow-300' : ''}"><img src="${user.image}" class="player-avatar"><span>${user.name}</span></div><div class="score ${isWinner ? 'font-bold text-yellow-300' : ''}">${score ?? ''}</div>`;
-            };
-            const roundsHTML = rounds.map(round => `<div class="round">${round.matches.map((match: any) => `<div class="matchup">${getPlayerHTML_bracket(match.player1, match.score1, match.winner === match.player1)}${getPlayerHTML_bracket(match.player2, match.score2, match.winner === match.player2)}</div>`).join('')}</div>`).join('');
-            const championHTML = champion_id ? `<div class="round"><div class="champion"><span class="text-yellow-400 text-2xl">🏆 CHAMPION 🏆</span>${getPlayerHTML_bracket(champion_id, null, true)}</div></div>` : '';
-            contentHTML = `<div class="tournament-bracket">${roundsHTML}${championHTML}</div>`;
+            contentHTML = `<div class="text-center">トーナメントは終了しました。チャンピオン: ${userDatabase[champion_id]?.name || '不明'}</div>`;
             break;
         }
     }
-
-    const finalHTML = `
-        <div class="bg-gray-800 bg-opacity-80 p-6 rounded-lg text-white">
-            <h2 class="text-3xl font-bold text-center mb-6">${name}</h2>
-            ${contentHTML}
-        </div>
-    `;
+    const finalHTML = `<div class="bg-gray-800 bg-opacity-80 p-6 rounded-lg text-white"><h2 class="text-3xl font-bold text-center mb-6">${name}</h2>${contentHTML}</div>`;
     render(appElement, finalHTML);
 }
 
-export function renderAdminScreen(appElement: HTMLElement, tournamentData: any, MY_USER_ID: string) {
+
+/**
+ * トーナメント管理画面を描画する
+ */
+export function renderAdminScreen(appElement: HTMLElement, tournamentData: any, myUserId: string | null): void {
     if (!tournamentData) {
         render(appElement, `<p class="text-red-500">Tournament data not found.</p>`);
         return;
     }
-    if (MY_USER_ID !== tournamentData.owner_id) {
+    if (myUserId !== tournamentData.owner_id) {
         render(appElement, `<div class="text-center text-red-500 font-bold">アクセス権がありません。</div>`);
         return;
     }
     
     let actionButtonHTML = '';
     if (tournamentData.state === 'reception') {
-        actionButtonHTML = `
-            <div class="mt-8 border-t border-gray-600 pt-6">
-                <h3 class="text-lg font-semibold mb-2">トーナメントを開始する</h3>
-                <p class="text-sm text-gray-400 mb-4">参加者を確定し、対戦をオープンします。この操作は元に戻せません。</p>
-                <button class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-bold" onclick="window.router.openTournament()">
-                    トーナメントをオープンする
-                </button>
-            </div>
-        `;
-    } else if (tournamentData.state === 'open') {
-         actionButtonHTML = `<div class="mt-8 text-center text-green-400 font-bold">トーナメントはオープン中です。</div>`;
+        actionButtonHTML = `<div class="mt-8 border-t border-gray-600 pt-6"><h3 class="text-lg font-semibold mb-2">トーナメントを開始する</h3><p class="text-sm text-gray-400 mb-4">参加者を確定し、対戦をオープンします。</p><button class="w-full px-4 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-bold" onclick="window.router.openTournament()">トーナメントをオープンする</button></div>`;
+    } else if (tournamentData.state === 'open' || tournamentData.state === 'in_progress') {
+         actionButtonHTML = `<div class="mt-8 text-center text-green-400 font-bold">トーナメントは進行中です。</div>`;
     }
 
     const contentHTML = `
@@ -168,19 +157,17 @@ export function renderAdminScreen(appElement: HTMLElement, tournamentData: any, 
             <form onsubmit="window.router.handleAdminFormSubmit(event)">
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-300 mb-1">トーナメント名</label>
-                    <input type="text" id="name" name="name" value="${tournamentData.name}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="text" id="name" name="name" value="${tournamentData.name}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-300 mb-1">説明</label>
-                    <textarea id="description" name="description" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">${tournamentData.description}</textarea>
+                    <textarea id="description" name="description" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">${tournamentData.description}</textarea>
                 </div>
                 <div class="mb-6">
                     <label for="max_participants" class="block text-sm font-medium text-gray-300 mb-1">最大参加人数</label>
-                    <input type="number" id="max_participants" name="max_participants" value="${tournamentData.max_participants}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <input type="number" id="max_participants" name="max_participants" value="${tournamentData.max_participants}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2">
                 </div>
-                <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-bold">
-                    変更を保存
-                </button>
+                <button type="submit" class="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white font-bold">変更を保存</button>
             </form>
             ${actionButtonHTML}
         </div>
