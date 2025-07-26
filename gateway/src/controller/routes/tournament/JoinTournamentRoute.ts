@@ -5,6 +5,7 @@ import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 import { handleServiceError } from "../../util/response";
+import { NotFoundError } from "../../../service/auth/AuthService";
 
 const description = `
 # 概要
@@ -45,6 +46,14 @@ export default function JoinTournament(fastify: FastifyInstance) {
         const tournament = await tournamentService.joinTournament(request);
         return tournament;
       } catch (error) {
+        if (error instanceof NotFoundError) {
+          reply.status(404).send({
+            code: error.code,
+            statusCode: 404,
+            error: error.name,
+            message: error.message,
+          });
+        }
         handleServiceError(error, reply, "Failed to fetch tournament");
       }
     }

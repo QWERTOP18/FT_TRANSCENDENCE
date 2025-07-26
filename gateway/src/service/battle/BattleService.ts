@@ -13,6 +13,9 @@ class BattleService {
     const tournamentId = request.params.tournament_id;
     const userId = request.headers["x-user-id"];
     const participantId = await this.getParticipantId(tournamentId, userId);
+    console.log(
+      `${this.endpoint}/${tournamentId}/participants/${participantId}/ready`
+    );
     const response = await axios.post(
       `${this.endpoint}/${tournamentId}/participants/${participantId}/ready`,
       undefined,

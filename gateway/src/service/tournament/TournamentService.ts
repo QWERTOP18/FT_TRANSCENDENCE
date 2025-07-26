@@ -1,5 +1,6 @@
 import axios from "axios";
 import { config } from "../../config/config";
+import { getUser } from "../auth/AuthService";
 
 class TournamentService {
   private endpoint: string;
@@ -28,8 +29,10 @@ class TournamentService {
   async joinTournament(request: any) {
     const id = request.params.id;
     const externalId = request.headers["x-user-id"];
+    const user = await getUser(externalId);
     const response = await axios.post(`${this.endpoint}/${id}/participants`, {
       external_id: externalId,
+      name: user.name,
     });
     return response.data;
   }
@@ -52,18 +55,18 @@ class TournamentService {
 
   async createTournament(request: any) {
     const externalId = request.headers["x-user-id"];
+    const user = await getUser(externalId);
 
-     console.log({
+    console.log({
       ...request.body,
       ownerExternalId: externalId,
-      ownerName: "<TODO: Owner Name>"
-    })
+      ownerName: user.name,
+    });
 
-    // todo : ownerName should be passed from the request body or headers
     const response = await axios.post(this.endpoint, {
       ...request.body,
       ownerExternalId: externalId,
-      ownerName: "<TODO: Owner Name>"
+      ownerName: user.name,
     });
 
     return response.data;

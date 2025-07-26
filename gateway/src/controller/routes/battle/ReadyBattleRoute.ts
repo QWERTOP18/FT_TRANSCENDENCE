@@ -4,6 +4,7 @@ import { Type } from "@sinclair/typebox";
 import { OKSchema } from "../../schemas/OtherSchema";
 import { TournamentIdSchema } from "../../schemas/TournamentSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
+import { handleServiceError } from "../../util/response";
 
 const description = `
 # 概要
@@ -46,7 +47,11 @@ export default function ReadyBattle(fastify: FastifyInstance) {
       },
     },
     async (request, reply) => {
-      return battleService.readyBattle(request);
+      try {
+        return battleService.readyBattle(request);
+      } catch (error) {
+        handleServiceError(error, reply, "Failed to ready battle");
+      }
     }
   );
 }

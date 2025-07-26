@@ -4,6 +4,7 @@ import { tournamentService } from "../../../service/tournament/TournamentService
 import { Type } from "@sinclair/typebox";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 import { handleServiceError } from "../../util/response";
+import { NotFoundError } from "../../../service/auth/AuthService";
 
 const description = `
   # 概要
@@ -45,6 +46,14 @@ export default function CreateTournament(fastify: FastifyInstance) {
         const tournament = await tournamentService.createTournament(request);
         return tournament;
       } catch (error) {
+        if (error instanceof NotFoundError) {
+          reply.status(404).send({
+            code: error.code,
+            statusCode: 404,
+            error: error.name,
+            message: error.message,
+          });
+        }
         handleServiceError(error, reply, "Failed to create tournament");
       }
     }
