@@ -4,6 +4,7 @@ import { tournamentService } from "../../../service/tournament/TournamentService
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
+import { handleServiceError } from "../../util/response";
 
 const description = `
 # 概要
@@ -40,7 +41,12 @@ export default function OpenTournament(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      return await tournamentService.openTournament(request);
+      try {
+        const tournament = await tournamentService.openTournament(request);
+        return tournament;
+      } catch (error) {
+        handleServiceError(error, reply, "Failed to open tournament");
+      }
     }
   );
 }

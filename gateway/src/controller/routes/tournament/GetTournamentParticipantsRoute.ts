@@ -4,6 +4,7 @@ import { ParticipantSchema } from "../../schemas/ParticipantSchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
+import { handleServiceError } from "../../util/response";
 
 const description = `
 # 概要
@@ -43,9 +44,11 @@ export default function GetTournamentParticipants(fastify: FastifyInstance) {
           await tournamentService.getTournamentParticipants(request);
         return participants;
       } catch (error) {
-        reply
-          .status(500)
-          .send({ error: "Failed to fetch tournament participants" });
+        handleServiceError(
+          error,
+          reply,
+          "Failed to fetch tournament participants"
+        );
       }
     }
   );

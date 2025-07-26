@@ -3,6 +3,7 @@ import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
 import { Type } from "@sinclair/typebox";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
+import { handleServiceError } from "../../util/response";
 
 const description = `
   # 概要
@@ -40,13 +41,11 @@ export default function CreateTournament(fastify: FastifyInstance) {
       },
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
-      console.log("CreateTournament request:", request.body);
       try {
         const tournament = await tournamentService.createTournament(request);
         return tournament;
       } catch (error) {
-        console.log(error);
-        reply.status(500).send({ error: "Failed to create tournament" });
+        handleServiceError(error, reply, "Failed to create tournament");
       }
     }
   );

@@ -4,6 +4,7 @@ import { HistorySchema } from "../../schemas/HistorySchema";
 import { tournamentService } from "../../../service/tournament/TournamentService";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
+import { handleServiceError } from "../../util/response";
 
 const description = `
 # 概要
@@ -41,8 +42,8 @@ export default function GetTournamentHistory(fastify: FastifyInstance) {
       try {
         const history = await tournamentService.getTournamentHistory(request);
         return history;
-      } catch (error) {
-        reply.status(500).send({ error: "Failed to fetch tournament history" });
+      } catch (error: unknown) {
+        handleServiceError(error, reply, "Failed to fetch tournament history");
       }
     }
   );

@@ -7,6 +7,7 @@ import {
 } from "../../schemas/TournamentSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
+import { handleServiceError } from "../../util/response";
 
 const description = `
 # 概要
@@ -47,8 +48,7 @@ export default function GetTournament(fastify: FastifyInstance) {
         const tournament = await tournamentService.getTournament(request);
         return tournament;
       } catch (error) {
-        console.error(error);
-        reply.status(500).send({ error: "Failed to fetch tournament" });
+        handleServiceError(error, reply, "Failed to fetch tournament");
       }
     }
   );
