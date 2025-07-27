@@ -38,7 +38,7 @@ up:
 	@echo "│                         BUILD SUCCESS                         │"
 	@echo "├───────────────────────────────────────────────────────────────┤"
 	@echo "│ Access Frontend    http://localhost:3000                      │"
-	@echo "│ Access Gateway     http://localhost:8000    Not implemented   │"
+	@echo "│ Access Gateway     http://localhost:8000                      │"
 	@echo "│ Access Auth        http://localhost:5000    Not implemented   │"
 	@echo "│ Access User        http://localhost:6000    Not implemented   │"
 	@echo "│ Access Game        http://localhost:4000/docs                 │"
@@ -82,6 +82,9 @@ logs-game:
 
 logs-tournament:
 	docker-compose logs -f tournament
+
+logs-gateway:
+	docker-compose logs -f gateway
 
 
 # =============================================================================

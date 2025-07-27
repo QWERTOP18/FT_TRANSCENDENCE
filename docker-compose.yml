@@ -26,6 +26,24 @@ services:
     networks:
       - transcendence-network
 
+  # Gateway service
+  gateway:
+    build:
+      context: ./gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./gateway:/app
+      - /app/dist
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - TOURNAMENT_URL=http://tournament:8080
+      - GAME_URL=http://game:4000
+    networks:
+      - transcendence-network
+
   # Game service
   game:
     build:
