@@ -2,7 +2,7 @@ import { FastifyInstance } from "fastify";
 import { battleService } from "../../../service/battle/BattleService";
 import { Type } from "@sinclair/typebox";
 import { OKSchema } from "../../schemas/OtherSchema";
-import { TournamentIdSchema } from "../../schemas/TournamentSchema";
+import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 import { handleServiceError } from "../../util/response";
 
@@ -17,11 +17,7 @@ frontendとwebsocket通信を開始します。
 `;
 
 const RouteSchema = {
-  Params: Type.Object({
-    tournament_id: TournamentIdSchema(),
-  }),
-  Querystring: undefined,
-  Body: undefined,
+  Params: Type.Pick(TournamentSchema(), ["id"]),
   Headers: UserIdHeaderSchema,
   Reply: {
     200: OKSchema(),
@@ -29,21 +25,15 @@ const RouteSchema = {
 } as const;
 
 export default function ReadyBattle(fastify: FastifyInstance) {
-  fastify.post(
-    "/tournaments/:tournament_id/battle/ready",
+  fastify.put(
+    "/tournaments/:id/battle/ready",
     {
       schema: {
         description,
         tags: ["Battle"],
         summary: "ユーザーをready状態にする",
         headers: RouteSchema.Headers,
-        params: {
-          type: "object",
-          properties: {
-            tournament_id: { type: "string" },
-          },
-          required: ["tournament_id"],
-        },
+        params: RouteSchema.Params,
       },
     },
     async (request, reply) => {

@@ -10,39 +10,47 @@ class BattleService {
   }
 
   async readyBattle(request: any) {
-    const tournamentId = request.params.tournament_id;
-    const userId = request.headers["x-user-id"];
-    const participantId = await this.getParticipantId(tournamentId, userId);
-    console.log(
-      `${this.endpoint}/${tournamentId}/participants/${participantId}/ready`
-    );
-    const response = await axios.post(
-      `${this.endpoint}/${tournamentId}/participants/${participantId}/ready`,
-      undefined,
-      {
-        headers: {
-          "x-external-id": userId,
-        },
+    try {
+      const tournamentId = request.params.id;
+      const userId = request.headers["x-user-id"];
+
+      const participantId = await this.getParticipantId(tournamentId, userId);
+
+      const response = await axios.put(
+        `${this.endpoint}/${tournamentId}/participants/${participantId}/ready`,
+        null,
+        {
+          headers: {
+            "x-external-id": userId,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      console.log(await this.countReadyParticipants(tournamentId));
+      if ((await this.countReadyParticipants(tournamentId)) >= 2) {
+        console.log("Creating game");
+        const gameRoom = await gameService.createGame(tournamentId);
+        console.log(gameRoom);
       }
-    );
 
-    if ((await this.countReadyParticipants(tournamentId)) >= 2) {
-      await gameService.createGame(tournamentId);
+      return response.data;
+    } catch (error) {
+      throw error;
     }
-
-    return response.data;
   }
 
   async cancelBattle(request: any) {
-    const tournamentId = request.params.tournament_id;
+    const tournamentId = request.params.id;
     const userId = request.headers["x-user-id"];
     const participantId = await this.getParticipantId(tournamentId, userId);
-    const response = await axios.post(
+    const response = await axios.put(
       `${this.endpoint}/${tournamentId}/participants/${participantId}/cancel`,
-      undefined,
+      null,
       {
         headers: {
           "x-external-id": userId,
+          "Content-Type": "application/json",
         },
       }
     );
@@ -51,7 +59,9 @@ class BattleService {
 
   private async countReadyParticipants(tournamentId: string) {
     const participants = await this.getParticipants(tournamentId);
-    return participants.filter((participant: any) => participant.ready).length;
+    return participants.filter(
+      (participant: any) => participant.state === "ready"
+    ).length;
   }
 
   private async getParticipantId(tournamentId: string, userId: string) {
@@ -59,14 +69,23 @@ class BattleService {
     const participant = participants.find(
       (participant: any) => participant.external_id === userId
     );
+    if (!participant) {
+      throw new Error(
+        `Participant not found for userId: ${userId} in tournament: ${tournamentId}`
+      );
+    }
     return participant.id;
   }
 
   private async getParticipants(tournamentId: string) {
-    const response = await axios.get(
-      `${this.endpoint}/${tournamentId}/participants`
-    );
-    return response.data;
+    try {
+      const response = await axios.get(
+        `${this.endpoint}/${tournamentId}/participants`
+      );
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 

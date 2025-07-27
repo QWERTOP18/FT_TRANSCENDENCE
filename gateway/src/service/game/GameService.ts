@@ -9,7 +9,8 @@ class GameService {
   }
 
   async createGame(tournamentId: string) {
-    const response = await axios.post(`${this.endpoint}/${tournamentId}`);
+    console.log(`${this.endpoint}/room`);
+    const response = await axios.post(`${this.endpoint}/room`, {});
     return response.data;
   }
 }

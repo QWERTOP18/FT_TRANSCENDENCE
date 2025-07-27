@@ -30,12 +30,9 @@ export async function Routes(app: FastifyInstance) {
     },
   });
 
-  // Register tournament routes first
-  await app.register(TournamentRoutes);
-
-  await app.register(BattleRoutes);
-
   await app.register(AuthRoutes);
+  await app.register(TournamentRoutes);
+  await app.register(BattleRoutes);
 
   app.get("/", (request, reply) => {
     reply.redirect("/docs");
