@@ -5,32 +5,32 @@ import { GameRoomSchema } from "../presentation/schemas/GameRoomSchema";
 
 export class GameRoom {
   public readonly room_id: string;
-  public readonly token_player1: string;
-  public readonly token_player2: string;
-  public readonly token_watcher: string;
+  public readonly tournament_id: string;
+  public readonly player1_id: string;
+  public readonly player2_id: string;
   public readonly gameState: GameState;
   public player1: WebSocket | null = null;
   public player2: WebSocket | null = null;
   public watchers: Set<WebSocket> = new Set();
 
-  constructor() {
+  constructor(body: any) {
     this.room_id = randomUUID();
-    this.token_player1 = randomUUID();
-    this.token_player2 = randomUUID();
-    this.token_watcher = randomUUID();
-    this.gameState = new GameState();
+    this.tournament_id = body.tournament_id;
+    this.player1_id = body.player1_id;
+    this.player2_id = body.player2_id;
+    this.gameState = new GameState(body.winning_score);
   }
 
-  assignPlayer(ws: WebSocket) {
-    if (this.player1 === null) {
+  assignPlayer(ws: WebSocket, id: string) {
+    if (id === this.player1_id) {
       this.player1 = ws;
-      return "player1";
-    } else if (this.player2 === null) {
+    } else if (id === this.player2_id) {
       this.player2 = ws;
-      return "player2";
     } else {
       this.watchers.add(ws);
-      return "watcher";
+    }
+    if (this.player1 != null && this.player2 != null) {
+      this.gameState.startGame();
     }
   }
 
@@ -47,9 +47,9 @@ export class GameRoom {
   toSchema(): GameRoomSchema {
     return {
       room_id: this.room_id,
-      token_player1: this.token_player1,
-      token_player2: this.token_player2,
-      token_watcher: this.token_watcher,
+      player1_id: this.player1_id,
+      player2_id: this.player2_id,
+      tournament_id: this.tournament_id,
     };
   }
 }

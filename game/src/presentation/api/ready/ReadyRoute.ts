@@ -1,7 +1,6 @@
 import { Type } from "@sinclair/typebox";
 import { FastifyInstance } from "fastify";
 import { GameRoomSchema } from "../../schemas/GameRoomSchema";
-import { GameRoom } from "../../../domain/GameRoom";
 import { GameGateway } from "../../gateway/GameGateway";
 
 const description = `
@@ -13,7 +12,7 @@ const description = `
 `;
 
 // グローバルな状態管理（実際の本番では適切な状態管理を使用）
-let readyUsers: Set<string> = new Set();
+let readyUser: string | null = null;
 
 export function ReadyRoute(fastify: FastifyInstance, gameGateway: GameGateway) {
   fastify.post(
@@ -41,29 +40,31 @@ export function ReadyRoute(fastify: FastifyInstance, gameGateway: GameGateway) {
     async (request, reply) => {
       const { user_id } = request.body as { user_id: string };
 
-      // ユーザーをready状態に追加
-      readyUsers.add(user_id);
-      const readyCount = readyUsers.size;
-
       // 二人揃った場合、部屋を作成
-      if (readyCount === 2) {
-        const room = gameGateway.createRoom();
+      if (readyUser) {
+        const room = gameGateway.createRoom({
+          tournament_id: "tournament_id",
+          player1_id: readyUser,
+          player2_id: user_id,
+          winning_score: 10,
+        });
         const roomData = room.toSchema();
         
         // ready状態をリセット
-        readyUsers.clear();
+        readyUser = null;
         
         return {
           message: "二人揃いました！部屋を作成しました。",
-          ready_count: readyCount,
+          ready_count: 2,
           room: roomData,
         };
       }
 
       // まだ二人揃っていない場合
+      readyUser = user_id;
       return {
-        message: `ready状態に登録しました。現在${readyCount}人がready状態です。`,
-        ready_count: readyCount,
+        message: `ready状態に登録しました。現在1人がready状態です。`,
+        ready_count: 1,
       };
     }
   );

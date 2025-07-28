@@ -3,6 +3,7 @@ import { FastifyInstance } from "fastify";
 import { GameRoomSchema } from "../../schemas/GameRoomSchema";
 import { GameRoom } from "../../../domain/GameRoom";
 import { GameGateway } from "../../gateway/GameGateway";
+import { CreateGameRoomSchema } from "../../schemas/GameRoomSchema";
 
 const description = `
 # 概要
@@ -20,7 +21,7 @@ export function CreateRoomRoute(fastify: FastifyInstance, gameGateway: GameGatew
         description,
         tags: ["participant"],
         summary: "room作成",
-        body: Type.Pick(GameRoomSchema(), []),
+        body: CreateGameRoomSchema(),
         response: {
           200: GameRoomSchema(),
           400: Type.Object({
@@ -30,9 +31,15 @@ export function CreateRoomRoute(fastify: FastifyInstance, gameGateway: GameGatew
       },
     },
     async (request, reply) => {
-      // GameRoomクラスで部屋インスタンスを生成し、スキーマ形式で返す
-      const room = gameGateway.createRoom();
-      return room.toSchema();
+      try {
+        console.log(request.body);
+        const room = gameGateway.createRoom(request.body as any);
+        console.log(room);
+        return room.toSchema();
+      } catch (error) {
+        console.error(error);
+        return reply.status(400).send({ error: "Failed to create room" });
+      }
     }
   );
 }

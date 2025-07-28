@@ -15,31 +15,37 @@ export class GameGateway {
     return this.rooms;
   }
 
-  createRoom(): GameRoom {
-    const room = new GameRoom();
+  createRoom(body: any): GameRoom {
+    const room = new GameRoom(body);
     this.rooms[room.room_id] = room;
     return room;
   }
 
   private setup() {
     this.wss.on("connection", (ws, req) => {
-      // URLからroomIdを取得
       const parsedUrl = url.parse(req.url || "", true);
       const match = parsedUrl.pathname?.match(/^\/game\/([a-zA-Z0-9\-]+)/);
       const roomId = match ? match[1] : null;
+      const query = parsedUrl.query;
+      const user_id = query.user_id as string | undefined; 
+
       if (!roomId) {
         console.log("roomId not found");
         ws.close();
         return;
       }
-      // ルームがなければErrorを返す
       if (!this.rooms[roomId]) {
         console.log("room not found");
         ws.close();
         return;
       }
+      if (!user_id) {
+        console.log("Token not provided, closing connection.");
+        ws.close();
+        return ;
+      }
       const room = this.rooms[roomId];
-      room.assignPlayer(ws);
+      room.assignPlayer(ws, user_id);
       ws.on("message", (message) => {
         try {
           const data = JSON.parse(message.toString());
