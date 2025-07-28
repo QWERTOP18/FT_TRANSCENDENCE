@@ -17,6 +17,16 @@ class GameService {
     return response.data;
   }
 
+  async createAiGame() {
+    console.log("createAiGame");
+    console.log(`${this.endpoint}/play-ai`);
+    const response = await axios.post(`${this.endpoint}/play-ai`, {
+      user_id: "ai",
+    });
+    console.log(response.data);
+    return response.data;
+  }
+
   private async connectGame(gameRoomId: string) {
     const ws = new WebSocket(`${config.wsURL}/room/${gameRoomId}/watch`);
     ws.onmessage = (event) => {

@@ -5,6 +5,7 @@ import { OKSchema } from "../../schemas/OtherSchema";
 import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 import { handleServiceError } from "../../util/response";
+import { ErrorSchema } from "../../schemas/ErrorSchema";
 
 const description = `
 # 概要
@@ -21,6 +22,7 @@ const RouteSchema = {
   Headers: UserIdHeaderSchema,
   Reply: {
     200: OKSchema(),
+    404: ErrorSchema(),
   },
 } as const;
 

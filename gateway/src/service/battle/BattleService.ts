@@ -27,6 +27,11 @@ class BattleService {
         }
       );
 
+      // todo receptionの時に500が帰ってしまうので、tournamentサービスのエラーを適切に伝播させる
+      if (response.status !== 200) {
+        throw new Error("Failed to ready battle");
+      }
+
       console.log(await this.countReadyParticipants(tournamentId));
       if ((await this.countReadyParticipants(tournamentId)) >= 2) {
         console.log("Creating game");
@@ -123,6 +128,11 @@ class BattleService {
       `${this.endpoint}/${tournamentId}/battle/end`,
       gameResult
     );
+    return response.data;
+  }
+
+  async aiOpponent(request: any) {
+    const response = await gameService.createAiGame();
     return response.data;
   }
 }
