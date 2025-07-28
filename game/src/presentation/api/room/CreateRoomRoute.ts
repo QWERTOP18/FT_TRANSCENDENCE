@@ -34,6 +34,7 @@ export function CreateRoomRoute(fastify: FastifyInstance, gameGateway: GameGatew
       try {
         console.log(request.body);
         const room = gameGateway.createRoom(request.body as any);
+        console.log(room);
         return room.toSchema();
       } catch (error) {
         console.error(error);

@@ -22,9 +22,7 @@ export function PlayAiRoute(fastify: FastifyInstance, gameGateway: GameGateway) 
           user_id: Type.String({ description: "ユーザーID" }),
         }),
         response: {
-          200: Type.Object({
-            room: Type.Optional(GameRoomSchema()),
-          }),
+          200: GameRoomSchema(),
           400: Type.Object({
             error: Type.String({ description: "エラーメッセージ" }),
           }),
@@ -43,6 +41,8 @@ export function PlayAiRoute(fastify: FastifyInstance, gameGateway: GameGateway) 
         player2_id: "ai_player",
         winning_score: 10,
       });
+      console.log(room);
+      // 非同期処理
       startAiClient(room.room_id, aiLevel);
       console.log(`AI match created in room: ${room.room_id}`);
       return room.toSchema();

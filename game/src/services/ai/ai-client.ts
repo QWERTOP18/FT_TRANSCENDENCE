@@ -1,7 +1,7 @@
 import WebSocket from "ws";
 import { wssURL } from "../../config";
 
-export function startAiClient(roomId: string, aiLevel: number) {
+export async function startAiClient(roomId: string, aiLevel: number) {
   let preX = 400;
   let preY: number = 300;
   const paddleLeft: number = 60;
