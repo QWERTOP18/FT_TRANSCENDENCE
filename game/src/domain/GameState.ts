@@ -19,8 +19,9 @@ export class GameState {
   private keys1: { [key: string]: boolean } = {};
   private keys2: { [key: string]: boolean } = {};
   private winner: number = 0;
-  private started: boolean = false;
+  private isPaused: boolean = true;
   private scoreUpdate: boolean = false;
+  private resumeTime: number | null = null;
 
   constructor(winningScore: number) {
     this.ballSpeedX = Math.random() > 0.5 ? 5 : -5;
@@ -33,8 +34,13 @@ export class GameState {
   }
 
   update() {
-    if (this.started) return;
-    this.scoreUpdate = false;
+    if (this.isPaused) {
+      this.scoreUpdate = false;
+      if (this.resumeTime === null || Date.now() < this.resumeTime) {
+        return ;
+      }
+      this.isPaused = false;
+    }
     this.updatePaddlePositions();
     this.ballX += this.ballSpeedX;
     this.ballY += this.ballSpeedY;
@@ -63,7 +69,6 @@ export class GameState {
     }
     if (this.ballX <= 0) {
       this.score2++;
-      this.scoreUpdate = true;
       this.resetBall();
       if (this.score2 == this.winningScore) {
         console.log("プレイヤー2が勝利しました！");
@@ -72,7 +77,6 @@ export class GameState {
     }
     if (this.ballX >= 800) {
       this.score1++;
-      this.scoreUpdate = true;
       this.resetBall();
       if (this.score1 == this.winningScore) {
         console.log("プレイヤー1が勝利しました！");
@@ -97,6 +101,8 @@ export class GameState {
   }
 
   private resetBall() {
+    this.sleep_3s();
+    this.scoreUpdate = true;
     console.log({resetBall: "resetBall", score1: this.score1, score2: this.score2});
     this.ballX = centerX;
     this.ballY = centerY;
@@ -139,8 +145,9 @@ export class GameState {
     }
   }
 
-  startGame() {
-    this.started = true;
+  sleep_3s() {
+    this.isPaused = true;
+    this.resumeTime = Date.now() + 3000;
   }
 
   ifEnd() {

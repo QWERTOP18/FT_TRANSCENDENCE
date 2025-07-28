@@ -30,7 +30,7 @@ export class GameRoom {
       this.watchers.add(ws);
     }
     if (this.player1 != null && this.player2 != null) {
-      this.gameState.startGame();
+      this.gameState.sleep_3s();
     }
   }
 
