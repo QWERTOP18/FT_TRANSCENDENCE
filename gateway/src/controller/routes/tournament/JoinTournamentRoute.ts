@@ -6,6 +6,7 @@ import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 import { handleServiceError } from "../../util/response";
 import { NotFoundError } from "../../../service/auth/AuthService";
+import { OKSchema } from "../../schemas/OtherSchema";
 
 const description = `
 # 概要
@@ -20,7 +21,7 @@ const RouteSchema = {
   Body: undefined,
   Headers: UserIdHeaderSchema,
   Reply: {
-    200: TournamentSchema({ description: "OK" }),
+    200: OKSchema(),
     404: ErrorSchema({ description: "見つからなかった" }),
   },
 } as const;
@@ -43,8 +44,8 @@ export default function JoinTournament(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const tournament = await tournamentService.joinTournament(request);
-        return tournament;
+        await tournamentService.joinTournament(request);
+        return reply.status(200).send({ ok: true });
       } catch (error) {
         if (error instanceof NotFoundError) {
           reply.status(404).send({
