@@ -1,6 +1,7 @@
 import { Pong } from "./Pong";
 import { PongGUI } from "./PongGUI";
 import { ScoreBoardGUI } from "./ScoreBoardGUI";
+import { ServerToPongMapper } from "./ServerYToPongZMapper";
 
 export type PongUpdaterProps = {
 	pong: Pong;
@@ -17,19 +18,30 @@ export class PongUpdater {
 			const data = JSON.parse(event.data);
 			console.log("Received data:", data);
 			if (data.type == 'gameState') {
+				const state = data.state;
 				props.pong.setPosition({
-					packPosition: { x: data.ballX, z: data.ballY },
-					bottomBarPosition: { x: data.paddle1Y, z: props.pong.props.bottomBar.position.z },
-					topBarPosition: { x: data.paddle2Y, z: props.pong.props.topBar.position.z },
+					packPosition: {
+						x: ServerToPongMapper.x2xMap(state.ballX),
+						z: ServerToPongMapper.y2zMap(state.ballY)
+					},
+					bottomBarPosition: {
+						x: ServerToPongMapper.x2xMap(state.paddle1Y),
+						z: props.pong.props.bottomBar.position.z
+					},
+					topBarPosition: {
+						x: ServerToPongMapper.x2xMap(state.paddle2Y),
+						z: props.pong.props.topBar.position.z
+					},
 				});
-				const newPlayerScore = data.score1;
-				const newOpponentScore = data.score2;
+				const newPlayerScore = state.score1;
+				const newOpponentScore = state.score2;
 				props.pongGui.setScore(newPlayerScore, newOpponentScore)
 				props.scoreboard.setScore(newPlayerScore, newOpponentScore)
 			}
 			else if (data.type == 'gameEnd') {
-				const newPlayerScore = data.score1;
-				const newOpponentScore = data.score2;
+				const state = data.state;
+				const newPlayerScore = state.score1;
+				const newOpponentScore = state.score2;
 				props.pongGui.setScore(newPlayerScore, newOpponentScore)
 				props.scoreboard.setScore(newPlayerScore, newOpponentScore)
 				props.scoreboard.animateScore(props.pong.props.scene);

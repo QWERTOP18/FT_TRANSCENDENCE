@@ -1,4 +1,4 @@
-import { Camera, Light, Mesh, Scene } from "@babylonjs/core";
+import { Camera, GroundMesh, Light, Mesh, Scene } from "@babylonjs/core";
 
 type PongProps = {
 	scene: Scene,
@@ -7,7 +7,7 @@ type PongProps = {
 	pack: Mesh,
 	bottomBar: Mesh,
 	topBar: Mesh,
-	ground: Mesh,
+	ground: GroundMesh,
 }
 
 export class Pong {
@@ -19,6 +19,7 @@ export class Pong {
 		bottomBarPosition?: { x: number, z: number },
 		topBarPosition?: { x: number, z: number },
 	}) {
+		console.log("position set", props);
 		if (props.packPosition) {
 			this.props.pack.position.x = props.packPosition.x;
 			this.props.pack.position.z = props.packPosition.z;

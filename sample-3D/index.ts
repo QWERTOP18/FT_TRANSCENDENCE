@@ -50,20 +50,26 @@ import { PongUpdater } from "./PongUpdater";
 		const createRoomResponseJson = await createRoomResponse.json()
 		console.log(createRoomResponseJson);
 		const ws = new WebSocket(`ws://localhost:4000/game/${createRoomResponseJson.room_id}?user_id=${userName}`);
-		ws.addEventListener("onopen", () => {
+		ws.addEventListener("open", () => {
 			console.log("WebSocket connection established");
+			canvas.focus();
 			const pongSender = new PongSender(ws);
-			const keyEventHandler = (event: KeyboardEvent) => {
-				pongSender.sendKey(event.key);
+			const onPressEventHandler = (event: KeyboardEvent) => {
+				pongSender.onPress(event.key);
 			}
-			canvas.addEventListener('keydown', keyEventHandler)
+			const onUpEventHandler = (event: KeyboardEvent) => {
+				pongSender.onUp(event.key);
+			}
+			canvas.addEventListener('keydown', onPressEventHandler)
+			canvas.addEventListener('keyup', onUpEventHandler)
 			PongUpdater.setEvents({
 				pong: pong,
 				pongGui: pongGui,
 				scoreboard: scoreboard,
 				ws: ws,
 				onEnd: () => {
-					canvas.removeEventListener('keydown', keyEventHandler);
+					canvas.removeEventListener('keydown', onPressEventHandler);
+					canvas.removeEventListener('keyup', onUpEventHandler);
 					button.disabled = false;
 				}
 			});

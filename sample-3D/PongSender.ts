@@ -3,11 +3,35 @@
 export class PongSender {
 	constructor(private ws: WebSocket) {}
 
-	sendKey(key: string) {
+	keyMap(key: string): string {
+		const rightKey = "w";
+		const leftKey = "s";
+		const keyMap: Record<string, string> = {
+
+			"ArrowLeft": rightKey,
+			"ArrowRight": leftKey,
+			"a": rightKey,
+			"d": leftKey,
+		}
+		return keyMap[key] || key;
+	}
+	onPress(key: string) {
+		console.log("Sending key event:", key);
+		const mappedKey = this.keyMap(key);
 		const message = JSON.stringify({
 			type: 'keyEvent',
-			key: key,
+			key: mappedKey,
 			pressed: true,
+		})
+		this.ws.send(message);
+	}
+	onUp(key: string) {
+		console.log("Sending key up event:", key);
+		const mappedKey = this.keyMap(key);
+		const message = JSON.stringify({
+			type: 'keyEvent',
+			key: mappedKey,
+			pressed: false,
 		})
 		this.ws.send(message);
 	}
