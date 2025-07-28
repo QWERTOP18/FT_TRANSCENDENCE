@@ -19,7 +19,9 @@ export class GameState {
   private keys1: { [key: string]: boolean } = {};
   private keys2: { [key: string]: boolean } = {};
   private winner: number = 0;
-  private started: boolean = false;
+  private isPaused: boolean = true;
+  private scoreUpdate: boolean = false;
+  private resumeTime: number | null = null;
 
   constructor(winningScore: number) {
     this.ballSpeedX = Math.random() > 0.5 ? 5 : -5;
@@ -32,7 +34,13 @@ export class GameState {
   }
 
   update() {
-    if (this.started) return;
+    if (this.isPaused) {
+      this.scoreUpdate = false;
+      if (this.resumeTime === null || Date.now() < this.resumeTime) {
+        return ;
+      }
+      this.isPaused = false;
+    }
     this.updatePaddlePositions();
     this.ballX += this.ballSpeedX;
     this.ballY += this.ballSpeedY;
@@ -93,6 +101,8 @@ export class GameState {
   }
 
   private resetBall() {
+    this.sleep_3s();
+    this.scoreUpdate = true;
     console.log({resetBall: "resetBall", score1: this.score1, score2: this.score2});
     this.ballX = centerX;
     this.ballY = centerY;
@@ -103,14 +113,14 @@ export class GameState {
   handleKeyEvent(key: string, pressed: boolean, ws: WebSocket, player1: WebSocket | null, player2: WebSocket | null) {
     if (ws === player1) {
         this.keys1[key] = pressed;
-        console.log("プレイヤー1のキーイベント")
+        console.log("プレイヤー1のキーイベント");
     }
     else if (ws === player2) {
         this.keys2[key] = pressed;
-        console.log("プレイヤー2のキーイベント")
+        console.log("プレイヤー2のキーイベント");
     }
     else {
-        console.log("それ以外のキーイベント")
+        console.log("それ以外のキーイベント");
     }
   }
 
@@ -135,8 +145,9 @@ export class GameState {
     }
   }
 
-  startGame() {
-    this.started = true;
+  sleep_3s() {
+    this.isPaused = true;
+    this.resumeTime = Date.now() + 3000;
   }
 
   ifEnd() {
@@ -152,6 +163,7 @@ export class GameState {
             ballY: centerY * 2 - this.ballY,
             score1: this.score2,
             score2: this.score1,
+            scoreUpdate: this.scoreUpdate,
         };
     }
     return {
@@ -161,6 +173,7 @@ export class GameState {
         ballY: this.ballY,
         score1: this.score1,
         score2: this.score2,
+        scoreUpdate: this.scoreUpdate,
     }
   }
 
