@@ -93,6 +93,7 @@ export class GameState {
   }
 
   private resetBall() {
+    console.log({resetBall: "resetBall", score1: this.score1, score2: this.score2});
     this.ballX = centerX;
     this.ballY = centerY;
     this.ballSpeedX = Math.random() > 0.5 ? 5 : -5;

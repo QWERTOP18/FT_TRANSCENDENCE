@@ -5,6 +5,7 @@ import { GameRoomSchema } from "../presentation/schemas/GameRoomSchema";
 
 export class GameRoom {
   public readonly room_id: string;
+  public readonly tournament_id: string;
   public readonly player1_id: string;
   public readonly player2_id: string;
   public readonly gameState: GameState;
@@ -12,11 +13,12 @@ export class GameRoom {
   public player2: WebSocket | null = null;
   public watchers: Set<WebSocket> = new Set();
 
-  constructor(player1_id: string, player2_id: string, winningScore: number) {
+  constructor(body: any) {
     this.room_id = randomUUID();
-    this.player1_id = player1_id;
-    this.player2_id = player2_id;
-    this.gameState = new GameState(winningScore);
+    this.tournament_id = body.tournament_id;
+    this.player1_id = body.player1_id;
+    this.player2_id = body.player2_id;
+    this.gameState = new GameState(body.winning_score);
   }
 
   assignPlayer(ws: WebSocket, id: string) {
@@ -46,7 +48,8 @@ export class GameRoom {
     return {
       room_id: this.room_id,
       player1_id: this.player1_id,
-      player2_id: this.player2_id
+      player2_id: this.player2_id,
+      tournament_id: this.tournament_id,
     };
   }
 }

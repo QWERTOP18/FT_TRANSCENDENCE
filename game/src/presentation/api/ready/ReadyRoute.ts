@@ -42,7 +42,12 @@ export function ReadyRoute(fastify: FastifyInstance, gameGateway: GameGateway) {
 
       // 二人揃った場合、部屋を作成
       if (readyUser) {
-        const room = gameGateway.createRoom(readyUser, user_id, 10);
+        const room = gameGateway.createRoom({
+          tournament_id: "tournament_id",
+          player1_id: readyUser,
+          player2_id: user_id,
+          winning_score: 10,
+        });
         const roomData = room.toSchema();
         
         // ready状態をリセット

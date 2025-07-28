@@ -15,8 +15,8 @@ export class GameGateway {
     return this.rooms;
   }
 
-  createRoom(player1_id: string, player2_id: string, winningScore: number): GameRoom {
-    const room = new GameRoom(player1_id, player2_id, winningScore);
+  createRoom(body: any): GameRoom {
+    const room = new GameRoom(body);
     this.rooms[room.room_id] = room;
     return room;
   }

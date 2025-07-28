@@ -1,4 +1,5 @@
 import WebSocket from "ws";
+import { wssURL } from "../../config";
 
 export function startAiClient(roomId: string, aiLevel: number) {
   let preX = 400;
@@ -36,7 +37,7 @@ export function startAiClient(roomId: string, aiLevel: number) {
     return finalY % topEnd;
   }
 
-  const ws = new WebSocket("ws://localhost:4000/game/" + roomId);
+  const ws = new WebSocket(wssURL + "/game/" + roomId);
 
   function sendKeyEvent(key: string, pressed: boolean) {
     ws.send(
