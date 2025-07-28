@@ -10,6 +10,10 @@ async function wakeupServer() {
 		origin: "*",
 		credentials: true,
 	});
+	fastify.addHook('onRequest', (request, reply, done) => {
+		console.log(`Request: ${request.method} ${request.url}`);
+		done();
+	});
 	fastify.register(TournamentAPIRoutes);
 
 	return await fastify.listen({
