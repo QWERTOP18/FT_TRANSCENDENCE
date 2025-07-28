@@ -1,6 +1,7 @@
 import axios from "axios";
 import { config } from "../../config/config";
 import { getUser } from "../auth/AuthService";
+import { TournamentSchema } from "../../controller/schemas/TournamentSchema";
 
 class TournamentService {
   private endpoint: string;
@@ -20,7 +21,7 @@ class TournamentService {
     return response.data;
   }
 
-  async getTournament(request: any) {
+  async getTournament(request: any): Promise<TournamentSchema> {
     const id = request.params.id;
     const response = await axios.get(`${this.endpoint}/${id}`, {});
     return response.data;

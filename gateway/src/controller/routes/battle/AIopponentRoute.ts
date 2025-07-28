@@ -3,6 +3,7 @@ import { battleService } from "../../../service/battle/BattleService";
 import { Type } from "@sinclair/typebox";
 import { OKSchema } from "../../schemas/OtherSchema";
 import { handleServiceError } from "../../util/response";
+import { GameRoomId } from "../../schemas/GameRoomSchema";
 
 const description = `
 # 概要
@@ -14,7 +15,7 @@ const description = `
 const RouteSchema = {
   Body: Type.Object({}, { description: "空のオブジェクト" }),
   Reply: {
-    200: OKSchema(),
+    200: GameRoomId(),
   },
 } as const;
 
@@ -34,7 +35,7 @@ export default function AIopponent(fastify: FastifyInstance) {
     },
     async (request, reply) => {
       try {
-        return battleService.aiOpponent(request);
+        return (await battleService.aiOpponent(request)).room_id;
       } catch (error) {
         handleServiceError(error, reply, "Failed to start AI opponent");
       }

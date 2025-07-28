@@ -1,5 +1,6 @@
 import axios from "axios";
 import { config } from "../../config/config";
+import { GameRoomSchema } from "../../controller/schemas/GameRoomSchema";
 
 class GameService {
   private endpoint: string;
@@ -8,39 +9,33 @@ class GameService {
     this.endpoint = `${baseURL}`;
   }
 
-  async createGame(tournamentId: string, participantIds: string[]) {
+  async createGame(
+    tournamentId: string,
+    participantIds: string[],
+    tournamentRule: string
+  ): Promise<GameRoomSchema> {
     const response = await axios.post(`${this.endpoint}/room`, {
       tournament_id: tournamentId,
-      participant_ids: participantIds,
+      player1_id: participantIds[0],
+      player2_id: participantIds[1],
+      winning_score: tournamentRule === "simple" ? 5 : 10,
     });
     console.log(response.data);
     return response.data;
   }
 
-  async createAiGame() {
+  async createAiGame(request: any): Promise<GameRoomSchema> {
     console.log("createAiGame");
     console.log(`${this.endpoint}/play-ai`);
+
+    // todo fetch ai level from request or config
+    const aiLevel = request?.aiLevel || 1;
     const response = await axios.post(`${this.endpoint}/play-ai`, {
       user_id: "ai",
+      aiLevel: aiLevel,
     });
     console.log(response.data);
     return response.data;
-  }
-
-  private async connectGame(gameRoomId: string) {
-    const ws = new WebSocket(`${config.wsURL}/room/${gameRoomId}/watch`);
-    ws.onmessage = (event) => {
-      console.log(event.data);
-    };
-    ws.onopen = () => {
-      console.log("Connected to game");
-    };
-    ws.onclose = () => {
-      console.log("Disconnected from game");
-    };
-    ws.onerror = (error) => {
-      console.log("Error:", error);
-    };
   }
 }
 
