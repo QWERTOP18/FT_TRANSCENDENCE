@@ -2,16 +2,8 @@ const path = require('path');
 const CopyPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-  mode: 'development',
   entry: './src/main.ts',
-  output: {
-    filename: 'bundle.js',
-    path: path.resolve(__dirname, 'dist'),
-    clean: true,
-  },
-  resolve: {
-    extensions: ['.ts', '.js'],
-  },
+  mode: 'development',
   module: {
     rules: [
       {
@@ -19,16 +11,35 @@ module.exports = {
         use: 'ts-loader',
         exclude: /node_modules/,
       },
+      {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
+      },
     ],
   },
-  devtool: 'source-map',
+  resolve: {
+    extensions: ['.ts', '.js'],
+  },
+  output: {
+    filename: 'bundle.js',
+    path: path.resolve(__dirname, 'dist'),
+    clean: true,
+  },
   plugins: [
     new CopyPlugin({
       patterns: [
         { from: 'index.html', to: '.' },
-        { from: 'dist/style.css', to: '.' },
-        { from: 'assets', to: 'assets' },
+        // ★★★ "dist/style.css"をコピーする不要な行を削除 ★★★
+        { from: 'assets', to: 'assets', noErrorOnMissing: true },
       ],
     }),
   ],
-}; 
+  devServer: {
+    static: {
+      directory: path.join(__dirname, 'dist'),
+    },
+    historyApiFallback: true,
+    port: 3000,
+    open: true,
+  },
+};
