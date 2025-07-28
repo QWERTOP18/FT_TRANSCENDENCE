@@ -8,10 +8,39 @@ class GameService {
     this.endpoint = `${baseURL}`;
   }
 
-  async createGame(tournamentId: string) {
-    console.log(`${this.endpoint}/room`);
-    const response = await axios.post(`${this.endpoint}/room`, {});
+  async createGame(tournamentId: string, participantIds: string[]) {
+    const response = await axios.post(`${this.endpoint}/room`, {
+      tournament_id: tournamentId,
+      participant_ids: participantIds,
+    });
+    console.log(response.data);
     return response.data;
+  }
+
+  async createAiGame() {
+    console.log("createAiGame");
+    console.log(`${this.endpoint}/play-ai`);
+    const response = await axios.post(`${this.endpoint}/play-ai`, {
+      user_id: "ai",
+    });
+    console.log(response.data);
+    return response.data;
+  }
+
+  private async connectGame(gameRoomId: string) {
+    const ws = new WebSocket(`${config.wsURL}/room/${gameRoomId}/watch`);
+    ws.onmessage = (event) => {
+      console.log(event.data);
+    };
+    ws.onopen = () => {
+      console.log("Connected to game");
+    };
+    ws.onclose = () => {
+      console.log("Disconnected from game");
+    };
+    ws.onerror = (error) => {
+      console.log("Error:", error);
+    };
   }
 }
 
