@@ -30,8 +30,18 @@ class BattleService {
       console.log(await this.countReadyParticipants(tournamentId));
       if ((await this.countReadyParticipants(tournamentId)) >= 2) {
         console.log("Creating game");
-        const gameRoom = await gameService.createGame(tournamentId);
-        console.log(gameRoom);
+        const readyParticipantIds =
+          await this.getReadyParticipantIds(tournamentId);
+
+        // 参加者をin_progress状態にする
+        await this.notifyGameInprogress(tournamentId, readyParticipantIds);
+
+        // ゲームルームを作成 ここからは非同期処理
+        const gameRoom = gameService.createGame(
+          tournamentId,
+          readyParticipantIds
+        );
+        console.log("Game room created");
       }
 
       return response.data;
@@ -86,6 +96,34 @@ class BattleService {
     } catch (error) {
       throw error;
     }
+  }
+
+  private async getReadyParticipantIds(tournamentId: string) {
+    const participants = await this.getParticipants(tournamentId);
+    return participants
+      .filter((participant: any) => participant.state === "ready")
+      .slice(0, 2)
+      .map((participant: any) => participant.id);
+  }
+
+  private async notifyGameInprogress(
+    tournamentId: string,
+    readyParticipantIds: string[]
+  ) {
+    console.log(readyParticipantIds);
+    const response = await axios.put(
+      `${this.endpoint}/${tournamentId}/battle/start`,
+      readyParticipantIds
+    );
+    return response.data;
+  }
+
+  private async notifyGameEnd(tournamentId: string, gameResult: any) {
+    const response = await axios.put(
+      `${this.endpoint}/${tournamentId}/battle/end`,
+      gameResult
+    );
+    return response.data;
   }
 }
 
