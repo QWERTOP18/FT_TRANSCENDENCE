@@ -2,6 +2,8 @@ import { config } from './config/config';
 import { BattleService } from './services/battleService';
 import { GameService } from './services/gameService';
 import { UserService } from './services/userService';
+import { MenuService } from './services/menuService';
+import { UserInputService } from './services/userInputService';
 import { User } from './types/auth';
 
 async function main(): Promise<void> {
@@ -9,20 +11,84 @@ async function main(): Promise<void> {
     const userService = new UserService();
     const battleService = new BattleService();
     const gameService = new GameService();
-
+    
     // ユーザー認証
     const user: User = await userService.authenticateUser();
     console.log(`User ID: ${user.id}`);
     
-    // Start AI battle and get room ID
-    const roomId = await battleService.startAIBattle();
+    // UserServiceのUserInputServiceインスタンスを取得してMenuServiceと共有
+    const userInputService = userService.userInputService;
+    const menuService = new MenuService(userInputService);
     
-    // Connect to WebSocket with authenticated user
-    gameService.connectToGameWebSocket(roomId, user.id);
+    // メインメニューを表示
+    await showMainMenuLoop(user, battleService, gameService, menuService, userInputService);
     
   } catch (error) {
     console.error('Application failed:', error);
     process.exit(1);
+  }
+}
+
+async function showMainMenuLoop(
+  user: User, 
+  battleService: BattleService, 
+  gameService: GameService, 
+  menuService: MenuService,
+  userInputService: UserInputService
+): Promise<void> {
+  while (true) {
+    try {
+      const choice = await menuService.showMainMenu();
+      
+      switch (choice) {
+        case '1':
+          // AI対戦を開始
+          console.log('\nStarting AI battle...');
+          const roomId = await battleService.startAIBattle();
+          gameService.connectToGameWebSocket(roomId, user.id);
+          return; // ゲーム終了後はアプリケーションを終了
+          
+        case '2':
+          // トーナメント一覧を表示
+          await handleTournamentMenu(user, gameService, menuService);
+          break;
+          
+        case '3':
+          // アプリケーションを終了
+          console.log('Goodbye!');
+          menuService.close();
+          userInputService.close();
+          process.exit(0);
+          
+        default:
+          console.log('Invalid choice. Please select 1, 2, or 3.');
+      }
+    } catch (error) {
+      console.error('Menu error:', error);
+      console.log('Returning to main menu...');
+    }
+  }
+}
+
+async function handleTournamentMenu(
+  user: User, 
+  gameService: GameService, 
+  menuService: MenuService
+): Promise<void> {
+  try {
+    const tournaments = await menuService.displayTournaments();
+    const selectedTournamentId = await menuService.showTournamentMenu(tournaments);
+    
+    if (selectedTournamentId) {
+      console.log('\nJoining tournament...');
+      const roomId = await menuService.joinSelectedTournament(selectedTournamentId, user.id);
+      gameService.connectToGameWebSocket(roomId, user.id);
+      return; // ゲーム終了後はアプリケーションを終了
+    }
+    // 戻るが選択された場合はメインメニューに戻る
+  } catch (error) {
+    console.error('Tournament menu error:', error);
+    console.log('Returning to main menu...');
   }
 }
 
