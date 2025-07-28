@@ -5,6 +5,7 @@ import { TournamentSchema } from "../../schemas/TournamentSchema";
 import { UserIdHeaderSchema } from "../../schemas/headers/UserIdHeaderSchema";
 import { ErrorSchema } from "../../schemas/ErrorSchema";
 import { handleServiceError } from "../../util/response";
+import { OKSchema } from "../../schemas/OtherSchema";
 
 const description = `
 # 概要
@@ -20,7 +21,7 @@ const RouteSchema = {
   Body: undefined,
   Headers: UserIdHeaderSchema,
   Reply: {
-    200: TournamentSchema(),
+    200: OKSchema(),
   },
 } as const;
 
@@ -42,8 +43,8 @@ export default function OpenTournament(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const tournament = await tournamentService.openTournament(request);
-        return tournament;
+        await tournamentService.openTournament(request);
+        return reply.status(200).send({ ok: true });
       } catch (error) {
         handleServiceError(error, reply, "Failed to open tournament");
       }
