@@ -20,6 +20,7 @@ export class GameState {
   private keys2: { [key: string]: boolean } = {};
   private winner: number = 0;
   private started: boolean = false;
+  private scoreUpdate: boolean = false;
 
   constructor(winningScore: number) {
     this.ballSpeedX = Math.random() > 0.5 ? 5 : -5;
@@ -33,6 +34,7 @@ export class GameState {
 
   update() {
     if (this.started) return;
+    this.scoreUpdate = false;
     this.updatePaddlePositions();
     this.ballX += this.ballSpeedX;
     this.ballY += this.ballSpeedY;
@@ -61,6 +63,7 @@ export class GameState {
     }
     if (this.ballX <= 0) {
       this.score2++;
+      this.scoreUpdate = true;
       this.resetBall();
       if (this.score2 == this.winningScore) {
         console.log("プレイヤー2が勝利しました！");
@@ -69,6 +72,7 @@ export class GameState {
     }
     if (this.ballX >= 800) {
       this.score1++;
+      this.scoreUpdate = true;
       this.resetBall();
       if (this.score1 == this.winningScore) {
         console.log("プレイヤー1が勝利しました！");
@@ -103,14 +107,14 @@ export class GameState {
   handleKeyEvent(key: string, pressed: boolean, ws: WebSocket, player1: WebSocket | null, player2: WebSocket | null) {
     if (ws === player1) {
         this.keys1[key] = pressed;
-        console.log("プレイヤー1のキーイベント")
+        console.log("プレイヤー1のキーイベント");
     }
     else if (ws === player2) {
         this.keys2[key] = pressed;
-        console.log("プレイヤー2のキーイベント")
+        console.log("プレイヤー2のキーイベント");
     }
     else {
-        console.log("それ以外のキーイベント")
+        console.log("それ以外のキーイベント");
     }
   }
 
@@ -152,6 +156,7 @@ export class GameState {
             ballY: centerY * 2 - this.ballY,
             score1: this.score2,
             score2: this.score1,
+            scoreUpdate: this.scoreUpdate,
         };
     }
     return {
@@ -161,6 +166,7 @@ export class GameState {
         ballY: this.ballY,
         score1: this.score1,
         score2: this.score2,
+        scoreUpdate: this.scoreUpdate,
     }
   }
 
