@@ -1,10 +1,9 @@
 import WebSocket from "ws";
 
-export function startAiClient(roomId: string) {
+export function startAiClient(roomId: string, aiLevel: number) {
   let preX = 400;
   let preY: number = 300;
   const paddleLeft: number = 60;
-  const paddleRight: number = 800;
   const topEnd: number = 600;
   let moveUp: boolean = false;
   let moveDown: boolean = false;
@@ -27,9 +26,8 @@ export function startAiClient(roomId: string) {
     let time: number;
     let finalY: number;
 
-    if (ballX == preX) return -1;
-    if (ballX < preX) time = (ballX - paddleLeft) / (preX - ballX);
-    else time = (2 * paddleRight - ballX - paddleLeft) / (ballX - preX);
+    if (preX <= ballX) return topEnd / 2;
+    else time = (ballX - paddleLeft) / (preX - ballX);
 
     finalY = ballY + (ballY - preY) * time;
     if (finalY < 0) finalY = -finalY;
@@ -50,36 +48,51 @@ export function startAiClient(roomId: string) {
     )
   }
 
-  function move(goal: number): void {
-    if (gameState.paddle1Y + paddleSize - 5 < goal) {
-      if (moveDown) {
-        sendKeyEvent("w", false);
-        moveDown = false;
-      }
-      if (!moveUp) {
-        sendKeyEvent("s", true);
-        moveUp = true;
-      }
+  function sendMoveUp(): void {
+    if (Math.random() * 4 < aiLevel) return;
+    if (moveDown) {
+      sendKeyEvent("w", false);
+      moveDown = false;
     }
-    else if (goal < gameState.paddle1Y + 5) {
-      if (!moveDown) {
-        sendKeyEvent("w", true);
-        moveDown = true;
-      }
-      if (moveUp) {
-        sendKeyEvent("s", false);
-        moveUp = false;
-      }
+    if (!moveUp) {
+      sendKeyEvent("s", true);
+      moveUp = true;
+    }
+  }
+
+  function sendMoveDown(): void {
+    if (Math.random() * 4 < aiLevel) return;
+    if (!moveDown) {
+      sendKeyEvent("w", true);
+      moveDown = true;
+    }
+    if (moveUp) {
+      sendKeyEvent("s", false);
+      moveUp = false;
+    }
+  }
+
+  function sendStop(): void {
+    if (Math.random() * 4 < aiLevel) return;
+    if (moveDown) {
+      sendKeyEvent("w", false);
+      moveDown = false;
+  }
+  if (moveUp) {
+      sendKeyEvent("s", false);
+      moveUp = false;
+    }
+  }
+
+  function move(goal: number): void {
+    if (gameState.paddle1Y + paddleSize / 2 < goal && gameState.paddle1Y < topEnd) {
+      sendMoveUp();
+    }
+    else if (goal < gameState.paddle1Y + paddleSize / 2 && 0 < gameState.paddle1Y) {
+      sendMoveDown();
     }
     else {
-      if (moveDown) {
-          sendKeyEvent("w", false);
-          moveDown = false;
-      }
-      if (moveUp) {
-          sendKeyEvent("s", false);
-          moveUp = false;
-      }
+      sendStop();
     }
   }
 
@@ -90,13 +103,13 @@ export function startAiClient(roomId: string) {
   ws.on('message', (message) => {
       const data = JSON.parse(message.toString());
       if (data.type === "gameState") {
-          gameState = data.state;
-          const goal = predictPosition();
-          preX = gameState.ballX;
-          preY = gameState.ballY;
-          move(goal);
-          console.log("目標の座標:", goal);
-          console.log("今の座標:", gameState.paddle1Y);
+        gameState = data.state;
+        const goal = predictPosition();
+        preX = gameState.ballX;
+        preY = gameState.ballY;
+        move(goal);
+        console.log("目標の座標:", goal);
+        console.log("今の座標:", gameState.paddle1Y);
       }
   })
 
