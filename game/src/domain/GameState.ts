@@ -1,31 +1,38 @@
 import { WebSocket } from "ws";
 
-export const WINNING_SCORE = 10;
 const centerX: number = 400;
 const centerY: number = 300;
 const paddleCenter: number = 250;
 
 // ゲームの状態を管理するクラス
 export class GameState {
+  private winningScore: number;
   private paddle1Y: number = 250;
   private paddle2Y: number = 250;
   private ballX: number = 400;
   private ballY: number = 300;
-  private ballSpeedX: number = 5;
-  private ballSpeedY: number = 5;
+  private ballSpeedX: number = 10;
+  private ballSpeedY: number = 10;
   private score1: number = 0;
   private score2: number = 0;
   private paddleSpeed: number = 10;
   private keys1: { [key: string]: boolean } = {};
   private keys2: { [key: string]: boolean } = {};
   private winner: number = 0;
+  private started: boolean = false;
 
-  constructor() {
+  constructor(winningScore: number) {
     this.ballSpeedX = Math.random() > 0.5 ? 5 : -5;
     this.ballSpeedY = Math.random() > 0.5 ? 5 : -5;
+    this.winningScore = winningScore;
+  }
+
+  private bound(paddleY: number) {
+    this.ballSpeedY = (this.ballY - paddleY) / 4 - 12.5;
   }
 
   update() {
+    if (this.started) return;
     this.updatePaddlePositions();
     this.ballX += this.ballSpeedX;
     this.ballY += this.ballSpeedY;
@@ -40,6 +47,7 @@ export class GameState {
       this.ballY <= this.paddle1Y + 100
     ) {
       this.ballSpeedX = -this.ballSpeedX;
+      this.bound(this.paddle1Y);
     }
     if (
       this.ballX >= 740 &&
@@ -49,11 +57,12 @@ export class GameState {
       this.ballY <= this.paddle2Y + 100
     ) {
       this.ballSpeedX = -this.ballSpeedX;
+      this.bound(this.paddle2Y);
     }
     if (this.ballX <= 0) {
       this.score2++;
       this.resetBall();
-      if (this.score2 == WINNING_SCORE) {
+      if (this.score2 == this.winningScore) {
         console.log("プレイヤー2が勝利しました！");
         this.winner = 2;
       }
@@ -61,7 +70,7 @@ export class GameState {
     if (this.ballX >= 800) {
       this.score1++;
       this.resetBall();
-      if (this.score1 == WINNING_SCORE) {
+      if (this.score1 == this.winningScore) {
         console.log("プレイヤー1が勝利しました！");
         this.winner = 1;
       }
@@ -123,6 +132,10 @@ export class GameState {
         console.log("プレイヤー2が切断しました。");
         this.winner = 1;
     }
+  }
+
+  startGame() {
+    this.started = true;
   }
 
   ifEnd() {

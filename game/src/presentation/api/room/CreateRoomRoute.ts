@@ -20,7 +20,11 @@ export function CreateRoomRoute(fastify: FastifyInstance, gameGateway: GameGatew
         description,
         tags: ["participant"],
         summary: "room作成",
-        body: Type.Pick(GameRoomSchema(), []),
+        body: Type.Object({
+            player1_id: Type.String({ description: "プレイヤー1のユーザーID"}),
+            player2_id: Type.String({ description: "プレイヤー2のユーザーID"}),
+            winningScore: Type.Number({ description: "ゲームに勝利するために必要な点数"})
+        }),
         response: {
           200: GameRoomSchema(),
           400: Type.Object({
@@ -31,7 +35,12 @@ export function CreateRoomRoute(fastify: FastifyInstance, gameGateway: GameGatew
     },
     async (request, reply) => {
       // GameRoomクラスで部屋インスタンスを生成し、スキーマ形式で返す
-      const room = gameGateway.createRoom();
+      const { player1_id, player2_id, winningScore } = request.body as {
+        player1_id: string;
+        player2_id: string;
+        winningScore: number;
+      };
+      const room = gameGateway.createRoom(player1_id, player2_id, winningScore);
       return room.toSchema();
     }
   );

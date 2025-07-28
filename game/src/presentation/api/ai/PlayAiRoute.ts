@@ -31,8 +31,11 @@ export function PlayAiRoute(fastify: FastifyInstance, gameGateway: GameGateway) 
       },
     },
     async (request, reply) => {
-      const room = gameGateway.createRoom();
-      startAiClient(room.room_id);
+      const { aiLevel } = request.body as {
+        aiLevel: number
+      };
+      const room = gameGateway.createRoom("default_player", "ai_player", 10);
+      startAiClient(room.room_id, aiLevel);
       console.log(`AI match created in room: ${room.room_id}`);
       return room.toSchema();
     }
