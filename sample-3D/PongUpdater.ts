@@ -16,7 +16,6 @@ export class PongUpdater {
 	static setEvents(props: PongUpdaterProps) {
 		props.ws.onmessage = (event) => {
 			const data = JSON.parse(event.data);
-			console.log("Received data:", data);
 			if (data.type == 'gameState') {
 				const state = data.state;
 				props.pong.setPosition({

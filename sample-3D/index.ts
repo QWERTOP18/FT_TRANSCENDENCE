@@ -48,10 +48,8 @@ import { PongUpdater } from "./PongUpdater";
 			}),
 		});
 		const createRoomResponseJson = await createRoomResponse.json()
-		console.log(createRoomResponseJson);
 		const ws = new WebSocket(`ws://localhost:4000/game/${createRoomResponseJson.room_id}?user_id=${userName}`);
 		ws.addEventListener("open", () => {
-			console.log("WebSocket connection established");
 			canvas.focus();
 			const pongSender = new PongSender(ws);
 			const onPressEventHandler = (event: KeyboardEvent) => {

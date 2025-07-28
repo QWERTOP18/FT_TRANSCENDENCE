@@ -16,7 +16,6 @@ export class PongSender {
 		return keyMap[key] || key;
 	}
 	onPress(key: string) {
-		console.log("Sending key event:", key);
 		const mappedKey = this.keyMap(key);
 		const message = JSON.stringify({
 			type: 'keyEvent',
@@ -26,7 +25,6 @@ export class PongSender {
 		this.ws.send(message);
 	}
 	onUp(key: string) {
-		console.log("Sending key up event:", key);
 		const mappedKey = this.keyMap(key);
 		const message = JSON.stringify({
 			type: 'keyEvent',

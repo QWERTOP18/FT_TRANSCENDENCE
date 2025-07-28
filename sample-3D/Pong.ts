@@ -19,7 +19,6 @@ export class Pong {
 		bottomBarPosition?: { x: number, z: number },
 		topBarPosition?: { x: number, z: number },
 	}) {
-		console.log("position set", props);
 		if (props.packPosition) {
 			this.props.pack.position.x = props.packPosition.x;
 			this.props.pack.position.z = props.packPosition.z;
