@@ -42,7 +42,20 @@ export default function ReadyBattle(fastify: FastifyInstance) {
       try {
         return battleService.readyBattle(request);
       } catch (error) {
-        handleServiceError(error, reply, "Failed to ready battle");
+        console.error("Error in ReadyBattle route:", error);
+        if (error instanceof Error) {
+          reply.status(500).send({
+            statusCode: 500,
+            error: "Internal Server Error",
+            message: error.message,
+          });
+        } else {
+          reply.status(500).send({
+            statusCode: 500,
+            error: "Internal Server Error",
+            message: "Unknown error occurred",
+          });
+        }
       }
     }
   );

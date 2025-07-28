@@ -1,6 +1,9 @@
 import axios from "axios";
 import { config } from "../../config/config";
 import { gameService } from "../game/GameService";
+import { err } from "pino-std-serializers";
+import { GameRoomSchema } from "../../controller/schemas/GameRoomSchema";
+import { tournamentService } from "../tournament/TournamentService";
 
 class BattleService {
   private endpoint: string;
@@ -41,10 +44,17 @@ class BattleService {
         // 参加者をin_progress状態にする
         await this.notifyGameInprogress(tournamentId, readyParticipantIds);
 
+        // トーナメントのルールを取得
+        const tournament = await tournamentService.getTournament({
+          params: { id: tournamentId },
+        });
+        const tournamentRule = tournament.rule;
+
         // ゲームルームを作成 ここからは非同期処理
         const gameRoom = gameService.createGame(
           tournamentId,
-          readyParticipantIds
+          readyParticipantIds,
+          tournamentRule
         );
         console.log("Game room created");
       }
@@ -131,9 +141,13 @@ class BattleService {
     return response.data;
   }
 
-  async aiOpponent(request: any) {
-    const response = await gameService.createAiGame();
-    return response.data;
+  async aiOpponent(request: any): Promise<GameRoomSchema> {
+    try {
+      const response = await gameService.createAiGame(request);
+      return response;
+    } catch (error) {
+      throw error;
+    }
   }
 }
 
