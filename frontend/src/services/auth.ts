@@ -1,3 +1,4 @@
+// localStorageに保存する際のキー名を定数として定義
 const USER_ID_KEY = 'user_id';
 
 /**
@@ -18,7 +19,7 @@ export function getUserId(): string | null {
 }
 
 /**
- * 認証ヘッダーを含むヘッダーオブジェクトを生成する
+ * 認証ヘッダーを含むヘッダーオブジェクトを動的に生成する
  * @returns HeadersInitオブジェクト
  */
 export function getAuthHeaders(): HeadersInit {
@@ -28,9 +29,17 @@ export function getAuthHeaders(): HeadersInit {
 
     const userId = getUserId();
     if (userId) {
-        // バックエンドが期待するヘッダー形式に合わせる。
-        // ここでは仮に 'Authorization': 'Bearer <user_id>' とする。
+        // バックエンドが期待するヘッダー形式に合わせてください。
+        // ここでは仮にユーザーIDをBearerトークンとして送ります。
         headers['Authorization'] = `Bearer ${userId}`;
     }
     return headers;
 }
+
+/**
+ * ログアウト処理（localStorageからユーザーIDを削除）
+ */
+// export function logout(): void {
+//     localStorage.removeItem(USER_ID_KEY);
+//     console.log('Logged out, user ID removed.');
+// }

@@ -1,9 +1,9 @@
 import * as api from './services/api';
+import * as auth from './services/auth';
 import * as gameViews from './views/gameViews';
 import * as tournamentViews from './views/tournamentView';
 import * as matchmakingView from './views/matchmakingView';
 import * as authView from './views/authView';
-import { getUserId } from './services/auth';
 
 export class AppRouter {
     private appElement: HTMLElement;
@@ -15,25 +15,14 @@ export class AppRouter {
         window.addEventListener('popstate', () => this.handleLocation());
     }
     
-    /**
-     * アプリケーションの初期化処理
-     * 最初に必要なグローバルデータ（ユーザー情報など）をAPIから取得する
-     */
     public async init() {
-        try {
-            // 最初にユーザー情報を取得してキャッシュに保存
-            // this.userDatabase = await api.getUsers();
-            // 上記APIがまだないため、仮のデータを設定
-            this.userDatabase = {
-                "player-a-id": { name: "K.K.", image: "https://via.placeholder.com/150/FFC107/000000?Text=A" },
-                "player-b-id": { name: "Isabelle", image: "https://via.placeholder.com/150/03A9F4/FFFFFF?Text=B" },
-                "player-c-id": { name: "Tom Nook", image: "https://via.placeholder.com/150/4CAF50/FFFFFF?Text=C" },
-            };
-        } catch (error) {
-            console.error("Failed to initialize app with user data:", error);
-        }
-        // データの準備ができてから最初の画面描画を実行
-        this.handleLocation();
+        // ここでユーザー一覧などを取得してキャッシュするのが理想
+        // try {
+        //     this.userDatabase = await api.getUsers();
+        // } catch (error) {
+        //     console.error("Failed to fetch users:", error);
+        // }
+        this.handleLocation(); // 最初の画面描画
     }
 
     /**
@@ -50,48 +39,51 @@ export class AppRouter {
      */
     public async handleLocation() {
         const path = window.location.pathname;
+        const loggedIn = !!auth.getUserId();
+
+        // ログインしていない場合、ほとんどのページでログイン画面にリダイレクト
+        if (!loggedIn && path !== '/signup' && path !== '/login') {
+            this.navigateTo('/login');
+            return;
+        }
+
         try {
-            if (path === '/tournaments/new') {
-                tournamentViews.renderCreateTournamentScreen(this.appElement);
-            } else if (path === '/tournaments') {
-                const tournaments = await api.getTournaments();
-                const myUserId = getUserId();
-                tournamentViews.renderTournamentListScreen(this.appElement, tournaments, myUserId, this.userDatabase);
-            } else if (path.startsWith('/tournament/detail/')) {
-                const tournamentId = path.split('/')[3];
-                const tournamentData = await api.getTournamentById(tournamentId);
-                this.currentTournamentData = tournamentData;
-                tournamentViews.renderTournamentScreen(this.appElement, this.currentTournamentData, this.userDatabase, getUserId());
-            } else if (path.startsWith('/tournament/admin/')) {
-                const tournamentId = path.split('/')[3];
-                if (!tournamentId) { this.navigateTo('/tournaments'); return; }
-                const tournamentData = await api.getTournamentById(tournamentId);
-                this.currentTournamentData = tournamentData;
-                tournamentViews.renderAdminScreen(this.appElement, this.currentTournamentData, getUserId());
-            } else {
-                switch (path) {
-                    case '/signup':
-                        authView.renderSignupScreen(this.appElement);
-                        break;
-                    case '/matchmaking':
-                        matchmakingView.renderMatchmakingScreen(this.appElement);
-                        break;
-                    case '/game':
-                        gameViews.renderGameScreen(this.appElement);
-                        break;
-                    case '/win':
-                        gameViews.renderResultScreen(this.appElement, true);
-                        break;
-                    case '/lose':
-                        gameViews.renderResultScreen(this.appElement, false);
-                        break;
-                    case '/error':
-                        gameViews.renderErrorScreen(this.appElement);
-                        break;
-                    default:
-                        this.navigateTo('/tournaments');
-                        break;
-                }
+            switch (true) {
+                case path === '/signup':
+                    authView.renderSignupScreen(this.appElement);
+                    break;
+                case path === '/login':
+                    authView.renderLoginScreen(this.appElement);
+                    break;
+                case path === '/tournaments/new':
+                    tournamentViews.renderCreateTournamentScreen(this.appElement);
+                    break;
+                case path === '/tournaments':
+                    const tournaments = await api.getTournaments();
+                    tournamentViews.renderTournamentListScreen(this.appElement, tournaments, auth.getUserId(), this.userDatabase);
+                    break;
+                case path.startsWith('/tournament/detail/'):
+                    const detailId = path.split('/')[3];
+                    const detailData = await api.getTournamentById(detailId);
+                    this.currentTournamentData = detailData;
+                    tournamentViews.renderTournamentScreen(this.appElement, detailData, this.userDatabase, auth.getUserId());
+                    break;
+                case path.startsWith('/tournament/admin/'):
+                    const adminId = path.split('/')[3];
+                    if (!adminId) { this.navigateTo('/tournaments'); return; }
+                    const adminData = await api.getTournamentById(adminId);
+                    this.currentTournamentData = adminData;
+                    tournamentViews.renderAdminScreen(this.appElement, adminData, auth.getUserId());
+                    break;
+                case path === '/matchmaking':
+                    matchmakingView.renderMatchmakingScreen(this.appElement);
+                    break;
+                case path === '/game':
+                    gameViews.renderGameScreen(this.appElement);
+                    break;
+                default:
+                    this.navigateTo(loggedIn ? '/tournaments' : '/login');
+                    break;
             }
         } catch (error) {
             console.error("Routing failed:", error);
@@ -101,45 +93,38 @@ export class AppRouter {
 
     // --- インタラクティブな操作を処理するメソッド群 ---
 
-    public async callFindMatch() {
-        const responseDisplay = document.getElementById('response-data');
-        if (!responseDisplay) return;
-        responseDisplay.textContent = 'Requesting...';
-        try {
-            const data = await api.findMatch();
-            responseDisplay.textContent = JSON.stringify(data, null, 2);
-        } catch (error) {
-            responseDisplay.textContent = `エラーが発生しました: ${error as string}`;
-        }
-    }
-
     public async handleSignup(event: SubmitEvent) {
         event.preventDefault();
         const formData = new FormData(event.target as HTMLFormElement);
         const name = formData.get('name') as string;
-
-        if (!name) {
-            alert('名前を入力してください。');
-            return;
-        }
-
+        if (!name) { alert('名前を入力してください。'); return; }
         try {
-            const data = await api.signup(name);
-            alert(`ようこそ、${data.name}さん！ユーザーが作成されました。`);
-            // サインアップ成功後、トーナメント一覧へ遷移
-            this.navigateTo('/tournaments');
+            await api.signup(name);
+            alert(`ユーザー「${name}」を作成しました。ログインしてください。`);
+            this.navigateTo('/login');
         } catch (error) {
-            alert('サインアップに失敗しました。ユーザー名が既に使用されている可能性があります。');
+            alert('サインアップに失敗しました。');
         }
     }
     
+    public async handleLogin(event: SubmitEvent) {
+        event.preventDefault();
+        const formData = new FormData(event.target as HTMLFormElement);
+        const name = formData.get('name') as string;
+        if (!name) { alert('名前を入力してください。'); return; }
+        try {
+            await api.authenticate(name);
+            alert(`ようこそ、${name}さん！`);
+            this.navigateTo('/tournaments');
+        } catch (error) {
+            alert('ログインに失敗しました。');
+        }
+    }
+
     public async handleCreateTournament(event: SubmitEvent) {
         event.preventDefault();
         const formData = new FormData(event.target as HTMLFormElement);
-        const data = {
-            name: formData.get('name') as string,
-            description: formData.get('description') as string
-        };
+        const data = { name: formData.get('name') as string, description: formData.get('description') as string };
         try {
             const newTournament = await api.createTournament(data);
             alert('トーナメントを作成しました！');
@@ -150,25 +135,23 @@ export class AppRouter {
     }
 
     public async handleJoinTournament(tournamentId: string) {
-        const myUserId = getUserId();
-        if (!myUserId) { alert("サインアップまたはログインが必要です。"); return; }
         try {
-            await api.joinTournament(tournamentId, myUserId);
+            await api.joinTournament(tournamentId);
             alert('トーナメントに参加しました！');
-            this.handleLocation(); // 画面を再読み込みして参加者リストを更新
+            this.handleLocation();
         } catch (error) {
             alert('参加に失敗しました。');
         }
     }
 
-    public async handleSetReady(tournamentId: string, participantId: string, currentStatus: string) {
+    public async handleSetReady(tournamentId: string, currentStatus: string) {
         try {
             if (currentStatus === 'pending' || currentStatus === 'accepted') {
-                await api.setParticipantReady(tournamentId, participantId);
+                await api.setParticipantReady(tournamentId);
             } else {
-                await api.setParticipantCancel(tournamentId, participantId);
+                await api.setParticipantCancel(tournamentId);
             }
-            this.handleLocation(); // 画面を再読み込みしてステータスを更新
+            this.handleLocation();
         } catch (error) {
             alert('ステータスの変更に失敗しました。');
         }
@@ -176,14 +159,42 @@ export class AppRouter {
 
     public async openTournament() {
         if (!this.currentTournamentData) return;
-        if (confirm('トーナメントをオープンし、対戦準備を開始しますか？')) {
+        if (confirm('トーナメントをオープンしますか？')) {
             try {
                 this.currentTournamentData = await api.openTournament(this.currentTournamentData.id);
                 alert('トーナメントがオープンされました！');
-                tournamentViews.renderAdminScreen(this.appElement, this.currentTournamentData, getUserId());
+                tournamentViews.renderAdminScreen(this.appElement, this.currentTournamentData, auth.getUserId());
             } catch (error) {
                 alert('トーナメントの開始に失敗しました。');
             }
+        }
+    }
+    
+    public async handlePlayAi() {
+        const responseDisplay = document.getElementById('response-data');
+        if (!responseDisplay) return;
+        responseDisplay.textContent = 'Creating AI room...';
+        try {
+            const data = await api.createAiRoom();
+            responseDisplay.textContent = JSON.stringify(data, null, 2);
+            alert('AI対戦ルームが作成されました！');
+            this.navigateTo('/game');
+        } catch (error) {
+            responseDisplay.textContent = `エラーが発生しました: ${error as string}`;
+        }
+    }
+    
+    public async handleCreateRoom() {
+        const responseDisplay = document.getElementById('response-data');
+        if (!responseDisplay) return;
+        responseDisplay.textContent = 'Creating multiplayer room...';
+        try {
+            const data = await api.createRoom();
+            responseDisplay.textContent = JSON.stringify(data, null, 2);
+            alert('マルプレイヤー用ルームが作成されました！');
+            this.navigateTo('/game');
+        } catch (error) {
+            responseDisplay.textContent = `エラーが発生しました: ${error as string}`;
         }
     }
 }

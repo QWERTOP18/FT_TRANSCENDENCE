@@ -1,50 +1,109 @@
 import { TOURNAMENT_URL, GAME_URL, SERVERURL } from '../config';
-import { getAuthHeaders, saveUserId } from './auth';
+import { getAuthHeaders, getUserId, saveUserId } from './auth';
 
 export async function signup(name: string) {
     try {
-        // バックエンドのAuthサービスのエンドポイントを叩く
         const response = await fetch(`${SERVERURL}/auth/signup`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name }),
         });
-
-        if (!response.ok) {
-            // エラーレスポンスもJSON形式の可能性があるため、内容を読み取る
-            const errorData = await response.json().catch(() => ({}));
-            throw new Error(`HTTP error! status: ${response.status}, message: ${errorData.error || 'Unknown error'}`);
-        }
-        
-        const data = await response.json();
-        if (data.id) {
-            // 成功レスポンスにIDが含まれていれば、localStorageに保存
-            saveUserId(data.id);
-        }
-        return data;
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
     } catch (error) {
         console.error("Signup failed:", error);
         throw error;
     }
 }
 
-/**
- * マッチメイキングキューに参加する
- */
-export async function findMatch() {
+export async function authenticate(name: string) {
     try {
-        const response = await fetch(`${GAME_URL}/ready`, {
+        const response = await fetch(`${SERVERURL}/auth/authenticate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ user_id: `user-${Math.random()}` }),
+            body: JSON.stringify({ name }),
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
+        const data = await response.json();
+        
+        // ★★★ 修正点：'token'ではなく'id'を、saveUserIdで保存する ★★★
+        if (data.id) {
+            saveUserId(data.id);
+        }
+        return data;
+    } catch (error) {
+        console.error("Authentication failed:", error);
+        throw error;
+    }
+}
+
+
+// =======================================================
+// Game Service (ゲーム・マッチメイキング関連)
+// =======================================================
+
+/**
+ * AI対戦用のルームを作成する (POST /play-ai)
+ */
+export async function createAiRoom() {
+    try {
+        const userId = getUserId(); // localStorageからユーザーIDを取得
+        if (!userId) {
+            throw new Error('User is not logged in.');
+        }
+
+        const response = await fetch(`${GAME_URL}/play-ai`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            // ★★★ API仕様に合わせてリクエストボディを修正 ★★★
+            body: JSON.stringify({
+                aiLevel: 0, // AIレベルは一旦0で固定
+                user_id: userId
+            }),
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return await response.json();
     } catch (error) {
-        console.error('Fetch error:', error);
+        console.error('Failed to create AI room:', error);
         throw error;
     }
 }
+
+/**
+ * マルチプレイヤー用のルームを作成する (POST /room)
+ */
+export async function createRoom() {
+    try {
+        const response = await fetch(`${GAME_URL}/room`, {
+            method: 'POST',
+            headers: getAuthHeaders(),
+        });
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        return await response.json();
+    } catch (error) {
+        console.error('Failed to create room:', error);
+        throw error;
+    }
+}
+
+/**
+ * gameサーバーの死活確認 (GET /ping)
+ */
+export async function pingGameServer() {
+    try {
+        const response = await fetch(`${GAME_URL}/ping`);
+        return response.ok;
+    } catch (error) {
+        console.error('Ping to game server failed:', error);
+        return false;
+    }
+}
+
+
+// =======================================================
+// Tournament Service (トーナメント管理)
+// =======================================================
 
 /**
  * トーナメント一覧を取得する (GET /tournaments)
@@ -90,23 +149,22 @@ export async function openTournament(id: string) {
 }
 
 /**
- * トーナメントに参加者を追加する (POST /tournaments/{id}/participants)
+ * トーナメントに参加者として自分を追加する (POST /tournaments/{id}/join)
  */
-export async function joinTournament(tournamentId: string, userId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/participants`, {
+export async function joinTournament(tournamentId: string) {
+    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/join`, {
         method: 'POST',
         headers: getAuthHeaders(),
-        body: JSON.stringify({ userId }), // APIの仕様に合わせて body を調整
     });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
 
 /**
- * 参加者のステータスを 'ready' にする
+ * 参加者のステータスを 'ready' にする (PUT /tournaments/{id}/battle/ready)
  */
-export async function setParticipantReady(tournamentId: string, participantId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/participants/${participantId}/ready`, {
+export async function setParticipantReady(tournamentId: string) {
+    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/ready`, {
         method: 'PUT',
         headers: getAuthHeaders(),
     });
@@ -115,66 +173,13 @@ export async function setParticipantReady(tournamentId: string, participantId: s
 }
 
 /**
- * 参加者のステータスを 'pending' (キャンセル) にする
+ * 参加者のステータスを 'pending' (キャンセル) にする (PUT /tournaments/{id}/battle/cancel)
  */
-export async function setParticipantCancel(tournamentId: string, participantId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/participants/${participantId}/cancel`, {
+export async function setParticipantCancel(tournamentId: string) {
+    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/cancel`, {
         method: 'PUT',
         headers: getAuthHeaders(),
     });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
-
-/**
- * 対戦結果を作成（報告）する (POST /tournaments/{id}/histories)
- */
-export async function createHistory(tournamentId: string, battleResult: any) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/histories`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(battleResult),
-    });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
-}
-
-/**
- * バトルを開始する (PUT /tournaments/{id}/battle/start)
- */
-export async function startBattle(tournamentId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/start`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
-}
-
-/**
- * 対戦を終了する (POST /tournaments/{id}/battle/end)
- */
-export async function endBattle(tournamentId: string, result: any) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/end`, {
-        method: 'POST',
-        headers: getAuthHeaders(),
-        body: JSON.stringify(result),
-    });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
-}
-
-// export async function updateTournament(id: string, data: { name: string; description: string; max_participants: number; }) {
-//     try {
-//         const response = await fetch(`${TOURNAMENT_URL}/tournaments/${id}`, {
-//             method: 'PUT',
-//             headers: getAuthHeaders(),
-//             body: JSON.stringify(data),
-//         });
-//         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-//         return await response.json();
-//     } catch (error) {
-//         console.error(`Failed to update tournament with id ${id}:`, error);
-//         throw error;
-//     }
-// }
