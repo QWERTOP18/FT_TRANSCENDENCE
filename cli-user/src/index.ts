@@ -76,7 +76,7 @@ async function handleTournamentMenu(
   menuService: MenuService
 ): Promise<void> {
   try {
-    const tournaments = await menuService.displayTournaments();
+    const tournaments = await menuService.displayTournaments(user.id);
     const selectedTournamentId = await menuService.showTournamentMenu(tournaments);
     
     if (selectedTournamentId) {

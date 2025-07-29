@@ -11,11 +11,16 @@ export interface Tournament {
 }
 
 export class TournamentService {
-  async getTournaments(): Promise<Tournament[]> {
+  async getTournaments(userId: string): Promise<Tournament[]> {
     try {
       console.log('Fetching tournaments...');
-      const response = await axios.get(`${config.gatewayURL}tournament`);
-      
+
+      const response = await axios.get(`${config.gatewayURL}tournaments`, {
+        headers: {
+          'X-User-ID': userId,
+        },
+      });
+
       if (response.data && Array.isArray(response.data)) {
         return response.data.map((tournament: any) => ({
           id: tournament.id,

@@ -51,9 +51,9 @@ export class MenuService {
     return await this.showTournamentMenu(tournaments);
   }
 
-  async displayTournaments(): Promise<Tournament[]> {
+  async displayTournaments(userId: string): Promise<Tournament[]> {
     try {
-      const tournaments = await this.tournamentService.getTournaments();
+      const tournaments = await this.tournamentService.getTournaments(userId);
       return tournaments;
     } catch (error) {
       console.error('Failed to fetch tournaments:', error);
