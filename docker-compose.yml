@@ -39,6 +39,7 @@ services:
       - /app/node_modules
     environment:
       - NODE_ENV=development
+      - AUTH_URL=http://auth:3001
       - TOURNAMENT_URL=http://tournament:8080
       - GAME_URL=http://game:4000
     networks:
@@ -105,6 +106,7 @@ services:
       - ./auth:/app
       - /app/dist
       - /app/node_modules
+      - auth_data:/app/prisma
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:3001"]
       interval: 30s
@@ -113,12 +115,14 @@ services:
       start_period: 40s
     environment:
       - NODE_ENV=development
+      - DATABASE_URL=file:/app/prisma/dev.db
     networks:
       - transcendence-network
     
 
 volumes:
   tournament_data:
+  auth_data:
 
 networks:
   transcendence-network:
