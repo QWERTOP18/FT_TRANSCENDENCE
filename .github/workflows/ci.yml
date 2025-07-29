@@ -30,8 +30,7 @@ jobs:
         timeout 60 bash -c 'until curl -f -s http://localhost:4000/ping > /dev/null; do sleep 2; done'
         timeout 60 bash -c 'until curl -f -s http://localhost:8080 > /dev/null; do sleep 2; done'
         timeout 60 bash -c 'until curl -f -s http://localhost:5000 > /dev/null; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f -s http://localhost:7000 > /dev/null; do sleep 2; done'
-        timeout
+        timeout 60 bash -c 'until curl -f -s http://localhost:3001 > /dev/null; do sleep 2; done'
 
         echo "=== Docker Compose Services ==="
         docker compose ps
@@ -82,8 +81,8 @@ jobs:
           exit 1
         fi
         echo ""
-        echo "Testing auth service (http://localhost:7000)..."
-        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:7000; then
+        echo "Testing auth service (http://localhost:3001)..."
+        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:3001; then
           echo "✅ Auth service is responding correctly"
         else
           echo "❌ Auth service is not responding"
@@ -97,7 +96,7 @@ jobs:
         echo "Game: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/ping)"
         echo "Tournament: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)"
         echo "Gateway: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:5000)"
-        echo "Auth: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:7000)"
+        echo "Auth: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001)"
     
     - name: Check service logs
       run: |
