@@ -25,9 +25,9 @@ export class TournamentService {
         return response.data.map((tournament: any) => ({
           id: tournament.id,
           name: tournament.name,
-          status: tournament.status,
+          status: tournament.state,
           participants: tournament.participants?.length || 0,
-          maxParticipants: tournament.maxParticipants || 8,
+          maxParticipants: tournament.max_num || 8,
           createdAt: tournament.createdAt
         }));
       }
@@ -47,7 +47,7 @@ export class TournamentService {
     try {
       console.log(`Joining tournament ${tournamentId}...`);
       const response = await axios.post(
-        `${config.gatewayURL}tournament/${tournamentId}/join`,
+        `${config.gatewayURL}tournaments/${tournamentId}/join`,
         {},
         {
           headers: {
