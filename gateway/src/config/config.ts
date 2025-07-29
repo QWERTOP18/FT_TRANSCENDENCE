@@ -1,6 +1,7 @@
 export const config = {
   port: Number(process.env.PORT) || 8000,
   host: process.env.HOST || "0.0.0.0",
+  authURL: process.env.AUTH_URL || "http://localhost:3001",
   tournamentURL: process.env.TOURNAMENT_URL || "http://localhost:8080",
   gameURL: process.env.GAME_URL || "http://localhost:4000",
   wsURL: process.env.WS_URL || "ws://localhost:4000",

@@ -30,7 +30,12 @@ export default function CreateUser(fastify: FastifyInstance) {
         return user;
       } catch (error) {
         if (error instanceof DuplicateError) {
-          reply.status(400).send({ error: "User already exists" });
+          reply.status(400).send({
+            code: error.code,
+            statusCode: 400,
+            error: "Bad Request",
+            message: error.message,
+          });
         } else {
           handleServiceError(error, reply, "Failed to create user");
         }

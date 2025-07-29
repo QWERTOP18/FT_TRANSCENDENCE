@@ -23,8 +23,18 @@ export function handleServiceError(
       axiosError.response?.data?.message ||
       axiosError.response?.data?.error ||
       defaultMessage;
-    reply.status(statusCode).send({ error: errorMessage });
+    reply.status(statusCode).send({
+      code: "SERVICE_ERROR",
+      statusCode: statusCode,
+      error: "Service Error",
+      message: errorMessage,
+    });
   } else {
-    reply.status(500).send({ error: defaultMessage });
+    reply.status(500).send({
+      code: "INTERNAL_SERVER_ERROR",
+      statusCode: 500,
+      error: "Internal Server Error",
+      message: defaultMessage,
+    });
   }
 }
