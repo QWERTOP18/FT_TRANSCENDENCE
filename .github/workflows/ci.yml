@@ -29,7 +29,9 @@ jobs:
         timeout 60 bash -c 'until curl -f -s http://localhost:3000 > /dev/null; do sleep 2; done'
         timeout 60 bash -c 'until curl -f -s http://localhost:4000/ping > /dev/null; do sleep 2; done'
         timeout 60 bash -c 'until curl -f -s http://localhost:8080 > /dev/null; do sleep 2; done'
-        
+        timeout 60 bash -c 'until curl -f -s http://localhost:8000 > /dev/null; do sleep 2; done'
+        timeout 60 bash -c 'until curl -f -s http://localhost:3001 > /dev/null; do sleep 2; done'
+
         echo "=== Docker Compose Services ==="
         docker compose ps
     
@@ -48,7 +50,6 @@ jobs:
           docker compose logs --tail=10 frontend
           exit 1
         fi
-        
         echo ""
         echo "Testing game service (http://localhost:4000/ping)..."
         if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:4000/ping; then
@@ -59,7 +60,6 @@ jobs:
           docker compose logs --tail=10 game
           exit 1
         fi
-        
         echo ""
         echo "Testing tournament service (http://localhost:8080)..."
         if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:8080; then
@@ -70,23 +70,46 @@ jobs:
           docker compose logs --tail=10 tournament
           exit 1
         fi
-        
+        echo ""
+        echo "Testing gateway service (http://localhost:8000)..."
+        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:8000; then
+          echo "✅ Gateway service is responding correctly"
+        else
+          echo "❌ Gateway service is not responding"
+          echo "Gateway logs:"
+          docker compose logs --tail=10 gateway
+          exit 1
+        fi
+        echo ""
+        echo "Testing auth service (http://localhost:3001)..."
+        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:3001; then
+          echo "✅ Auth service is responding correctly"
+        else
+          echo "❌ Auth service is not responding"
+          echo "Auth logs:"
+          docker compose logs --tail=10 auth
+          exit 1
+        fi
         echo ""
         echo "=== Service Response Summary ==="
         echo "Frontend: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)"
         echo "Game: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/ping)"
         echo "Tournament: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)"
+        echo "Gateway: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000)"
+        echo "Auth: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001)"
     
     - name: Check service logs
       run: |
         echo "=== Frontend Logs ==="
         docker compose logs frontend
-        
         echo "=== Game Logs ==="
         docker compose logs game
-        
         echo "=== Tournament Logs ==="
         docker compose logs tournament
+        echo "=== Gateway Logs ==="
+        docker compose logs gateway
+        echo "=== Auth Logs ==="
+        docker compose logs auth
     
     - name: Cleanup
       if: always()
