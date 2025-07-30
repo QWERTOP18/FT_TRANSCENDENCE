@@ -10,11 +10,11 @@
     <header class="w-full text-white p-4 text-center">
         <h1 class="text-2xl font-bold">My Pong Game</h1>
         <nav class="mt-4 flex justify-around items-center">
-            <button class="menu-item" onclick="window.router.navigateTo('/game')">Game</button>
-            <button class="menu-item" onclick="window.router.navigateTo('/tournaments')">Tournaments</button>
-            <button class="menu-item" onclick="window.router.navigateTo('/matchmaking')">Matchmaking</button>
-            <button class="menu-item bg-red-600 hover:bg-red-700" onclick="window.router.navigateTo('/tournament/admin/a7b7a8a0-c5e3-4b1d-8f6a-9f0b1c2d3e4f')">Admin</button>
             <button class="menu-item" onclick="window.router.navigateTo('/signup')">Signup</button>
+            <button class="menu-item" onclick="window.router.navigateTo('/login')">Login</button>
+            <button class="menu-item" onclick="window.router.navigateTo('/tournaments')">Tournaments</button>
+            <button class="menu-item" onclick="window.router.navigateTo('/matchmaking')">Play Game</button>
+            <!-- <button class="menu-item" onclick="window.auth.logout(); window.router.navigateTo('/login');">Logout</button> -->
         </nav>
     </header>
     <main class="flex-grow flex justify-center items-center w-full p-4">
