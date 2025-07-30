@@ -43,7 +43,7 @@ import { PongUpdater } from "./PongUpdater";
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify({
-				"aiLevel": 0,
+				"aiLevel": 4,
 				"user_id": userName
 			}),
 		});

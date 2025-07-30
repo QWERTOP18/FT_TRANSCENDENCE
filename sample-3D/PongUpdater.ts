@@ -1,7 +1,7 @@
 import { Pong } from "./Pong";
 import { PongGUI } from "./PongGUI";
 import { ScoreBoardGUI } from "./ScoreBoardGUI";
-import { ServerToPongMapper } from "./ServerYToPongZMapper";
+import { ServerToPongMapper } from "./ServerToPongMapper";
 
 export type PongUpdaterProps = {
 	pong: Pong;
@@ -18,17 +18,19 @@ export class PongUpdater {
 			const data = JSON.parse(event.data);
 			if (data.type == 'gameState') {
 				const state = data.state;
+				const centerX = ServerToPongMapper.y2xMap(ServerToPongMapper.width_server / 2);
+				const centerZ = ServerToPongMapper.x2zMap(ServerToPongMapper.height_server / 2);
 				props.pong.setPosition({
 					packPosition: {
-						x: ServerToPongMapper.x2xMap(state.ballX),
-						z: ServerToPongMapper.y2zMap(state.ballY)
+						x: ServerToPongMapper.y2xMap(state.ballY) - centerX,
+						z: ServerToPongMapper.x2zMap(state.ballX) - centerZ,
 					},
 					bottomBarPosition: {
-						x: ServerToPongMapper.x2xMap(state.paddle1Y),
+						x: ServerToPongMapper.y2xMap(state.paddle1Y - ServerToPongMapper.paddleWidth_server / 2) - centerX,
 						z: props.pong.props.bottomBar.position.z
 					},
 					topBarPosition: {
-						x: ServerToPongMapper.x2xMap(state.paddle2Y),
+						x: ServerToPongMapper.y2xMap(state.paddle2Y - ServerToPongMapper.paddleWidth_server / 2) - centerX,
 						z: props.pong.props.topBar.position.z
 					},
 				});
