@@ -10,6 +10,14 @@ export interface Tournament {
   createdAt: string;
 }
 
+export interface TournamentParticipant {
+  id: string;
+  tournament_id: string;
+  name: string;
+  external_id: string;
+  state: string;
+}
+
 export class TournamentService {
   async getTournaments(userId: string): Promise<Tournament[]> {
     try {
@@ -31,7 +39,7 @@ export class TournamentService {
           createdAt: tournament.createdAt
         }));
       }
-      
+
       return [];
     } catch (error) {
       console.error('Failed to fetch tournaments:', error);
@@ -56,9 +64,9 @@ export class TournamentService {
           },
         }
       );
-      
+
       console.log('Successfully joined tournament!');
-      
+
       // レスポンスからroom_idを取得
       let roomId: string;
       if (typeof response.data === 'string') {
@@ -68,10 +76,36 @@ export class TournamentService {
       } else {
         throw new Error('Invalid response format');
       }
-      
+
       return roomId;
     } catch (error) {
       console.error('Failed to join tournament:', error);
+      if (axios.isAxiosError(error)) {
+        console.error('Response data:', error.response?.data);
+        console.error('Response status:', error.response?.status);
+      }
+      throw error;
+    }
+  }
+
+  async getTournamentParticipants(tournamentId: string): Promise<TournamentParticipant[]> {
+    try {
+      console.log(`Fetching participants for tournament ${tournamentId}...`);
+      const response = await axios.get(`${config.gatewayURL}tournaments/${tournamentId}/participants`);
+
+      if (response.data && Array.isArray(response.data)) {
+        return response.data.map((participant: any) => ({
+          id: participant.id,
+          tournament_id: participant.tournament_id,
+          name: participant.name,
+          external_id: participant.external_id,
+          state: participant.state,
+        }));
+      }
+
+      return [];
+    } catch (error) {
+      console.error('Failed to fetch tournament participants:', error);
       if (axios.isAxiosError(error)) {
         console.error('Response data:', error.response?.data);
         console.error('Response status:', error.response?.status);

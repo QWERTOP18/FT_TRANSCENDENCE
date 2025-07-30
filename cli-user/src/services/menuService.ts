@@ -51,6 +51,33 @@ export class MenuService {
     return await this.showTournamentMenu(tournaments);
   }
 
+  async showTournamentDetailsMenu(tournament: Tournament): Promise<'join' | 'ready' | 'exit'> {
+
+    console.log('\n=== Tournament Details ===');
+    console.log(`Name: ${tournament.name}`);
+    console.log(`Status: ${tournament.status}`);
+    console.log(`Participants: ${tournament.participants}/${tournament.maxParticipants}`);
+    console.log(`Created: ${new Date(tournament.createdAt).toLocaleDateString()}`);
+    console.log('==========================');
+
+    console.log('1. Join Tournament');
+    console.log('2. Ready to Play');
+    console.log('3. Back to Tournaments');
+
+    
+    while (true) {
+      const choice = await this.userInputService.askQuestion(`Select a tournament (1-3): `);
+      if (choice === '1') {
+        return 'join';
+      } else if (choice === '2') {
+        return 'ready';
+      } else if (choice === '3' || choice.toLowerCase() === 'b' || choice.toLowerCase() === 'back') {
+        return 'exit';
+      }
+      console.log('Invalid selection. Please try again.');
+    }
+  }
+
   async displayTournaments(userId: string): Promise<Tournament[]> {
     try {
       const tournaments = await this.tournamentService.getTournaments(userId);

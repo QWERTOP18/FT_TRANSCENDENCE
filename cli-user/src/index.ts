@@ -76,15 +76,36 @@ async function handleTournamentMenu(
   menuService: MenuService
 ): Promise<void> {
   try {
-    const tournaments = await menuService.displayTournaments(user.id);
-    const selectedTournamentId = await menuService.showTournamentMenu(tournaments);
-    
-    if (selectedTournamentId) {
-      console.log('\nJoining tournament...');
-      const roomId = await menuService.joinSelectedTournament(selectedTournamentId, user.id);
-      gameService.connectToGameWebSocket(roomId, user.id);
-      return; // ゲーム終了後はアプリケーションを終了
+    while (true) {
+      const tournaments = await menuService.displayTournaments(user.id);
+      const selectedTournamentId = await menuService.showTournamentMenu(tournaments);
+      
+      if (selectedTournamentId) {
+        const tournament = tournaments.find(t => t.id == selectedTournamentId);
+        if (!tournament) {
+          break ;
+        }
+        const selection = await menuService.showTournamentDetailsMenu(tournament);
+        if (selection === 'join') {
+          console.log('\nJoining tournament...');
+          const roomId = await menuService.joinSelectedTournament(selectedTournamentId, user.id);
+          gameService.connectToGameWebSocket(roomId, user.id);
+          return ;
+        } else if (selection === 'ready') {
+          console.log('Ready to play!'); // ここで実際のゲーム開始処理を追加することも可能
+          
+        } else if (selection === 'exit') {
+          console.log('Exiting tournament details...');
+          return ;
+        }
+        return; // ゲーム終了後はアプリケーションを終了
+      }
+      else {
+        break ;
+      }
     }
+    console.log('Returning to main menu...');
+    return;
     // 戻るが選択された場合はメインメニューに戻る
   } catch (error) {
     console.error('Tournament menu error:', error);
