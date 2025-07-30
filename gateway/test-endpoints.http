@@ -1,0 +1,93 @@
+### Gateway Endpoint Tests
+
+# Base URL
+@baseUrl = http://localhost:8000
+
+### Health Check
+GET {{baseUrl}}/ping
+
+### Swagger UI
+GET {{baseUrl}}/docs
+
+### Auth Endpoints
+
+# Create User
+POST {{baseUrl}}/auth/signup
+Content-Type: application/json
+
+{
+  "name": "testuser"
+}
+
+### Authenticate User
+POST {{baseUrl}}/auth/authenticate
+Content-Type: application/json
+
+{
+  "name": "testuser"
+}
+
+### Tournament Endpoints
+
+# Get All Tournaments (requires x-user-id header)
+GET {{baseUrl}}/tournaments
+x-user-id: {{userId}}
+
+### Create Tournament (requires x-user-id header)
+POST {{baseUrl}}/tournaments
+Content-Type: application/json
+x-user-id: {{userId}}
+
+{
+  "name": "Test Tournament",
+  "description": "A test tournament",
+  "max_num": 8,
+  "rule": "simple"
+}
+
+### Get Tournament by ID (replace {id} with actual tournament ID)
+GET {{baseUrl}}/tournaments/{id}
+x-user-id: {{userId}}
+
+### Open Tournament (replace {id} with actual tournament ID)
+POST {{baseUrl}}/tournaments/{id}/open
+x-user-id: {{userId}}
+
+### Get Tournament Participants (replace {id} with actual tournament ID)
+GET {{baseUrl}}/tournaments/{id}/participants
+x-user-id: {{userId}}
+
+### Join Tournament (replace {id} with actual tournament ID)
+POST {{baseUrl}}/tournaments/{id}/join
+Content-Type: application/json
+x-user-id: {{userId}}
+
+{
+  "userId": "{{userId}}"
+}
+
+### Battle Endpoints
+
+# Ready for Battle (PUT method, requires tournament ID in URL)
+PUT {{baseUrl}}/tournaments/{tournamentId}/battle/ready
+x-user-id: {{userId}}
+
+### Cancel Battle
+POST {{baseUrl}}/battle/cancel
+Content-Type: application/json
+x-user-id: {{userId}}
+
+{
+  "userId": "{{userId}}",
+  "battleId": "test-battle"
+}
+
+### AI Opponent
+POST {{baseUrl}}/battle/ai-opponent
+Content-Type: application/json
+x-user-id: {{userId}}
+
+{
+  "userId": "{{userId}}",
+  "aiLevel": 1
+} 

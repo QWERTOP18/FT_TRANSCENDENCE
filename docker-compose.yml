@@ -41,6 +41,10 @@ services:
       - NODE_ENV=development
       - TOURNAMENT_URL=http://tournament:8080
       - GAME_URL=http://game:4000
+      - AUTH_URL=http://auth:3001
+    depends_on:
+      auth:
+        condition: service_started
     networks:
       - transcendence-network
 
