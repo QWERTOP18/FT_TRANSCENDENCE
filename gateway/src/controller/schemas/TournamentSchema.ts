@@ -30,7 +30,10 @@ export function TournamentSchema(options?: ObjectOptions) {
       description: Type.Optional(
         Type.String({ description: "トーナメントの説明" })
       ),
-      rule: TournamentRuleSchema({ description: "トーナメントのルール", default: "simple" }),
+      rule: TournamentRuleSchema({
+        description: "トーナメントのルール",
+        default: "simple",
+      }),
       state: TournamentStatusSchema(),
       participants: Type.Array(ParticipantIdSchema(), {
         description: "参加者リスト",
@@ -38,6 +41,15 @@ export function TournamentSchema(options?: ObjectOptions) {
       histories: Type.Array(HistoryIdSchema(), {
         description: "トーナメントの履歴",
       }),
+      is_participating: Type.Optional(
+        Type.Boolean({ description: "現在のユーザーが参加しているかどうか" })
+      ),
+      is_owner: Type.Optional(
+        Type.Boolean({
+          description: "現在のユーザーがオーナーかどうか",
+          default: false,
+        })
+      ),
     },
     { description: "トーナメント", ...options }
   );
@@ -59,9 +71,11 @@ export function TournamentStatusSchema(options?: SchemaOptions) {
 }
 
 // トーナメントルール
-export type TournamentRuleSchema = Static<ReturnType<typeof TournamentRuleSchema>>
+export type TournamentRuleSchema = Static<
+  ReturnType<typeof TournamentRuleSchema>
+>;
 export function TournamentRuleSchema(options?: SchemaOptions) {
-	return Type.String({ description: "トーナメントのルール", ...options })
+  return Type.String({ description: "トーナメントのルール", ...options });
 }
 
 // トーナメントID

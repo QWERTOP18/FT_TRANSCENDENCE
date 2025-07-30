@@ -39,7 +39,7 @@ export default function GetTournaments(fastify: FastifyInstance) {
     },
     async (request: FastifyRequest, reply: FastifyReply) => {
       try {
-        const tournaments = await tournamentService.getTournaments();
+        const tournaments = await tournamentService.getTournaments(request);
         return tournaments;
       } catch (error) {
         handleServiceError(error, reply, "Failed to fetch tournaments");

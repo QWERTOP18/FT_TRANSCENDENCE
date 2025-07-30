@@ -10,9 +10,54 @@ class TournamentService {
     this.endpoint = `${baseURL}/tournaments`;
   }
 
-  async getTournaments() {
+  async getTournaments(request?: any) {
     const response = await axios.get(this.endpoint);
-    return response.data;
+    const tournaments = response.data;
+
+    // If no request provided (no user context), return tournaments as is
+    if (!request || !request.headers["x-user-id"]) {
+      return tournaments;
+    }
+
+    // Add is_participating and is_owner fields for each tournament
+    const externalId = request.headers["x-user-id"];
+    const tournamentsWithUserInfo = await Promise.all(
+      tournaments.map(async (tournament: any) => {
+        try {
+          const participantsResponse = await axios.get(
+            `${this.endpoint}/${tournament.id}/participants`
+          );
+          const participants = participantsResponse.data;
+          const isParticipating = participants.some(
+            (participant: any) => participant.external_id === externalId
+          );
+
+          // Check if current user is the owner by comparing with owner_id
+          // We need to find the owner participant to get their external_id
+          const ownerParticipant = participants.find(
+            (participant: any) => participant.id === tournament.owner_id
+          );
+          const isOwner = ownerParticipant
+            ? ownerParticipant.external_id === externalId
+            : false;
+
+          return {
+            ...tournament,
+            is_participating: isParticipating,
+            is_owner: isOwner,
+          };
+        } catch (error) {
+          // If we can't fetch participants, assume not participating and not owner
+          return {
+            ...tournament,
+            is_participating: false,
+            is_owner: false,
+          };
+        }
+      })
+    );
+
+    return tournamentsWithUserInfo;
   }
 
   async getTournamentParticipants(request: any) {
@@ -24,7 +69,45 @@ class TournamentService {
   async getTournament(request: any): Promise<TournamentSchema> {
     const id = request.params.id;
     const response = await axios.get(`${this.endpoint}/${id}`, {});
-    return response.data;
+    const tournament = response.data;
+
+    // If no user context, return tournament as is
+    if (!request.headers["x-user-id"]) {
+      return tournament;
+    }
+
+    // Add is_participating and is_owner fields
+    const externalId = request.headers["x-user-id"];
+    try {
+      const participantsResponse = await axios.get(
+        `${this.endpoint}/${id}/participants`
+      );
+      const participants = participantsResponse.data;
+      const isParticipating = participants.some(
+        (participant: any) => participant.external_id === externalId
+      );
+
+      // Check if current user is the owner by comparing with owner_id
+      const ownerParticipant = participants.find(
+        (participant: any) => participant.id === tournament.owner_id
+      );
+      const isOwner = ownerParticipant
+        ? ownerParticipant.external_id === externalId
+        : false;
+
+      return {
+        ...tournament,
+        is_participating: isParticipating,
+        is_owner: isOwner,
+      };
+    } catch (error) {
+      // If we can't fetch participants, assume not participating and not owner
+      return {
+        ...tournament,
+        is_participating: false,
+        is_owner: false,
+      };
+    }
   }
 
   async joinTournament(request: any) {
@@ -70,7 +153,12 @@ class TournamentService {
       ownerName: user.name,
     });
 
-    return response.data;
+    // Add is_participating and is_owner fields since the creator is automatically both
+    return {
+      ...response.data,
+      is_participating: true,
+      is_owner: true,
+    };
   }
 
   async getTournamentHistory(request: any) {
