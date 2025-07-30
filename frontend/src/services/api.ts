@@ -94,7 +94,7 @@ export async function createRoom(roomData: {
 }
 
 export async function startBattle(tournamentId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/start`, {
+    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/start`, {
         method: 'PUT',
         headers: getAuthHeaders(),
     });
@@ -124,7 +124,7 @@ export async function pingGameServer() {
  * トーナメント一覧を取得する (GET /tournaments)
  */
 export async function getTournaments() {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments`, { headers: getAuthHeaders() });
+    const response = await fetch(`${SERVERURL}/tournaments`, { headers: getAuthHeaders() });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
@@ -146,7 +146,7 @@ export async function createTournament(data: { name: string; description: string
  * 特定のトーナメント詳細を取得する (GET /tournaments/{id})
  */
 export async function getTournamentById(id: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${id}`, { headers: getAuthHeaders() });
+    const response = await fetch(`${SERVERURL}/tournaments/${id}`, { headers: getAuthHeaders() });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
@@ -155,7 +155,7 @@ export async function getTournamentById(id: string) {
  * トーナメントを開始（オープン）状態にする (PUT /tournaments/{id}/open)
  */
 export async function openTournament(id: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${id}/open`, {
+    const response = await fetch(`${SERVERURL}/tournaments/${id}/open`, {
         method: 'PUT',
         headers: getAuthHeaders(),
     });
@@ -167,9 +167,10 @@ export async function openTournament(id: string) {
  * トーナメントに参加者として自分を追加する (POST /tournaments/{id}/join)
  */
 export async function joinTournament(tournamentId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/join`, {
+    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/join`, {
         method: 'POST',
         headers: getAuthHeaders(),
+        body: "{}",
     });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
@@ -179,7 +180,7 @@ export async function joinTournament(tournamentId: string) {
  * 参加者のステータスを 'ready' にする (PUT /tournaments/{id}/battle/ready)
  */
 export async function setParticipantReady(tournamentId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/ready`, {
+    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/ready`, {
         method: 'PUT',
         headers: getAuthHeaders(),
     });
@@ -191,7 +192,7 @@ export async function setParticipantReady(tournamentId: string) {
  * 参加者のステータスを 'pending' (キャンセル) にする (PUT /tournaments/{id}/battle/cancel)
  */
 export async function setParticipantCancel(tournamentId: string) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/cancel`, {
+    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/cancel`, {
         method: 'PUT',
         headers: getAuthHeaders(),
     });
