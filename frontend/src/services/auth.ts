@@ -29,12 +29,11 @@ export function getAuthHeaders(): HeadersInit {
 
     const userId = getUserId();
     if (userId) {
-        // バックエンドが期待するヘッダー形式に合わせてください。
-        // ここでは仮にユーザーIDをBearerトークンとして送ります。
-        headers['Authorization'] = `Bearer ${userId}`;
+        headers['x-user-id'] = userId; // ヘッダー名を 'x-user-id' に変更
     }
     return headers;
 }
+
 
 /**
  * ログアウト処理（localStorageからユーザーIDを削除）

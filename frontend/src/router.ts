@@ -124,7 +124,12 @@ export class AppRouter {
     public async handleCreateTournament(event: SubmitEvent) {
         event.preventDefault();
         const formData = new FormData(event.target as HTMLFormElement);
-        const data = { name: formData.get('name') as string, description: formData.get('description') as string };
+        const data = { 
+            name: formData.get('name') as string, 
+            description: formData.get('description') as string,
+            max_num: parseInt(formData.get('max_num') as string, 10),
+            rule: formData.get('rule') as string
+        };
         try {
             const newTournament = await api.createTournament(data);
             alert('トーナメントを作成しました！');
@@ -188,13 +193,32 @@ export class AppRouter {
         const responseDisplay = document.getElementById('response-data');
         if (!responseDisplay) return;
         responseDisplay.textContent = 'Creating multiplayer room...';
+        alert("トーナメント外のルーム作成APIは現在利用できません。");
+        responseDisplay.textContent = "Error: API endpoint for non-tournament rooms is not available.";
+    }
+    
+    /**
+     * トーナメント詳細画面の「試合開始」ボタンの処理
+     */
+    public async startBattle(tournamentId: string) {
+        if (!this.currentTournamentData || this.currentTournamentData.id !== tournamentId) {
+            alert("トーナメント情報が正しくありません。");
+            return;
+        }
+
+        alert('次の対戦を開始します！');
         try {
-            const data = await api.createRoom();
-            responseDisplay.textContent = JSON.stringify(data, null, 2);
-            alert('マルプレイヤー用ルームが作成されました！');
+            // バックエンドが次の対戦者を自動で決定してくれるAPIを叩く
+            const battleInfo = await api.startBattle(tournamentId);
+            console.log("Battle started:", battleInfo);
+            
+            alert('対戦が準備されました。ゲーム画面に遷移します。');
             this.navigateTo('/game');
         } catch (error) {
-            responseDisplay.textContent = `エラーが発生しました: ${error as string}`;
+            alert('対戦の開始に失敗しました。');
+            console.error(error);
         }
     }
+
+    
 }

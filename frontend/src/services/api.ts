@@ -73,11 +73,17 @@ export async function createAiRoom() {
 /**
  * マルチプレイヤー用のルームを作成する (POST /room)
  */
-export async function createRoom() {
+export async function createRoom(roomData: {
+    tournament_id: string;
+    player1_id: string;
+    player2_id: string;
+    winning_score: number;
+}) {
     try {
         const response = await fetch(`${GAME_URL}/room`, {
             method: 'POST',
             headers: getAuthHeaders(),
+            body: JSON.stringify(roomData),
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
         return await response.json();
@@ -85,6 +91,15 @@ export async function createRoom() {
         console.error('Failed to create room:', error);
         throw error;
     }
+}
+
+export async function startBattle(tournamentId: string) {
+    const response = await fetch(`${TOURNAMENT_URL}/tournaments/${tournamentId}/battle/start`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
 }
 
 /**
@@ -117,8 +132,8 @@ export async function getTournaments() {
 /**
  * 新しいトーナメントを作成する (POST /tournaments)
  */
-export async function createTournament(data: { name: string, description: string }) {
-    const response = await fetch(`${TOURNAMENT_URL}/tournaments`, {
+export async function createTournament(data: { name: string; description: string; max_num: number; rule: string; }) {
+    const response = await fetch(`${SERVERURL}/tournaments`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(data),
