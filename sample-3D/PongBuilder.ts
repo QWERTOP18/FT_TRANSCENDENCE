@@ -1,6 +1,7 @@
 import { Color3, CreateBox, CreateCylinder, Engine, FreeCamera, HemisphericLight, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 import { GradientMaterial, GridMaterial, SkyMaterial } from "@babylonjs/materials";
 import { Pong } from "./Pong";
+import { ServerToPongMapper } from "./ServerToPongMapper";
 
 export class PongBuilder
 {
@@ -61,7 +62,7 @@ export class PongBuilder
 	public static CreateBottomBar(scene?: Scene) {
 		const bar = MeshBuilder.CreateBox("bottom-bar", {
 			height: 1,
-			width: 5,
+			width: ServerToPongMapper.x2zMap(100),
 		}, scene);
 		bar.position.y = 0.5;
 		bar.position.z = -15;
@@ -78,7 +79,7 @@ export class PongBuilder
 	public static CreateTopBar(scene?: Scene) {
 		const bar = CreateBox("top-bar", {
 			height: 1,
-			width: 5,
+			width: ServerToPongMapper.x2zMap(100),
 		}, scene);
 		bar.position.y = 0.5;
 		bar.position.z = 15;

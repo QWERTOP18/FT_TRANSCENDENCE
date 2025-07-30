@@ -1,4 +1,4 @@
-import { Camera, Light, Mesh, Scene } from "@babylonjs/core";
+import { Camera, GroundMesh, Light, Mesh, Scene } from "@babylonjs/core";
 
 type PongProps = {
 	scene: Scene,
@@ -7,7 +7,7 @@ type PongProps = {
 	pack: Mesh,
 	bottomBar: Mesh,
 	topBar: Mesh,
-	ground: Mesh,
+	ground: GroundMesh,
 }
 
 export class Pong {
