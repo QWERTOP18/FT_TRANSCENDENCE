@@ -75,62 +75,6 @@ import { PongUpdater } from "./PongUpdater";
 		})
 	});
 
-	/**
-	 * サンプルの操作方法
-	 * ↑: パックを前に移動
-	 * ↓: パックを後ろに移動
-	 * ←: パックを左に移動
-	 * →: パックを右に移動
-	 * a: プレイヤーを左に移動
-	 * d: プレイヤーを右に移動
-	 * q: 相手を左に移動
-	 * e: 相手を右に移動
-	 * r: スコアをリセット
-	 * w: 相手のスコアを1点増やす
-	 * s: プレイヤーのスコアを1点増やす
-	 */
-	// canvas.addEventListener("keydown", (event: KeyboardEvent) => {
-	// 	// Pack
-	// 	if (event.key === "ArrowUp") {
-	// 		pong.props.pack.position.z += 0.1;
-	// 	} else if (event.key === "ArrowDown") {
-	// 		pong.props.pack.position.z -= 0.1;
-	// 	} else if (event.key === "ArrowLeft") {
-	// 		pong.props.pack.position.x -= 0.1;
-	// 	} else if (event.key === "ArrowRight") {
-	// 		pong.props.pack.position.x += 0.1;
-	// 	}
-	// 	// Player
-	// 	else if (event.key == "a") {
-	// 		pong.props.bottomBar.position.x -= 0.1;
-	// 	}
-	// 	else if (event.key == "d") {
-	// 		pong.props.bottomBar.position.x += 0.1;
-	// 	}
-	// 	// Opponent
-	// 	else if (event.key == "q") {
-	// 		pong.props.topBar.position.x -= 0.1;
-	// 	}
-	// 	else if (event.key == "e") {
-	// 		pong.props.topBar.position.x += 0.1;
-	// 	}
-	// 	// Score
-	// 	else if (event.key == "r") {
-	// 		pongGui.setScore(0, 0);
-	// 		scoreboard.setScore(0, 0);
-	// 	}
-	// 	else if (event.key == "w") {
-	// 		const newOpponentScore = pongGui.opponentScore + 1;
-	// 		const newPlayerScore = pongGui.playerScore;
-	// 		pongGui.setScore(newPlayerScore, newOpponentScore);
-	// 		scoreboard.setScore(newPlayerScore, newOpponentScore);
-	// 		scoreboard.animateScore(pong.props.scene);
-	// 	} else if (event.key == "s") {
-	// 		pongGui.setScore(pongGui.opponentScore, pongGui.playerScore + 1);
-	// 		scoreboard.setScore(pongGui.playerScore + 1, pongGui.opponentScore);
-	// 	}
-	// });
-
 	// ウィンドウのリサイズイベントを監視して、エンジンをリサイズ
 	window.addEventListener("resize", function () {
 		engine.resize();
