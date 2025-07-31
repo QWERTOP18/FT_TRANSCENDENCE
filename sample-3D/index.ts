@@ -30,7 +30,7 @@ async function initializeSample3DPong() {
 			}
 			game.createAiGame({
 				aiLevel: 0,
-				userName: userName,
+				userId: userName,
 				onStart: () => {
 					canvas.focus();
 					button.disabled = true;
