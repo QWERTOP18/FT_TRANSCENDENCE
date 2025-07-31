@@ -1,7 +1,7 @@
 import { Color3, CreateBox, CreateCylinder, Engine, FreeCamera, HemisphericLight, MeshBuilder, Scene, StandardMaterial, Vector3 } from "@babylonjs/core";
 import { GradientMaterial, GridMaterial, SkyMaterial } from "@babylonjs/materials";
 import { Pong } from "./Pong";
-import { ServerToPongMapper } from "./ServerToPongMapper";
+import { ServerToPongMapper } from "../utils/ServerToPongMapper";
 
 export class PongBuilder
 {

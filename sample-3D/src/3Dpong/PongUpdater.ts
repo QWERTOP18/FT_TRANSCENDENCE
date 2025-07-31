@@ -1,7 +1,7 @@
+import { PongGUI } from "../gui/PongGUI";
+import { ScoreBoardGUI } from "../gui/ScoreBoardGUI";
+import { ServerToPongMapper } from "../utils/ServerToPongMapper";
 import { Pong } from "./Pong";
-import { PongGUI } from "./PongGUI";
-import { ScoreBoardGUI } from "./ScoreBoardGUI";
-import { ServerToPongMapper } from "./ServerToPongMapper";
 
 export type PongUpdaterProps = {
 	pong: Pong;

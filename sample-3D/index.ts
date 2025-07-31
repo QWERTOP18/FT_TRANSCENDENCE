@@ -1,9 +1,9 @@
 import { Engine } from "@babylonjs/core";
-import { PongBuilder } from "./PongBuilder";
-import { PongGUI } from "./PongGUI";
-import { ScoreBoardGUI } from "./ScoreBoardGUI";
-import { PongSender } from "./PongSender";
-import { PongUpdater } from "./PongUpdater";
+import { PongBuilder } from "./src/3Dpong/PongBuilder";
+import { PongGUI } from "./src/gui/PongGUI";
+import { ScoreBoardGUI } from "./src/gui/ScoreBoardGUI";
+import { PongSender } from "./src/3Dpong/PongSender";
+import { PongUpdater } from "./src/3Dpong/PongUpdater";
 
 (async () => {
 	// Canvasエレメントを取得
