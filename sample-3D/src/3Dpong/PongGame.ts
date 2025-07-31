@@ -7,6 +7,7 @@ import { PongInputEventManager } from "../input/PongInputEventManager";
 import { Pong } from "./Pong";
 import { PongBuilder } from "./PongBuilder";
 import { PongUpdater } from "./PongUpdater";
+import { PongConfigs } from "../PongConfigs";
 
 
 export class PongGame {
@@ -25,7 +26,6 @@ export class PongGame {
 		// ゲーム画面とGUIの初期化
 		const pong = PongBuilder.CreatePong(engine, canvas);
 		const pongGui = await PongGUI.createPongGUI(pong.props.scene);
-		pongGui.setScore(0, 0);
 		const scoreboard = await ScoreBoardGUI.createScoreBoardGUI(pong.props.scene);
 
 		// 継続的にシーンをレンダリングする
@@ -34,9 +34,13 @@ export class PongGame {
 		});
 
 		// ウィンドウのリサイズイベントを監視して、エンジンをリサイズ
-		window.addEventListener("resize", function () {
+		const resizeHandler = function () {
 			engine.resize();
-		});
+		}
+		window.addEventListener("resize", resizeHandler);
+		engine.onDisposeObservable.add(() => {
+			window.removeEventListener("resize", resizeHandler);
+		})
 
 		const pongGame = new PongGame({
 			pong,
@@ -46,6 +50,10 @@ export class PongGame {
 		return pongGame;
 	}
 
+	dispose() {
+		this.props.pong.props.engine.dispose();
+	}
+
 	// AIとの対戦を開始する
 	public async createAiGame(props: {
 		aiLevel: number,
@@ -53,7 +61,7 @@ export class PongGame {
 		onStart: () => void,
 		onEnd: () => void,
 	}) {
-		if (props.aiLevel < 0 || props.aiLevel > 4) {
+		if (props.aiLevel < PongConfigs.minAiLevel || props.aiLevel > PongConfigs.maxAiLevel) {
 			throw new Error("AI level must be between 0 and 4.");
 		}
 		const resp = await PongGameAPI.playAiGame({

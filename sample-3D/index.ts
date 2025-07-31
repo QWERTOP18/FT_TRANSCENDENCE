@@ -21,7 +21,6 @@ async function initializeSample3DPong() {
 	const game = await PongGame.bootPongGame(canvas);
 
 	const button = createBattleAiButton({
-		game: game,
 		onClick: async () => {
 			const userName = prompt("Enter your name:");
 			if (!userName) {
@@ -41,18 +40,49 @@ async function initializeSample3DPong() {
 			})
 		}
 	})
-	document.body.appendChild(button);
+	addUIContainer(button);
+
+	const disposeButton = createDisposeButton({
+		onClick: () => {
+			game.dispose();
+			alert("Game disposed.");
+		}
+	});
+	addUIContainer(disposeButton);
 }
 
 function createBattleAiButton(props: {
-	game: PongGame,
 	onClick: () => void | Promise<void>,
 }) {
 	const button = document.createElement("button");
-	button.style.position = "absolute";
-	button.style.top = "10px";
-	button.style.left = "10px";
 	button.textContent = "Battle AI";
 	button.addEventListener("click", props.onClick);
 	return button;
+}
+
+function createDisposeButton(props: {
+	onClick: () => void | Promise<void>,
+}) {
+	const button = document.createElement("button");
+	button.textContent = "Dispose Game";
+	button.addEventListener("click", props.onClick);
+	return button;
+}
+
+function addUIContainer(element: HTMLElement) {
+	const container = (() => {
+		const container = document.getElementById("uiContainer");
+		if (container) 
+			return container;
+		const newContainer = document.createElement("div");
+		newContainer.id = "uiContainer";
+		newContainer.style.position = "absolute";
+		newContainer.style.display = "flex";
+		newContainer.style.top = "0";
+		newContainer.style.left = "0";
+		newContainer.style.padding = "10px";
+		document.body.appendChild(newContainer);
+		return newContainer;
+	})();
+	container.appendChild(element);
 }

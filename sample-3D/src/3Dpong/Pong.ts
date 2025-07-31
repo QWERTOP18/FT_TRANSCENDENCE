@@ -1,6 +1,7 @@
-import { Camera, GroundMesh, Light, Mesh, Scene } from "@babylonjs/core";
+import { Camera, Engine, GroundMesh, Light, Mesh, Scene } from "@babylonjs/core";
 
 type PongProps = {
+	engine: Engine,
 	canvas: HTMLCanvasElement
 	scene: Scene,
 	camera: Camera,

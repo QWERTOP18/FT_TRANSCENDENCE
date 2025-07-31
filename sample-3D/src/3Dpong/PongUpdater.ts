@@ -1,5 +1,6 @@
 import { PongGUI } from "../gui/PongGUI";
 import { ScoreBoardGUI } from "../gui/ScoreBoardGUI";
+import { PongConfigs } from "../PongConfigs";
 import { ServerToPongMapper } from "../utils/ServerToPongMapper";
 import { Pong } from "./Pong";
 
@@ -26,11 +27,11 @@ export class PongUpdater {
 						z: ServerToPongMapper.x2zMap(state.ballX) - centerZ,
 					},
 					bottomBarPosition: {
-						x: ServerToPongMapper.y2xMap(state.paddle1Y) - centerX + ServerToPongMapper.y2xMap(ServerToPongMapper.paddleWidth_server) / 2,
+						x: ServerToPongMapper.y2xMap(state.paddle1Y) - centerX + ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth) / 2,
 						z: props.pong.props.bottomBar.position.z
 					},
 					topBarPosition: {
-						x: ServerToPongMapper.y2xMap(state.paddle2Y) - centerX + ServerToPongMapper.y2xMap(ServerToPongMapper.paddleWidth_server) / 2,
+						x: ServerToPongMapper.y2xMap(state.paddle2Y) - centerX + ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth) / 2,
 						z: props.pong.props.topBar.position.z
 					},
 				});
