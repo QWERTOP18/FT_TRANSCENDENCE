@@ -23,6 +23,7 @@ export class PongBuilder
 			bottomBar,
 			topBar,
 			ground,
+			canvas,
 		});
 
 		return pong;

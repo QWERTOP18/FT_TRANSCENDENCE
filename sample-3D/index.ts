@@ -1,9 +1,8 @@
 import { Engine } from "@babylonjs/core";
 import { PongBuilder } from "./src/3Dpong/PongBuilder";
+import { PongGame } from "./src/3Dpong/PongGame";
 import { PongGUI } from "./src/gui/PongGUI";
 import { ScoreBoardGUI } from "./src/gui/ScoreBoardGUI";
-import { PongSender } from "./src/3Dpong/PongSender";
-import { PongUpdater } from "./src/3Dpong/PongUpdater";
 
 (async () => {
 	// Canvasエレメントを取得
@@ -51,26 +50,17 @@ import { PongUpdater } from "./src/3Dpong/PongUpdater";
 		const ws = new WebSocket(`ws://localhost:4000/game/${createRoomResponseJson.room_id}?user_id=${userName}`);
 		ws.addEventListener("open", () => {
 			canvas.focus();
-			const pongSender = new PongSender(ws);
-			const onPressEventHandler = (event: KeyboardEvent) => {
-				pongSender.onPress(event.key);
-			}
-			const onUpEventHandler = (event: KeyboardEvent) => {
-				pongSender.onUp(event.key);
-			}
-			canvas.addEventListener('keydown', onPressEventHandler)
-			canvas.addEventListener('keyup', onUpEventHandler)
-			PongUpdater.setEvents({
-				pong: pong,
-				pongGui: pongGui,
-				scoreboard: scoreboard,
-				ws: ws,
+			const pongGame = new PongGame({
+				pong,
+				pongGui,
+				scoreboard,
+			})
+			pongGame.startPongGame({
+				ws,
 				onEnd: () => {
-					canvas.removeEventListener('keydown', onPressEventHandler);
-					canvas.removeEventListener('keyup', onUpEventHandler);
 					button.disabled = false;
 				}
-			});
+			})
 			button.disabled = true;
 		})
 	});
