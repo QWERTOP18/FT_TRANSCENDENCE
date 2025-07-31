@@ -68,10 +68,25 @@ export class PongGame {
 			aiLevel: props.aiLevel,
 			userId: props.userId,
 		})
-		const ws = new GameSocket({
+		this.connectRoom({
 			roomId: resp.room_id,
 			userId: props.userId,
-		});
+			onStart: props.onStart,
+			onEnd: props.onEnd,
+		})
+	}
+
+	// 部屋にプレイヤーとして接続する
+	public async connectRoom(props: {
+		roomId: string,
+		userId: string,
+		onStart: () => void,
+		onEnd: () => void,
+	}) {
+		const ws = new GameSocket({
+			roomId: props.roomId,
+			userId: props.userId,
+		})
 		ws.addEventListener("open", () => {
 			props.onStart();
 			this.attachPlayerPongSocket({
