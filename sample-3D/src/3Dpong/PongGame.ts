@@ -1,11 +1,11 @@
 import { Engine } from "@babylonjs/core";
+import { GameSocket } from "../gameAPIs/GameSocket";
+import { PongGameAPI } from "../gameAPIs/PongGameAPI";
 import { PongGUI } from "../gui/PongGUI";
 import { ScoreBoardGUI } from "../gui/ScoreBoardGUI";
 import { Pong } from "./Pong";
-import { PongSender } from "./PongSender";
-import { PongUpdater } from "./PongUpdater";
 import { PongBuilder } from "./PongBuilder";
-import { PongGameAPI } from "../gameAPIs/PongGameAPI";
+import { PongUpdater } from "./PongUpdater";
 
 
 export class PongGame {
@@ -19,8 +19,7 @@ export class PongGame {
 	}
 
 	// PongGameの作成
-	public static async bootPongGame(canvas: HTMLCanvasElement)
-	{
+	public static async bootPongGame(canvas: HTMLCanvasElement) {
 		const engine = new Engine(canvas, true); // Generate the BABYLON 3D engine
 		// ゲーム画面とGUIの初期化
 		const pong = PongBuilder.CreatePong(engine, canvas);
@@ -32,7 +31,7 @@ export class PongGame {
 		engine.runRenderLoop(function () {
 			pong.props.scene.render();
 		});
-		
+
 		// ウィンドウのリサイズイベントを監視して、エンジンをリサイズ
 		window.addEventListener("resize", function () {
 			engine.resize();
@@ -60,7 +59,7 @@ export class PongGame {
 			aiLevel: props.aiLevel,
 			userId: props.userId,
 		})
-		const ws = PongGameAPI.createPongGameSocket({
+		const ws = new GameSocket({
 			roomId: resp.room_id,
 			userId: props.userId,
 		});
@@ -75,15 +74,25 @@ export class PongGame {
 
 	// プレイヤーのPongのソケットを接続する
 	private attachPlayerPongSocket(props: {
-		ws: WebSocket,
+		ws: GameSocket,
 		onEnd: () => void,
 	}) {
-		const pongSender = new PongSender(props.ws);
+		const handleKey = (key: string, pressed: boolean) => {
+			const keyActions: Record<string, () => void> = {
+				a: () => props.ws.pressLeftKey(pressed),
+				ArrowLeft: () => props.ws.pressLeftKey(pressed),
+				d: () => props.ws.pressRightKey(pressed),
+				ArrowRight: () => props.ws.pressRightKey(pressed),
+			};
+
+			const action = keyActions[key];
+			if (action) action();
+		};
 		const onPressEventHandler = (event: KeyboardEvent) => {
-			pongSender.onPress(event.key);
+			handleKey(event.key, true);
 		}
 		const onUpEventHandler = (event: KeyboardEvent) => {
-			pongSender.onUp(event.key);
+			handleKey(event.key, false);
 		}
 		const pong = this.props.pong;
 		pong.props.canvas.addEventListener('keydown', onPressEventHandler)
