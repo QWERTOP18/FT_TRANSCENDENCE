@@ -3,6 +3,7 @@ import { GameSocket } from "../gameAPIs/GameSocket";
 import { PongGameAPI } from "../gameAPIs/PongGameAPI";
 import { PongGUI } from "../gui/PongGUI";
 import { ScoreBoardGUI } from "../gui/ScoreBoardGUI";
+import { PongInputEventManager } from "../input/PongInputEventManager";
 import { Pong } from "./Pong";
 import { PongBuilder } from "./PongBuilder";
 import { PongUpdater } from "./PongUpdater";
@@ -77,31 +78,14 @@ export class PongGame {
 		ws: GameSocket,
 		onEnd: () => void,
 	}) {
-		const handleKey = (key: string, pressed: boolean) => {
-			const keyActions: Record<string, () => void> = {
-				a: () => props.ws.pressLeftKey(pressed),
-				ArrowLeft: () => props.ws.pressLeftKey(pressed),
-				d: () => props.ws.pressRightKey(pressed),
-				ArrowRight: () => props.ws.pressRightKey(pressed),
-			};
-
-			const action = keyActions[key];
-			if (action) action();
-		};
-		const onPressEventHandler = (event: KeyboardEvent) => {
-			handleKey(event.key, true);
-		}
-		const onUpEventHandler = (event: KeyboardEvent) => {
-			handleKey(event.key, false);
-		}
-		const pong = this.props.pong;
-		pong.props.canvas.addEventListener('keydown', onPressEventHandler)
-		pong.props.canvas.addEventListener('keyup', onUpEventHandler)
+		const inputEventManager = PongInputEventManager.createInputEventManager({
+			ws: props.ws
+		});
+		inputEventManager.addKeyBoardEvent(this.props.pong);
 		this.attachPongSocket({
 			ws: props.ws,
 			onEnd: () => {
-				pong.props.canvas.removeEventListener('keydown', onPressEventHandler);
-				pong.props.canvas.removeEventListener('keyup', onUpEventHandler);
+				inputEventManager.removeKeyBoardEvent(this.props.pong);
 				props.onEnd();
 			}
 		})
