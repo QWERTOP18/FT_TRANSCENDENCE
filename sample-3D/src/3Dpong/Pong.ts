@@ -34,4 +34,17 @@ export class Pong {
 			this.props.topBar.position.z = props.topBarPosition.z;
 		}
 	}
+
+	public setPlayerPaddlePosition(x: number) {
+		this.props.bottomBar.position.x = x;
+	}
+
+	public setOpponentPaddlePosition(x: number) {
+		this.props.topBar.position.x = x;
+	}
+
+	public setPackPosition(x: number, z: number) {
+		this.props.pack.position.x = x;
+		this.props.pack.position.z = z;
+	}
 }

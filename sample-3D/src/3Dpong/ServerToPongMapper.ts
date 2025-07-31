@@ -1,5 +1,5 @@
 import { PongConfigs } from "../PongConfigs";
-import { Mapper } from "./Mapper";
+import { Mapper } from "../utils/Mapper";
 
 
 export class ServerToPongMapper {
@@ -7,15 +7,12 @@ export class ServerToPongMapper {
 	static yxMapper: Mapper;
 	static xzMapper: Mapper;
 
-	static paddleWidth_server: number;
-
 	static width_3d: number;
 	static width_server: number;
 	static height_3d: number;
 	static height_server: number;
 	
 	static {
-		this.paddleWidth_server = PongConfigs.gameApiPaddleWidth;
 		this.width_3d = PongConfigs.pongWidth;
 		this.width_server = PongConfigs.gameApiWidth;
 		ServerToPongMapper.yxMapper = new Mapper(0, this.width_server, 0, this.width_3d);
