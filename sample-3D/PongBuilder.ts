@@ -65,7 +65,7 @@ export class PongBuilder
 			width: ServerToPongMapper.x2zMap(100),
 		}, scene);
 		bar.position.y = 0.5;
-		bar.position.z = -15;
+		bar.position.z = -15 + ServerToPongMapper.x2zMap(10);
 
 		const material = new GradientMaterial("bar-material", scene);
 		material.topColor = Color3.White();
@@ -82,7 +82,7 @@ export class PongBuilder
 			width: ServerToPongMapper.x2zMap(100),
 		}, scene);
 		bar.position.y = 0.5;
-		bar.position.z = 15;
+		bar.position.z = 15 - ServerToPongMapper.x2zMap(10);
 
 		const material = new GradientMaterial("bar-material", scene);
 		material.topColor = Color3.White();

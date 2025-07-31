@@ -26,11 +26,11 @@ export class PongUpdater {
 						z: ServerToPongMapper.x2zMap(state.ballX) - centerZ,
 					},
 					bottomBarPosition: {
-						x: ServerToPongMapper.y2xMap(state.paddle1Y - ServerToPongMapper.paddleWidth_server / 2) - centerX,
+						x: ServerToPongMapper.y2xMap(state.paddle1Y) - centerX + ServerToPongMapper.y2xMap(ServerToPongMapper.paddleWidth_server) / 2,
 						z: props.pong.props.bottomBar.position.z
 					},
 					topBarPosition: {
-						x: ServerToPongMapper.y2xMap(state.paddle2Y - ServerToPongMapper.paddleWidth_server / 2) - centerX,
+						x: ServerToPongMapper.y2xMap(state.paddle2Y) - centerX + ServerToPongMapper.y2xMap(ServerToPongMapper.paddleWidth_server) / 2,
 						z: props.pong.props.topBar.position.z
 					},
 				});
