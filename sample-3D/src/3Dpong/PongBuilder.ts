@@ -30,7 +30,7 @@ export class PongBuilder
 
 	// This creates and positions a free camera (non-mesh)
 	public static CreateCamera(canvas: HTMLCanvasElement, scene?: Scene) {
-		const camera = new FreeCamera("camera1", new Vector3(0, 5, -25), scene);
+		const camera = new FreeCamera("camera1", new Vector3(0, 5, -26), scene);
 
 		camera.setTarget(Vector3.Zero());
 
@@ -40,7 +40,7 @@ export class PongBuilder
 	public static CreatePack(scene?: Scene) {
 		const pack = CreateCylinder("pack", {
 			height: 0.5,
-			diameter: 1.5,
+			diameter: ServerToPongMapper.x2zMap(10),
 		}, scene);
 		pack.position.y = 0.25;
 
@@ -65,7 +65,7 @@ export class PongBuilder
 			width: ServerToPongMapper.x2zMap(100),
 		}, scene);
 		bar.position.y = 0.5;
-		bar.position.z = -15 + ServerToPongMapper.x2zMap(10);
+		bar.position.z = -15 + ServerToPongMapper.x2zMap(50);
 
 		const material = new GradientMaterial("bar-material", scene);
 		material.topColor = Color3.White();
@@ -82,7 +82,7 @@ export class PongBuilder
 			width: ServerToPongMapper.x2zMap(100),
 		}, scene);
 		bar.position.y = 0.5;
-		bar.position.z = 15 - ServerToPongMapper.x2zMap(10);
+		bar.position.z = 15 - ServerToPongMapper.x2zMap(50);
 
 		const material = new GradientMaterial("bar-material", scene);
 		material.topColor = Color3.White();
