@@ -34,7 +34,8 @@ export class ScoreBoardGUI {
 		if (!(grid instanceof Grid)) {
 			throw new Error("GUIのスコアボードがAdvancedDynamicTextureではありません。");
 		}
-
+		grid.alpha = 0;
+		
 		this.frameRate = 10;
 		const xSlide = new Animation("xSlide", "top", this.frameRate, Animation.ANIMATIONTYPE_FLOAT, Animation.ANIMATIONLOOPMODE_CYCLE);
 
