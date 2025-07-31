@@ -36,32 +36,23 @@ import { ScoreBoardGUI } from "./src/gui/ScoreBoardGUI";
 			alert("Name is required to create a room.");
 			return;
 		}
-		const createRoomResponse = await fetch("http://localhost:4000/play-ai", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				"aiLevel": 4,
-				"user_id": userName
-			}),
-		});
-		const createRoomResponseJson = await createRoomResponse.json()
-		const ws = new WebSocket(`ws://localhost:4000/game/${createRoomResponseJson.room_id}?user_id=${userName}`);
-		ws.addEventListener("open", () => {
+		const onStart = () => {
 			canvas.focus();
-			const pongGame = new PongGame({
-				pong,
-				pongGui,
-				scoreboard,
-			})
-			pongGame.startPongGame({
-				ws,
-				onEnd: () => {
-					button.disabled = false;
-				}
-			})
 			button.disabled = true;
+		}
+		const onEnd = () => {
+			button.disabled = false;
+		}
+		const pongGame = new PongGame({
+			pong,
+			pongGui,
+			scoreboard,
+		})
+		pongGame.createAiGame({
+			aiLevel: 0,
+			userName: userName,
+			onEnd: onEnd,
+			onStart: onStart,
 		})
 	});
 

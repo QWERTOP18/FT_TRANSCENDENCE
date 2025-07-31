@@ -15,6 +15,36 @@ export class PongGame {
 
 	}
 
+	public async createAiGame(props: {
+		aiLevel: number,
+		userName: string,
+		onStart: () => void,
+		onEnd: () => void,
+	}) {
+		if (props.aiLevel < 0 || props.aiLevel > 4) {
+			throw new Error("AI level must be between 0 and 4.");
+		}
+		const createRoomResponse = await fetch("http://localhost:4000/play-ai", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				"aiLevel": props.aiLevel,
+				"user_id": props.userName
+			}),
+		});
+		const createRoomResponseJson = await createRoomResponse.json()
+		const ws = new WebSocket(`ws://localhost:4000/game/${createRoomResponseJson.room_id}?user_id=${props.userName}`);
+		ws.addEventListener("open", () => {
+			this.startPongGame({
+				ws,
+				onEnd: props.onEnd
+			})
+		})
+		props.onStart();
+	}
+
 	public startPongGame(props: {
 		ws: WebSocket,
 		onEnd: () => void
