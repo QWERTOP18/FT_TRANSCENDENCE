@@ -1,4 +1,4 @@
-import { PongGame } from "./src/3Dpong/PongGame";
+import { PongGame } from "./src/PongGame/PongGame";
 
 (async () => {
 	// Canvasエレメントを取得

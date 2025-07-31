@@ -1,6 +1,6 @@
 import { Engine } from "@babylonjs/core";
-import { GameSocket } from "../gameAPIs/GameSocket";
-import { PongGameAPI } from "../gameAPIs/PongGameAPI";
+import { GameSocket } from "../game-API/GameSocket";
+import { PongGameAPI } from "../game-API/PongGameAPI";
 import { PongGUI } from "../gui/PongGUI";
 import { ScoreBoardGUI } from "../gui/ScoreBoardGUI";
 import { PongInputEventManager } from "../input/PongInputEventManager";

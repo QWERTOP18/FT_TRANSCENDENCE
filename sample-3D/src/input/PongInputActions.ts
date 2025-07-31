@@ -1,4 +1,4 @@
-import { GameSocket } from "../gameAPIs/GameSocket";
+import { GameSocket } from "../game-API/GameSocket";
 
 /**
  * Pongゲームで使用できるアクション

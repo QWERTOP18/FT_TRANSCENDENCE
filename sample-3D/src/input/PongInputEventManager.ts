@@ -1,5 +1,5 @@
-import { Pong } from "../3Dpong/Pong";
-import { GameSocket } from "../gameAPIs/GameSocket";
+import { Pong } from "../PongGame/Pong";
+import { GameSocket } from "../game-API/GameSocket";
 import { PongInputActions } from "./PongInputActions";
 import { PongInputHandlerFactory } from "./PongInputHandlerFactory";
 import { PongInputMappers } from "./PongInputMappers";
