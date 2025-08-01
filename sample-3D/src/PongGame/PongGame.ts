@@ -55,7 +55,7 @@ export class PongGame {
 	}
 
 	// AIとの対戦を開始する
-	public async createAiGame(props: {
+	public async battleAi(props: {
 		aiLevel: number,
 		userId: string,
 		onStart: () => void,
@@ -71,7 +71,7 @@ export class PongGame {
 		this.connectRoom({
 			roomId: resp.room_id,
 			userId: props.userId,
-			onStart: props.onStart,
+			onConnect: props.onStart,
 			onEnd: props.onEnd,
 		})
 	}
@@ -80,7 +80,7 @@ export class PongGame {
 	public async connectRoom(props: {
 		roomId: string,
 		userId: string,
-		onStart: () => void,
+		onConnect: () => void,
 		onEnd: () => void,
 	}) {
 		const ws = new GameSocket({
@@ -88,7 +88,7 @@ export class PongGame {
 			userId: props.userId,
 		})
 		ws.addEventListener("open", () => {
-			props.onStart();
+			props.onConnect();
 			this.attachPlayerPongSocket({
 				ws,
 				onEnd: props.onEnd

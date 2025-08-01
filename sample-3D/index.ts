@@ -27,7 +27,7 @@ async function initializeSample3DPong() {
 				alert("Name is required to create a room.");
 				return;
 			}
-			game.createAiGame({
+			game.battleAi({
 				aiLevel: 0,
 				userId: userName,
 				onStart: () => {
