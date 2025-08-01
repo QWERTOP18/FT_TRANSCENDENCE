@@ -1,33 +1,114 @@
 import { gameState, gameEndState, MY_USERNAME } from '../data/mockData';
 
-function render(appElement: HTMLElement, content: string) {
+export class PongGame {
+
+    // PongGameの作成
+    public static async bootPongGame(canvas: HTMLCanvasElement) {
+        console.log('bootPongGame')
+        return new PongGame();
+    }
+
+    dispose() {
+        console.log('dispose');
+    }
+
+    // AIとの対戦を開始する
+    public async battleAi(props: {
+        aiLevel: number,
+        userId: string,
+        onStart: () => void,
+        onEnd: () => void,
+    }) {
+        console.log('battleAi');
+    }
+
+    // 部屋にプレイヤーとして接続する
+    public async connectRoom(props: {
+        roomId: string,
+        userId: string,
+        onConnect: () => void,
+        onEnd: () => void,
+    }) {
+        console.log('connectRoom')
+    }
+}
+
+
+// 作成されたPongGameインスタンスを保持するための変数
+let pongGameInstance: PongGame | null = null;
+
+function render(appElement: HTMLElement, content: string): void {
     appElement.innerHTML = content;
 }
 
-function drawGame(ctx: CanvasRenderingContext2D, width: number, height: number) {
-    const state = gameState.state;
-    const paddleWidth = 100, paddleHeight = 20, ballRadius = 10;
-    ctx.fillStyle = 'black';
-    ctx.fillRect(0, 0, width, height);
-    ctx.fillStyle = 'white';
-    ctx.font = '32px sans-serif';
-    ctx.fillText(state.score1.toString(), 30, 50);
-    ctx.fillText(state.score2.toString(), width - 50, height - 30);
-    ctx.fillRect(state.paddle1Y - paddleWidth / 2, 20, paddleWidth, paddleHeight);
-    ctx.fillRect(state.paddle2Y - paddleWidth / 2, height - 40, paddleWidth, paddleHeight);
-    ctx.beginPath();
-    ctx.arc(state.ballX, state.ballY, ballRadius, 0, Math.PI * 2);
-    ctx.fill();
-}
+/**
+ * ゲーム画面の骨格を描画し、Pongゲームを開始する
+ * @param appElement 描画対象
+ * @param gameParams ゲーム開始に必要な情報（AI対戦か、ルーム接続かなど）
+ */
+export async function renderGameScreen(appElement: HTMLElement, gameParams: any): Promise<void> {
+    // 以前のゲームインスタンスが残っていれば、必ず破棄する
+    if (pongGameInstance) {
+        pongGameInstance.dispose();
+        pongGameInstance = null;
+        console.log("Previous game instance disposed.");
+    }
 
-export function renderGameScreen(appElement: HTMLElement) {
-    const canvasWidth = 500;
-    const canvasHeight = 700;
-    const content = `<div class="flex justify-center items-center bg-white border-2 border-gray-800 shadow-lg rounded-lg"><canvas id="game-canvas" width="${canvasWidth}" height="${canvasHeight}"></canvas></div>`;
-    render(appElement, content);
-    const canvas = document.getElementById('game-canvas') as HTMLCanvasElement;
-    const ctx = canvas.getContext('2d')!;
-    drawGame(ctx, canvasWidth, canvasHeight);
+    const contentHTML = `
+        <div class="w-full h-full flex flex-col items-center justify-center">
+            <h2 class="text-2xl font-bold mb-4">${gameParams.title || 'Pong Game'}</h2>
+            <canvas id="pong-canvas" class="bg-black border-2 border-white"></canvas>
+        </div>
+    `;
+    render(appElement, contentHTML);
+
+    const canvas = document.getElementById('pong-canvas') as HTMLCanvasElement;
+    if (!canvas) {
+        console.error("Canvas element not found!");
+        return;
+    }
+
+    try {
+        // PongGameを起動
+        const game = await PongGame.bootPongGame(canvas);
+        pongGameInstance = game;
+
+        // AI対戦の場合
+        if (gameParams.type === 'ai') {
+            game.battleAi({
+                aiLevel: gameParams.aiLevel,
+                userId: gameParams.userId,
+                onStart: () => {
+                    console.log("AI game started!");
+                    canvas.focus();
+                },
+                onEnd: () => {
+                    alert('AI対戦が終了しました。');
+                    // 終了後はトーナメント一覧などに戻る
+                    (window as any).router.navigateTo('/tournaments');
+                }
+            });
+        }
+        // ルーム接続の場合
+        else if (gameParams.type === 'room') {
+            game.connectRoom({
+                roomId: gameParams.roomId,
+                userId: gameParams.token,
+                onConnect: () => {
+                    console.log("Connected to room!");
+                    canvas.focus();
+                },
+                onEnd: () => {
+                    alert('対戦が終了しました。');
+                    (window as any).router.navigateTo('/tournaments');
+                }
+            });
+        }
+
+    } catch (error) {
+        console.error("Failed to boot Pong game:", error);
+        appElement.innerHTML = `<p class="text-red-500">Failed to load game.</p>`;
+    }
 }
 
 export function renderResultScreen(appElement: HTMLElement, isWin: boolean) {

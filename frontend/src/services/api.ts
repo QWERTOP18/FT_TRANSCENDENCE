@@ -59,7 +59,7 @@ export async function createAiRoom() {
             // ★★★ API仕様に合わせてリクエストボディを修正 ★★★
             body: JSON.stringify({
                 aiLevel: 0, // AIレベルは一旦0で固定
-                user_id: userId
+                user_id: userId,
             }),
         });
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
@@ -69,6 +69,30 @@ export async function createAiRoom() {
         throw error;
     }
 }
+
+//8000番の方のai対戦
+
+// export async function createAiRoom() {
+//     try {
+//         const response = await fetch(`${SERVERURL}/battle/ai`, {
+//             method: 'POST',
+//             headers: getAuthHeaders(),
+//             body: JSON.stringify({}), // ★★★ API仕様に合わせてボディを空のオブジェクトにする ★★★
+//         });
+
+//         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+//         // ★★★ サーバーがJSONではなく文字列を返す問題に対応 ★★★
+//         const roomId = await response.text(); 
+        
+//         // アプリケーションが使いやすいように、JSONオブジェクトの形に整形して返す
+//         return { room_id: roomId };
+
+//     } catch (error) {
+//         console.error('Failed to create AI room:', error);
+//         throw error;
+//     }
+// }
 
 /**
  * マルチプレイヤー用のルームを作成する (POST /room)
@@ -124,7 +148,10 @@ export async function pingGameServer() {
  * トーナメント一覧を取得する (GET /tournaments)
  */
 export async function getTournaments() {
-    const response = await fetch(`${SERVERURL}/tournaments`, { headers: getAuthHeaders() });
+    const response = await fetch(`${SERVERURL}/tournaments`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+    });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }

@@ -79,7 +79,7 @@ export class AppRouter {
                     matchmakingView.renderMatchmakingScreen(this.appElement);
                     break;
                 case path === '/game':
-                    gameViews.renderGameScreen(this.appElement);
+                    this.appElement.innerHTML = `<p>No game specified. Please start a match from matchmaking or a tournament.</p>`;
                     break;
                 default:
                     this.navigateTo(loggedIn ? '/tournaments' : '/login');
@@ -176,19 +176,63 @@ export class AppRouter {
     }
     
     public async handlePlayAi() {
-        const responseDisplay = document.getElementById('response-data');
-        if (!responseDisplay) return;
-        responseDisplay.textContent = 'Creating AI room...';
         try {
-            const data = await api.createAiRoom();
-            responseDisplay.textContent = JSON.stringify(data, null, 2);
-            alert('AI対戦ルームが作成されました！');
-            this.navigateTo('/game');
+            const myUserId = auth.getUserId();
+            if (!myUserId) {
+                alert("ログインが必要です。");
+                return;
+            }
+            alert("AI対戦用のルームを作成しています...");
+            const roomData = await api.createAiRoom();
+            
+            // ★★★ 新しいゲーム画面描画関数を呼び出す
+            gameViews.renderGameScreen(this.appElement, {
+                type: 'ai',
+                title: 'AI Battle',
+                aiLevel: 0, // APIから返ってきたレベルを使うのが理想
+                userId: myUserId
+            });
+
         } catch (error) {
-            responseDisplay.textContent = `エラーが発生しました: ${error as string}`;
+            alert('AI対戦の開始に失敗しました。');
+            console.error(error);
         }
     }
     
+    // public async handlePlayAi() {
+    //     const responseDisplay = document.getElementById('response-data');
+    //     if (responseDisplay) responseDisplay.textContent = 'Creating AI room...';
+
+    //     try {
+    //         // 1. AI対戦用のルーム作成APIを呼び出す
+    //         const roomDataFromServer = await api.createAiRoom();
+    //         if (!roomDataFromServer.room_id) {
+    //             throw new Error("API did not return a room_id");
+    //         }
+            
+    //         alert(`AI対戦ルームが作成されました！ Room ID: ${roomDataFromServer.room_id}`);
+
+    //         // 2. ★★★ 3D Pongライブラリに渡すためのパラメータを準備 ★★★
+    //         // AI対戦は、ルーム接続(connectRoom)として扱う
+    //         const gameParams = {
+    //             type: 'room',
+    //             title: 'AI Battle',
+    //             roomId: roomDataFromServer.room_id,
+    //             // 3D PongライブラリのconnectRoomがユーザーIDを必要とするため、ここで渡す
+    //             userId: auth.getUserId() 
+    //         };
+
+    //         // 3. ゲーム画面を描画し、ルームに接続する
+    //         gameViews.renderGameScreen(this.appElement, gameParams);
+
+    //     } catch (error) {
+    //         const errorMessage = `エラーが発生しました: ${error as string}`;
+    //         if (responseDisplay) responseDisplay.textContent = errorMessage;
+    //         alert('AI対戦の開始に失敗しました。');
+    //         console.error(error);
+    //     }
+    // }
+
     public async handleCreateRoom() {
         const responseDisplay = document.getElementById('response-data');
         if (!responseDisplay) return;
@@ -201,24 +245,23 @@ export class AppRouter {
      * トーナメント詳細画面の「試合開始」ボタンの処理
      */
     public async startBattle(tournamentId: string) {
-        if (!this.currentTournamentData || this.currentTournamentData.id !== tournamentId) {
-            alert("トーナメント情報が正しくありません。");
-            return;
-        }
-
-        alert('次の対戦を開始します！');
+        if (!this.currentTournamentData) { alert("トーナメント情報が見つかりません。"); return; }
+        alert('対戦ルームを作成しています...');
         try {
-            // バックエンドが次の対戦者を自動で決定してくれるAPIを叩く
+            // バックエンドが次の対戦者を決定し、ルーム情報とトークンを返すと仮定
             const battleInfo = await api.startBattle(tournamentId);
-            console.log("Battle started:", battleInfo);
-            
-            alert('対戦が準備されました。ゲーム画面に遷移します。');
-            this.navigateTo('/game');
+
+            // ★★★ 新しいゲーム画面描画関数を呼び出す ★★★
+            gameViews.renderGameScreen(this.appElement, {
+                type: 'room',
+                title: `Tournament Match: ${this.currentTournamentData.name}`,
+                roomId: battleInfo.room_id,
+                token: battleInfo.token // どのトークンかはAPI仕様による
+            });
+
         } catch (error) {
             alert('対戦の開始に失敗しました。');
             console.error(error);
         }
     }
-
-    
 }
