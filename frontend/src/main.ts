@@ -1,4 +1,5 @@
 import { AppRouter } from './router';
+import "./style.css"
 
 const router = new AppRouter();
 
