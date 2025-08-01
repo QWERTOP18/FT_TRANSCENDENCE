@@ -16,7 +16,7 @@ export class PongGameAPI {
 		aiLevel: number,
 		userId: string,
 	}) {
-		const playAiResponse = await fetch("http://localhost:8000/play-ai", {
+		const playAiResponse = await fetch("http://localhost:4000/play-ai", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
