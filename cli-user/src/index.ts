@@ -5,6 +5,8 @@ import { UserService } from './services/userService';
 import { MenuService } from './services/menuService';
 import { UserInputService } from './services/userInputService';
 import { User } from './types/auth';
+import { TournamentService } from './services/tournamentService';
+import { ErrorResponse } from './errors/JoinErrorResponse';
 
 async function main(): Promise<void> {
   try {
@@ -87,13 +89,11 @@ async function handleTournamentMenu(
         }
         const selection = await menuService.showTournamentDetailsMenu(tournament);
         if (selection === 'join') {
-          console.log('\nJoining tournament...');
-          const roomId = await menuService.joinSelectedTournament(selectedTournamentId, user.id);
-          gameService.connectToGameWebSocket(roomId, user.id);
+          await handleJoinTournament(tournament.id, user.id);
           return ;
         } else if (selection === 'ready') {
-          console.log('Ready to play!'); // ここで実際のゲーム開始処理を追加することも可能
-          
+          console.log('Ready to play!');
+          return ;
         } else if (selection === 'exit') {
           console.log('Exiting tournament details...');
           return ;
@@ -110,6 +110,24 @@ async function handleTournamentMenu(
   } catch (error) {
     console.error('Tournament menu error:', error);
     console.log('Returning to main menu...');
+  }
+}
+
+async function handleJoinTournament(
+  tournamentId: string, 
+  userId: string
+): Promise<void> {
+  try {
+    console.log('\nJoining tournament...');
+    const tournamentService = new TournamentService();
+    await tournamentService.joinTournament(tournamentId, userId);
+    console.log('Successfully joined the tournament!');
+  } catch (error) {
+    if (error instanceof ErrorResponse) {
+      console.error('Error joining tournament:', error.error);
+    } else {
+      console.error('Error joining tournament:', error);
+    }
   }
 }
 

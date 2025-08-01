@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { config } from '../config/config';
+import { ErrorResponse } from '../errors/JoinErrorResponse';
 
 export interface Tournament {
   id: string;
@@ -51,9 +52,10 @@ export class TournamentService {
     }
   }
 
-  async joinTournament(tournamentId: string, userId: string): Promise<string> {
+  async joinTournament(tournamentId: string, userId: string): Promise<{
+    ok: true;
+  }> {
     try {
-      console.log(`Joining tournament ${tournamentId}...`);
       const response = await axios.post(
         `${config.gatewayURL}tournaments/${tournamentId}/join`,
         {},
@@ -65,24 +67,10 @@ export class TournamentService {
         }
       );
 
-      console.log('Successfully joined tournament!');
-
-      // レスポンスからroom_idを取得
-      let roomId: string;
-      if (typeof response.data === 'string') {
-        roomId = response.data;
-      } else if (response.data && typeof response.data === 'object' && 'room_id' in response.data) {
-        roomId = response.data.room_id;
-      } else {
-        throw new Error('Invalid response format');
-      }
-
-      return roomId;
+      return response.data;
     } catch (error) {
-      console.error('Failed to join tournament:', error);
       if (axios.isAxiosError(error)) {
-        console.error('Response data:', error.response?.data);
-        console.error('Response status:', error.response?.status);
+        throw new ErrorResponse(error.response?.data?.error);
       }
       throw error;
     }

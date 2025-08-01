@@ -1,5 +1,6 @@
 import { UserInputService } from './userInputService';
 import { TournamentService, Tournament } from './tournamentService';
+import { ErrorResponse } from '../errors/JoinErrorResponse';
 
 export class MenuService {
   private userInputService: UserInputService;
@@ -88,10 +89,10 @@ export class MenuService {
     }
   }
 
-  async joinSelectedTournament(tournamentId: string, userId: string): Promise<string> {
+  async joinSelectedTournament(tournamentId: string, userId: string) {
     try {
-      const roomId = await this.tournamentService.joinTournament(tournamentId, userId);
-      return roomId;
+      const resp = await this.tournamentService.joinTournament(tournamentId, userId);
+      return resp;
     } catch (error) {
       console.error('Failed to join tournament:', error);
       throw error;
