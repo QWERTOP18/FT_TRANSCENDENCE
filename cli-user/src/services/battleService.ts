@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { config } from '../config/config';
-import { BattleAIResponse } from '../types/game';
+import { TournamentErrorResponse } from '../errors/TournamentErrorResponse';
+import { ReadyResponse } from '../types/battle';
 
 export class BattleService {
   async startAIBattle(): Promise<string> {
@@ -41,6 +42,36 @@ export class BattleService {
       if (axios.isAxiosError(error)) {
         console.error('Response data:', error.response?.data);
         console.error('Response status:', error.response?.status);
+      }
+      throw error;
+    }
+  }
+
+  async ready(tournamentId: string, userId: string): Promise<ReadyResponse> {
+    try {
+      const response = await axios.put(
+        `${config.gatewayURL}tournaments/${tournamentId}/battle/ready`,
+        {},
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            'X-User-Id': userId,
+          },
+        }
+      );
+
+      if (response.status !== 200) {
+        throw new Error('Failed to ready battle');
+      }
+
+      return { ok: true };
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const data = error.response?.data;
+        if (TournamentErrorResponse.isTournamentErrorProperties(data)) {
+          console.log(data);
+          throw new TournamentErrorResponse(data);
+        }
       }
       throw error;
     }

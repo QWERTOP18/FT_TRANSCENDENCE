@@ -5,8 +5,9 @@ import { UserService } from './services/userService';
 import { MenuService } from './services/menuService';
 import { UserInputService } from './services/userInputService';
 import { User } from './types/auth';
-import { TournamentService } from './services/tournamentService';
+import { Tournament, TournamentService } from './services/tournamentService';
 import { ErrorResponse } from './errors/JoinErrorResponse';
+import { TournamentErrorResponse } from './errors/TournamentErrorResponse';
 
 async function main(): Promise<void> {
   try {
@@ -87,18 +88,11 @@ async function handleTournamentMenu(
         if (!tournament) {
           break ;
         }
-        const selection = await menuService.showTournamentDetailsMenu(tournament);
-        if (selection === 'join') {
-          await handleJoinTournament(tournament.id, user.id);
-          return ;
-        } else if (selection === 'ready') {
-          console.log('Ready to play!');
-          return ;
-        } else if (selection === 'exit') {
+        const selection = await handleTournamentDetailMenu(user, tournament, menuService);
+        if (selection === 'back') {
           console.log('Exiting tournament details...');
           return ;
         }
-        return; // ゲーム終了後はアプリケーションを終了
       }
       else {
         break ;
@@ -106,11 +100,24 @@ async function handleTournamentMenu(
     }
     console.log('Returning to main menu...');
     return;
-    // 戻るが選択された場合はメインメニューに戻る
   } catch (error) {
     console.error('Tournament menu error:', error);
     console.log('Returning to main menu...');
   }
+}
+
+async function handleTournamentDetailMenu(
+  user: User,
+  tournament: Tournament, 
+  menuService: MenuService,
+) {
+  const selection = await menuService.showTournamentDetailsMenu(tournament);
+  if (selection === 'join') {
+    await handleJoinTournament(tournament.id, user.id);
+  } else if (selection === 'ready') {
+    await handleTournamentReady(tournament, user);
+  }
+  return selection;
 }
 
 async function handleJoinTournament(
@@ -125,9 +132,25 @@ async function handleJoinTournament(
   } catch (error) {
     if (error instanceof ErrorResponse) {
       console.error('Error joining tournament:', error.error);
-    } else {
-      console.error('Error joining tournament:', error);
+      return;
     }
+    throw error;
+  }
+}
+
+async function handleTournamentReady(tournament: Tournament, user: User) {
+  console.log('Ready to play tournament!');
+  try {
+    const battleService = new BattleService();
+    await battleService.ready(tournament.id, user.id);
+    console.log('Ready signal sent successfully!');
+    return;
+  } catch (error) {
+    if (error instanceof TournamentErrorResponse) {
+      console.error('Tournament error:', error.error, error.message);
+      return;
+    }
+    console.error('Error sending ready signal:', error);
   }
 }
 
