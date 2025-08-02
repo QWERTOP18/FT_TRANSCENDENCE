@@ -42,6 +42,11 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
                 管理する
             </button>` : '';
 
+        const editButtonHTML = t.is_owner ?
+            `<button class="mt-2 block w-full px-4 py-2 bg-orange-600 hover:bg-orange-700 rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/edit/${t.id}')">
+                開始する
+            </button>` : '';
+
         return `
             <div class="bg-gray-700 p-4 rounded-lg mb-4 flex justify-between items-center transition hover:bg-gray-600 shadow-lg">
                 <div>
@@ -58,6 +63,7 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
                         詳細を見る
                     </button>
                     ${adminButtonHTML}
+                    ${editButtonHTML}
                 </div>
             </div>
         `;
@@ -65,7 +71,12 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
 
     const contentHTML = `
         <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
-            <h2 class="text-3xl font-bold text-center mb-8">Tournament List</h2>
+            <div class="flex justify-between items-center mb-8">
+                <h2 class="text-3xl font-bold">Tournament List</h2>
+                <button class="px-6 py-2 bg-green-600 hover:bg-green-700 rounded text-white font-bold" onclick="window.router.navigateTo('/tournaments/new')">
+                    Create Tournament
+                </button>
+            </div>
             ${listHTML}
         </div>
     `;
@@ -89,7 +100,10 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
             const participantIds = participants.map((p: any) => p.userId || p.id || p);
             const isParticipant = myUserId ? participantIds.includes(myUserId) : false;
             
-            const joinButtonHTML = !isParticipant ? 
+            // is_participatingプロパティがある場合はそれを使用、なければ従来の判定を使用
+            const isAlreadyParticipating = tournamentData.is_participating !== undefined ? tournamentData.is_participating : isParticipant;
+            
+            const joinButtonHTML = !isAlreadyParticipating ? 
                 `<button class="mt-6 px-6 py-2 bg-blue-600 hover:bg-blue-700 rounded text-white" onclick="window.router.handleJoinTournament('${tournamentId}')">
                     トーナメントに参加する
                 </button>` 
@@ -122,6 +136,52 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
     render(appElement, finalHTML);
 }
 
+
+/**
+ * トーナメント開始画面を描画する
+ */
+export function renderEditTournamentScreen(appElement: HTMLElement, tournamentData: any, myUserId: string | null): void {
+    if (!tournamentData) {
+        render(appElement, `<p class="text-red-500">Tournament data not found.</p>`);
+        return;
+    }
+    if (!tournamentData.is_owner) {
+        render(appElement, `<div class="text-center text-red-500 font-bold">編集権限がありません。</div>`);
+        return;
+    }
+    
+    const contentHTML = `
+        <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white max-w-2xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-6">トーナメント開始</h2>
+            <div class="mb-6">
+                <h3 class="text-xl font-semibold mb-4">${tournamentData.name}</h3>
+                <p class="text-gray-300 mb-4">${tournamentData.description}</p>
+                <div class="bg-gray-700 p-4 rounded-lg">
+                    <p class="text-sm text-gray-400 mb-2">現在の状態: <span class="text-yellow-400">${tournamentData.state}</span></p>
+                    <p class="text-sm text-gray-400 mb-2">参加者数: ${tournamentData.participants?.length || 0} / ${tournamentData.max_num}</p>
+                    <p class="text-sm text-gray-400">ルール: ${tournamentData.rule}</p>
+                </div>
+            </div>
+            <div class="bg-yellow-900 bg-opacity-50 border border-yellow-600 p-4 rounded-lg mb-6">
+                <h4 class="text-yellow-400 font-semibold mb-2">⚠️ 注意</h4>
+                <p class="text-sm text-yellow-300">トーナメントを開始すると、新しい参加者の追加ができなくなります。</p>
+                ${tournamentData.participants && tournamentData.participants.length < 2 ? 
+                    '<p class="text-sm text-red-300 mt-2">⚠️ 最低2人以上の参加者が必要です。</p>' : 
+                    '<p class="text-sm text-green-300 mt-2">✅ 参加者数が十分です。</p>'
+                }
+            </div>
+            <div class="flex gap-4">
+                <button type="button" class="flex-1 px-4 py-2 ${tournamentData.participants && tournamentData.participants.length >= 2 ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-500 cursor-not-allowed'} rounded text-white font-bold" onclick="window.router.handleOpenTournament()" ${tournamentData.participants && tournamentData.participants.length < 2 ? 'disabled' : ''}>
+                    トーナメントを開始する
+                </button>
+                <button type="button" class="flex-1 px-4 py-2 bg-gray-600 hover:bg-gray-700 rounded text-white font-bold" onclick="window.router.navigateTo('/tournaments')">
+                    キャンセル
+                </button>
+            </div>
+        </div>
+    `;
+    render(appElement, contentHTML);
+}
 
 /**
  * トーナメント管理画面を描画する

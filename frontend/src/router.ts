@@ -60,11 +60,13 @@ export class AppRouter {
                     break;
                 case path === '/tournaments':
                     const tournaments = await api.getTournaments();
+                    console.log(tournaments);
                     tournamentViews.renderTournamentListScreen(this.appElement, tournaments, auth.getUserId(), this.userDatabase);
                     break;
                 case path.startsWith('/tournament/detail/'):
                     const detailId = path.split('/')[3];
                     const detailData = await api.getTournamentById(detailId);
+                    console.log(detailData);
                     this.currentTournamentData = detailData;
                     tournamentViews.renderTournamentScreen(this.appElement, detailData, this.userDatabase, auth.getUserId());
                     break;
@@ -72,8 +74,17 @@ export class AppRouter {
                     const adminId = path.split('/')[3];
                     if (!adminId) { this.navigateTo('/tournaments'); return; }
                     const adminData = await api.getTournamentById(adminId);
+                    console.log(adminData);
                     this.currentTournamentData = adminData;
                     tournamentViews.renderAdminScreen(this.appElement, adminData, auth.getUserId());
+                    break;
+                case path.startsWith('/tournament/edit/'):
+                    const editId = path.split('/')[3];
+                    if (!editId) { this.navigateTo('/tournaments'); return; }
+                    const editData = await api.getTournamentById(editId);
+                    console.log(editData);
+                    this.currentTournamentData = editData;
+                    tournamentViews.renderEditTournamentScreen(this.appElement, editData, auth.getUserId());
                     break;
                 case path === '/matchmaking':
                     matchmakingView.renderMatchmakingScreen(this.appElement);
@@ -136,6 +147,33 @@ export class AppRouter {
             this.navigateTo(`/tournament/detail/${newTournament.id}`);
         } catch (error) {
             alert('トーナメントの作成に失敗しました。');
+        }
+    }
+
+    public async handleOpenTournament() {
+        if (!this.currentTournamentData) {
+            alert('トーナメント情報が見つかりません。');
+            return;
+        }
+        
+        console.log('Current tournament data:', this.currentTournamentData);
+        
+        // 参加者数をチェック
+        if (this.currentTournamentData.participants && this.currentTournamentData.participants.length < 2) {
+            alert('トーナメントを開始するには最低2人以上の参加者が必要です。');
+            return;
+        }
+        
+        if (confirm('トーナメントを開始しますか？\n開始すると新しい参加者の追加ができなくなります。')) {
+            try {
+                console.log('Calling openTournament with ID:', this.currentTournamentData.id);
+                await api.openTournament(this.currentTournamentData.id);
+                alert('トーナメントを開始しました！');
+                this.navigateTo(`/tournament/detail/${this.currentTournamentData.id}`);
+            } catch (error) {
+                console.error('Error opening tournament:', error);
+                alert(`トーナメントの開始に失敗しました: ${error}`);
+            }
         }
     }
 
