@@ -10,7 +10,7 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
                 管理する
             </button>` : '';
 
-        const editButtonHTML = t.is_owner && t.state !== 'open' ?
+        const editButtonHTML = t.is_owner && t.state === 'reception' ?
             `<button class="mt-2 block w-full px-4 py-2 metallic-button-orange rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/edit/${t.id}')">
                 開始する
             </button>` : '';
