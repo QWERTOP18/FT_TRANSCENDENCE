@@ -4,7 +4,7 @@ import { render } from './tournamentView';
  * トーナメント一覧画面を描画する
  */
 export function renderTournamentListScreen(appElement: HTMLElement, tournaments: any[], myUserId: string | null): void {
-    const listHTML = tournaments.map(t => {
+    const listHTML = tournaments.reverse().map(t => {
         const adminButtonHTML = t.owner_id === myUserId ?
             `<button class="mt-2 block w-full px-4 py-2 metallic-button-red rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/admin/${t.id}')">
                 管理する
