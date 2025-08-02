@@ -111,18 +111,18 @@ export async function startAiClient(roomId: string, aiLevel: number) {
   }
 
   function move(goal: number): void {
-    console.log("現在のパドル位置:", gameState.paddle2Y, "目標位置:", goal);
+    // console.log("現在のパドル位置:", gameState.paddle2Y, "目標位置:", goal);
     
     // パドルの中心位置を計算（AIはplayer2なのでpaddle2Yを使用）
     const paddleCenter = gameState.paddle2Y + paddleSize / 2;
     const tolerance = 20; // 許容誤差を増加
     
     if (paddleCenter < goal - tolerance && gameState.paddle2Y < topEnd - paddleSize) {
-      console.log("上に移動");
+      // console.log("上に移動");
       sendMoveUp();
     }
     else if (goal + tolerance < paddleCenter && 0 < gameState.paddle2Y) {
-      console.log("下に移動");
+      // console.log("下に移動");
       sendMoveDown();
     }
     else {
@@ -142,7 +142,7 @@ export async function startAiClient(roomId: string, aiLevel: number) {
         const goal = predictPosition();
         preX = gameState.ballX;
         preY = gameState.ballY;
-        console.log("AI Debug - Ball:", gameState.ballX, gameState.ballY, "Paddle:", gameState.paddle2Y, "Goal:", goal);
+        // console.log("AI Debug - Ball:", gameState.ballX, gameState.ballY, "Paddle:", gameState.paddle2Y, "Goal:", goal);
         move(goal);
         // console.log("目標の座標:", goal);
         // console.log("今の座標:", gameState.paddle2Y);

@@ -34,11 +34,3 @@ export function getAuthHeaders(): HeadersInit {
     return headers;
 }
 
-
-/**
- * ログアウト処理（localStorageからユーザーIDを削除）
- */
-// export function logout(): void {
-//     localStorage.removeItem(USER_ID_KEY);
-//     console.log('Logged out, user ID removed.');
-// }

@@ -70,29 +70,7 @@ export async function createAiRoom() {
     }
 }
 
-//8000番の方のai対戦
 
-// export async function createAiRoom() {
-//     try {
-//         const response = await fetch(`${SERVERURL}/battle/ai`, {
-//             method: 'POST',
-//             headers: getAuthHeaders(),
-//             body: JSON.stringify({}), // ★★★ API仕様に合わせてボディを空のオブジェクトにする ★★★
-//         });
-
-//         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-//         // ★★★ サーバーがJSONではなく文字列を返す問題に対応 ★★★
-//         const roomId = await response.text(); 
-        
-//         // アプリケーションが使いやすいように、JSONオブジェクトの形に整形して返す
-//         return { room_id: roomId };
-
-//     } catch (error) {
-//         console.error('Failed to create AI room:', error);
-//         throw error;
-//     }
-// }
 
 /**
  * マルチプレイヤー用のルームを作成する (POST /room)
@@ -117,14 +95,7 @@ export async function createRoom(roomData: {
     }
 }
 
-export async function startBattle(tournamentId: string) {
-    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/start`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
-}
+
 
 /**
  * gameサーバーの死活確認 (GET /ping)
