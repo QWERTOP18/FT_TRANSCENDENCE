@@ -1,7 +1,9 @@
 import { render } from './tournamentView';
+import { createHeader } from './header';
 
 export function renderCreateTournamentScreen(appElement: HTMLElement): void {
     const contentHTML = `
+        ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white w-full max-w-lg mx-auto">
             <h2 class="text-3xl font-bold text-center mb-6">Create New Tournament</h2>
             <form onsubmit="window.router.handleCreateTournament(event)">

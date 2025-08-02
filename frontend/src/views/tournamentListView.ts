@@ -1,4 +1,5 @@
 import { render } from './tournamentView';
+import { createHeader } from './header';
 
 /**
  * トーナメント一覧画面を描画する
@@ -38,6 +39,7 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
     }).join('');
 
     const contentHTML = `
+        ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold">Tournament List</h2>
