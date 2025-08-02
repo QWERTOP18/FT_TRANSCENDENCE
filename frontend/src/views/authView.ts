@@ -1,3 +1,5 @@
+import { createHeader } from './header';
+
 function render(appElement: HTMLElement, content: string): void {
     appElement.innerHTML = content;
 }
@@ -7,6 +9,7 @@ function render(appElement: HTMLElement, content: string): void {
  */
 export function renderSignupScreen(appElement: HTMLElement): void {
     const contentHTML = `
+        ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white max-w-md mx-auto">
             <h2 class="text-3xl font-bold text-center mb-6">Sign Up</h2>
             <form onsubmit="window.router.handleSignup(event)">
@@ -28,6 +31,7 @@ export function renderSignupScreen(appElement: HTMLElement): void {
  */
 export function renderLoginScreen(appElement: HTMLElement): void {
     const contentHTML = `
+        ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white max-w-md mx-auto">
             <h2 class="text-3xl font-bold text-center mb-6">Login</h2>
             <form onsubmit="window.router.handleLogin(event)">

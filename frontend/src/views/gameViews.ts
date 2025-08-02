@@ -24,12 +24,8 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
 
     const contentHTML = `
         <div class="w-full h-full flex flex-col items-center justify-center">
-            <div class="w-full max-w-4xl flex justify-between items-center mb-4">
-                <button class="px-4 py-2 metallic-button rounded text-white hover:bg-gray-600 transition-colors" onclick="window.router.navigateTo('/tournaments')">
-                    ← Home
-                </button>
+            <div class="w-full max-w-4xl flex justify-center items-center mb-4">
                 <h2 class="text-2xl font-bold text-white">${gameParams.title || 'Pong Game'}</h2>
-                <div class="w-24"></div>
             </div>
             <canvas id="pong-canvas" class="bg-black border-2 border-white w-4/5 h-4/5 max-w-4xl max-h-4xl rounded-lg shadow-2xl"></canvas>
         </div>

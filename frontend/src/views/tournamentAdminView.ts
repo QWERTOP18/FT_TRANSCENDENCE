@@ -1,4 +1,5 @@
 import { render } from './tournamentView';
+import { createHeader } from './header';
 
 /**
  * トーナメント管理画面を描画する
@@ -21,6 +22,7 @@ export function renderAdminScreen(appElement: HTMLElement, tournamentData: any, 
     }
 
     const contentHTML = `
+        ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white max-w-2xl mx-auto">
             <h2 class="text-3xl font-bold text-center mb-6">トーナメント管理</h2>
             <form onsubmit="window.router.handleAdminFormSubmit(event)">
