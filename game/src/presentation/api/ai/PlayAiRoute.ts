@@ -38,7 +38,7 @@ export function PlayAiRoute(fastify: FastifyInstance, gameGateway: GameGateway) 
       const room = gameGateway.createRoom({
         tournament_id: "ai_match",
         player1_id: user_id,
-        player2_id: "ai_player",
+        player2_id: "00000000-0000-0000-0000-000000000000",
         winning_score: 10,
       });
       console.log(room);

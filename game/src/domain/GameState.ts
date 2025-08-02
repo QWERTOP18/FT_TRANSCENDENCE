@@ -34,14 +34,18 @@ export class GameState {
   }
 
   update() {
+    // パドルの移動は常に処理する
+    this.updatePaddlePositions();
+    
     if (this.isPaused) {
       this.scoreUpdate = false;
       if (this.resumeTime === null || Date.now() < this.resumeTime) {
-        return ;
+        return ; // ボールの移動は停止
       }
       this.isPaused = false;
     }
-    this.updatePaddlePositions();
+    
+    // ボールの移動処理（sleep中は実行されない）
     this.ballX += this.ballSpeedX;
     this.ballY += this.ballSpeedY;
     if (this.ballY <= 0 || this.ballY >= 600) {

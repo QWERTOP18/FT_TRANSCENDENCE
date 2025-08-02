@@ -28,11 +28,20 @@ async function main() {
     },
   });
 
-  const gameGateway = new GameGateway(app.server);
+  const gameGateway = new GameGateway(app.server, process.env.GATEWAY_URL || "http://localhost:8000");
   GameRoutes(app, gameGateway);
+
+  app.addHook("onRequest", (request, reply, done) => {
+    console.log(`Request: ${request.method} ${request.url}`);
+    done();
+  });
 
   app.get("/ping", async (request, reply) => {
     return "pong\n";
+  });
+
+  app.get("/", async (request, reply) => {
+    return reply.redirect("/docs");
   });
 
   await app.listen({ port: Number(process.env.PORT) || 4000, host: "0.0.0.0" });

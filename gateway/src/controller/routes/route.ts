@@ -1,5 +1,4 @@
 import { FastifyInstance } from "fastify";
-import cors from "@fastify/cors";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
 import { TournamentRoutes } from "./tournament/TournamentRoutes";
@@ -7,11 +6,6 @@ import { AuthRoutes } from "./auth/AuthRoute";
 import { BattleRoutes } from "./battle/BattleRoute";
 
 export async function Routes(app: FastifyInstance) {
-  await app.register(cors, {
-    origin: "*",
-    credentials: true,
-  });
-
   await app.register(swagger, {
     openapi: {
       info: {
