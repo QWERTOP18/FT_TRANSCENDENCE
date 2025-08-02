@@ -9,8 +9,5 @@ export class TournamentRule extends ValueObject<'TournamentRule', TournamentRule
 	}
 
 	protected validate(value: TournamentRuleValue): void {
-		const state = ['simple'];
-		if (state.some((state) => state === value) == false)
-			throw new Error('トーナメントルールの形式が不正です');
 	}
 }
