@@ -28,7 +28,7 @@ async function main() {
     },
   });
 
-  const gameGateway = new GameGateway(app.server);
+  const gameGateway = new GameGateway(app.server, process.env.GATEWAY_URL || "http://localhost:8000");
   GameRoutes(app, gameGateway);
 
   app.addHook("onRequest", (request, reply, done) => {

@@ -1,13 +1,16 @@
 import { WebSocketServer, WebSocket } from "ws";
 import url from "url";
 import { GameRoom } from "../../domain/GameRoom";
+import axios from "axios";
 
 export class GameGateway {
   private rooms: { [roomId: string]: GameRoom } = {};
   private wss: WebSocketServer;
+  private gatewayUrl: string;
 
-  constructor(server: any) {
+  constructor(server: any, gatewayUrl: string = "http://localhost:8000") {
     this.wss = new WebSocketServer({ server });
+    this.gatewayUrl = gatewayUrl;
     this.setup();
   }
 
@@ -19,6 +22,34 @@ export class GameGateway {
     const room = new GameRoom(body);
     this.rooms[room.room_id] = room;
     return room;
+  }
+
+  private async notifyBattleEnd(room: GameRoom) {
+    try {
+      const gameState = room.gameState;
+      const endState = gameState.endState(false); // player1視点で取得
+      
+      let winner, loser;
+      if (endState.winner === 1) {
+        winner = { id: room.player1_id, score: endState.score1 };
+        loser = { id: room.player2_id, score: endState.score2 };
+      } else {
+        winner = { id: room.player2_id, score: endState.score2 };
+        loser = { id: room.player1_id, score: endState.score1 };
+      }
+
+      const battleResult = {
+        winner,
+        loser
+      };
+
+      console.log("Battle ended, notifying gateway:", battleResult);
+      
+      await axios.post(`${this.gatewayUrl}/tournaments/${room.tournament_id}/battle/end`, battleResult);
+      console.log("Battle result sent to gateway successfully");
+    } catch (error) {
+      console.error("Failed to notify gateway of battle end:", error);
+    }
   }
 
   private setup() {
@@ -107,6 +138,8 @@ export class GameGateway {
           }
         });
         if (gameState.ifEnd()) {
+          // 対戦終了時にgatewayに通知
+          this.notifyBattleEnd(room);
           delete this.rooms[roomId];
         }
       }
