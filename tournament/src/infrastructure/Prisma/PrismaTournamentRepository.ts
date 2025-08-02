@@ -54,7 +54,6 @@ export class PrismaTournamentRepository implements ITournamentRepository {
 
 	async findAll(): Promise<Array<Tournament>> {
 		const tournaments = await this._client.tournament.findMany({
-			take: 10,
 			include: {
 				histories: true,
 				participants: true
