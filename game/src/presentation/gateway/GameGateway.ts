@@ -25,6 +25,14 @@ export class GameGateway {
   }
 
   private async notifyBattleEnd(room: GameRoom) {
+    // AI対戦の場合は通知をスキップ
+    if (room.player1_id === "00000000-0000-0000-0000-000000000000" || 
+        room.player2_id === "00000000-0000-0000-0000-000000000000" ||
+        room.tournament_id === "ai_match") {
+      console.log("AI battle ended, skipping notification");
+      return;
+    }
+
     try {
       const gameState = room.gameState;
       const endState = gameState.endState(false); // player1視点で取得

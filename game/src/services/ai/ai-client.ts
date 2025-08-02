@@ -27,18 +27,28 @@ export async function startAiClient(roomId: string, aiLevel: number) {
     let time: number;
     let finalY: number;
 
-    if (preX <= ballX) return topEnd / 2;
-    else time = (ballX - paddleLeft) / (preX - ballX);
-
+    if (preX <= ballX) {
+      console.log("ボールが近づいていない、中央に移動");
+      return topEnd / 2;
+    }
+    
+    time = (ballX - paddleLeft) / (preX - ballX);
     finalY = ballY + (ballY - preY) * time;
+    
     if (finalY < 0) finalY = -finalY;
 
-    if (Math.floor(finalY / topEnd) % 2) return topEnd - finalY % topEnd;
-    return finalY % topEnd;
+    if (Math.floor(finalY / topEnd) % 2) {
+      finalY = topEnd - finalY % topEnd;
+    } else {
+      finalY = finalY % topEnd;
+    }
+    
+    console.log("予測位置計算:", { ballX, ballY, preX, preY, time, finalY });
+    return finalY;
   }
 
-  // AIクライアント用のuser_idを設定
-  const aiUserId = "ai_player";
+  // AIクライアント用のuser_idを設定（UUID形式）
+  const aiUserId = "00000000-0000-0000-0000-000000000000";
   const ws = new WebSocket(`${wssURL}/game/${roomId}?user_id=${aiUserId}`);
 
   function sendKeyEvent(key: string, pressed: boolean) {
@@ -53,23 +63,33 @@ export async function startAiClient(roomId: string, aiLevel: number) {
 
   function sendMoveUp(): void {
     // AIレベルによる制限を緩和
-    if (Math.random() * 10 < aiLevel) return;
+    // if (Math.random() * 10 < aiLevel) return;
     if (moveDown) {
-      sendKeyEvent("w", false);
+      sendKeyEvent("s", false);
       moveDown = false;
     }
     if (!moveUp) {
       sendKeyEvent("s", true);
       moveUp = true;
+      // 移動したらすぐにfalseにする
+      setTimeout(() => {
+        sendKeyEvent("s", false);
+        moveUp = false;
+      }, 100); // 100ms後にfalseにする（サーバーの60FPSに合わせて調整）
     }
   }
 
   function sendMoveDown(): void {
     // AIレベルによる制限を緩和
-    if (Math.random() * 10 < aiLevel) return;
+    // if (Math.random() * 10 < aiLevel) return;
     if (!moveDown) {
       sendKeyEvent("w", true);
       moveDown = true;
+      // 移動したらすぐにfalseにする
+      setTimeout(() => {
+        sendKeyEvent("w", false);
+        moveDown = false;
+      }, 100); // 100ms後にfalseにする（サーバーの60FPSに合わせて調整）
     }
     if (moveUp) {
       sendKeyEvent("s", false);
@@ -79,7 +99,7 @@ export async function startAiClient(roomId: string, aiLevel: number) {
 
   function sendStop(): void {
     // AIレベルによる制限を緩和
-    if (Math.random() * 10 < aiLevel) return;
+    // if (Math.random() * 10 < aiLevel) return;
     if (moveDown) {
       sendKeyEvent("w", false);
       moveDown = false;
@@ -95,7 +115,7 @@ export async function startAiClient(roomId: string, aiLevel: number) {
     
     // パドルの中心位置を計算（AIはplayer2なのでpaddle2Yを使用）
     const paddleCenter = gameState.paddle2Y + paddleSize / 2;
-    const tolerance = 20; // 許容誤差
+    const tolerance = 20; // 許容誤差を増加
     
     if (paddleCenter < goal - tolerance && gameState.paddle2Y < topEnd - paddleSize) {
       console.log("上に移動");
@@ -122,6 +142,7 @@ export async function startAiClient(roomId: string, aiLevel: number) {
         const goal = predictPosition();
         preX = gameState.ballX;
         preY = gameState.ballY;
+        console.log("AI Debug - Ball:", gameState.ballX, gameState.ballY, "Paddle:", gameState.paddle2Y, "Goal:", goal);
         move(goal);
         // console.log("目標の座標:", goal);
         // console.log("今の座標:", gameState.paddle2Y);

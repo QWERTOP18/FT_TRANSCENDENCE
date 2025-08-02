@@ -1,5 +1,6 @@
 import { gameEndState } from '../data/mockData';
 import { PongGame } from '../PongGame/PongGame';
+import { getUserId } from '../services/auth';
 
 
 // 作成されたPongGameインスタンスを保持するための変数
@@ -65,9 +66,15 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
         }
         // ルーム接続の場合
         else if (gameParams.type === 'room') {
+            const userId = getUserId();
+            if (!userId) {
+                alert('ユーザーIDが取得できません。ログインしてください。');
+                return;
+            }
+            
             game.connectRoom({
                 roomId: gameParams.roomId,
-                userId: gameParams.token,
+                userId: userId,
                 onConnect: () => {
                     console.log("Connected to room!");
                     canvas.focus();
