@@ -67,6 +67,11 @@ export class Tournament {
 		if (this._props.participants.length < 2)
 			throw new UsageError('開催するためには二人以上の参加が必要です')
 		this._props.state = new TournamentState('open');
+
+		// トーナメント開始時にpendingが奇数の場合、1人を昇格させる
+		if (this.shouldCarryUpOneParticipant()) {
+			this.carryUpOneParticipant();
+		}
 	}
 
 	public close() {
