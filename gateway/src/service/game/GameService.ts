@@ -14,6 +14,7 @@ class GameService {
     participantIds: string[],
     tournamentRule: string
   ): Promise<GameRoomSchema> {
+    console.log(`createGame: ${this.endpoint}/room`);
     const response = await axios.post(`${this.endpoint}/room`, {
       tournament_id: tournamentId,
       player1_id: participantIds[0],
@@ -29,7 +30,7 @@ class GameService {
     console.log(`${this.endpoint}/play-ai`);
 
     // todo fetch ai level from request or config
-    const aiLevel = request?.aiLevel || 1;
+    const aiLevel = request?.aiLevel || 8;
     const response = await axios.post(`${this.endpoint}/play-ai`, {
       user_id: "ai",
       aiLevel: aiLevel,

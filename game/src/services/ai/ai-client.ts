@@ -37,7 +37,9 @@ export async function startAiClient(roomId: string, aiLevel: number) {
     return finalY % topEnd;
   }
 
-  const ws = new WebSocket(wssURL + "/game/" + roomId);
+  // AIクライアント用のuser_idを設定
+  const aiUserId = "ai_player";
+  const ws = new WebSocket(`${wssURL}/game/${roomId}?user_id=${aiUserId}`);
 
   function sendKeyEvent(key: string, pressed: boolean) {
     ws.send(
@@ -50,7 +52,8 @@ export async function startAiClient(roomId: string, aiLevel: number) {
   }
 
   function sendMoveUp(): void {
-    if (Math.random() * 4 < aiLevel) return;
+    // AIレベルによる制限を緩和
+    if (Math.random() * 10 < aiLevel) return;
     if (moveDown) {
       sendKeyEvent("w", false);
       moveDown = false;
@@ -62,7 +65,8 @@ export async function startAiClient(roomId: string, aiLevel: number) {
   }
 
   function sendMoveDown(): void {
-    if (Math.random() * 4 < aiLevel) return;
+    // AIレベルによる制限を緩和
+    if (Math.random() * 10 < aiLevel) return;
     if (!moveDown) {
       sendKeyEvent("w", true);
       moveDown = true;
@@ -74,31 +78,41 @@ export async function startAiClient(roomId: string, aiLevel: number) {
   }
 
   function sendStop(): void {
-    if (Math.random() * 4 < aiLevel) return;
+    // AIレベルによる制限を緩和
+    if (Math.random() * 10 < aiLevel) return;
     if (moveDown) {
       sendKeyEvent("w", false);
       moveDown = false;
-  }
-  if (moveUp) {
+    }
+    if (moveUp) {
       sendKeyEvent("s", false);
       moveUp = false;
     }
   }
 
   function move(goal: number): void {
-    if (gameState.paddle1Y + paddleSize / 2 < goal && gameState.paddle1Y < topEnd) {
+    console.log("現在のパドル位置:", gameState.paddle2Y, "目標位置:", goal);
+    
+    // パドルの中心位置を計算（AIはplayer2なのでpaddle2Yを使用）
+    const paddleCenter = gameState.paddle2Y + paddleSize / 2;
+    const tolerance = 20; // 許容誤差
+    
+    if (paddleCenter < goal - tolerance && gameState.paddle2Y < topEnd - paddleSize) {
+      console.log("上に移動");
       sendMoveUp();
     }
-    else if (goal < gameState.paddle1Y + paddleSize / 2 && 0 < gameState.paddle1Y) {
+    else if (goal + tolerance < paddleCenter && 0 < gameState.paddle2Y) {
+      console.log("下に移動");
       sendMoveDown();
     }
     else {
+      console.log("停止");
       sendStop();
     }
   }
 
   ws.on("open", () => {
-    console.log("WebSocket connected.");
+    console.log("AI WebSocket connected to room:", roomId, "as user_id:", aiUserId);
   });
 
   ws.on('message', (message) => {
@@ -109,12 +123,12 @@ export async function startAiClient(roomId: string, aiLevel: number) {
         preX = gameState.ballX;
         preY = gameState.ballY;
         move(goal);
-        console.log("目標の座標:", goal);
-        console.log("今の座標:", gameState.paddle1Y);
+        // console.log("目標の座標:", goal);
+        // console.log("今の座標:", gameState.paddle2Y);
       }
   })
 
   ws.on("error", (err) => {
-    console.error("WebSocket error:", err);
+    console.error("AI WebSocket error:", err);
   });
 }

@@ -35,9 +35,9 @@ class BattleService {
         throw new Error("Failed to ready battle");
       }
 
-      console.log(await this.countReadyParticipants(tournamentId));
-      if ((await this.countReadyParticipants(tournamentId)) >= 2) {
-        console.log("Creating game");
+      const readyCount = await this.countReadyParticipants(tournamentId);
+
+      if (readyCount >= 2) {
         const readyParticipantIds =
           await this.getReadyParticipantIds(tournamentId);
 
@@ -47,6 +47,7 @@ class BattleService {
         // トーナメントのルールを取得
         const tournament = await tournamentService.getTournament({
           params: { id: tournamentId },
+          headers: { "x-user-id": userId },
         });
         const tournamentRule = tournament.rule;
 
@@ -56,7 +57,6 @@ class BattleService {
           readyParticipantIds,
           tournamentRule
         );
-        console.log("Game room created");
       }
 
       return response.data;
@@ -84,9 +84,10 @@ class BattleService {
 
   private async countReadyParticipants(tournamentId: string) {
     const participants = await this.getParticipants(tournamentId);
-    return participants.filter(
+    const readyParticipants = participants.filter(
       (participant: any) => participant.state === "ready"
-    ).length;
+    );
+    return readyParticipants.length;
   }
 
   private async getParticipantId(tournamentId: string, userId: string) {
@@ -115,17 +116,16 @@ class BattleService {
 
   private async getReadyParticipantIds(tournamentId: string) {
     const participants = await this.getParticipants(tournamentId);
-    return participants
+    const readyParticipants = participants
       .filter((participant: any) => participant.state === "ready")
-      .slice(0, 2)
-      .map((participant: any) => participant.id);
+      .slice(0, 2);
+    return readyParticipants.map((participant: any) => participant.id);
   }
 
   private async notifyGameInprogress(
     tournamentId: string,
     readyParticipantIds: string[]
   ) {
-    console.log(readyParticipantIds);
     const response = await axios.put(
       `${this.endpoint}/${tournamentId}/battle/start`,
       readyParticipantIds
