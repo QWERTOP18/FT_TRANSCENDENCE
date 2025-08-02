@@ -149,6 +149,27 @@ class BattleService {
       throw error;
     }
   }
+
+  async endBattle(request: any) {
+    try {
+      const tournamentId = request.params.id;
+      const battleResult = request.body;
+
+      const response = await axios.post(
+        `${this.endpoint}/${tournamentId}/battle/end`,
+        battleResult,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
 }
 
 export const battleService = new BattleService(config.tournamentURL);
