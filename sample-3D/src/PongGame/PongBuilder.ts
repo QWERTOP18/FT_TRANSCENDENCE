@@ -2,6 +2,7 @@ import { Color3, CreateBox, CreateCylinder, Engine, FreeCamera, HemisphericLight
 import { GradientMaterial, GridMaterial, SkyMaterial } from "@babylonjs/materials";
 import { Pong } from "./Pong";
 import { ServerToPongMapper } from "./ServerToPongMapper";
+import { PongConfigs } from "../PongConfigs";
 
 export class PongBuilder
 {
@@ -16,6 +17,7 @@ export class PongBuilder
 		const ground = this.CreateGround(scene);
 
 		const pong = new Pong({
+			engine,
 			scene,
 			camera,
 			light,
@@ -23,6 +25,7 @@ export class PongBuilder
 			bottomBar,
 			topBar,
 			ground,
+			canvas,
 		});
 
 		return pong;
@@ -30,7 +33,9 @@ export class PongBuilder
 
 	// This creates and positions a free camera (non-mesh)
 	public static CreateCamera(canvas: HTMLCanvasElement, scene?: Scene) {
-		const camera = new FreeCamera("camera1", new Vector3(0, 5, -25), scene);
+		const cameraZ = - PongConfigs.pongHeight / 2 - PongConfigs.pongWidth / 2 - 1; // 視野角90度としてカメラの位置を計算 幅が全て映るように引いている
+		const cameraY = Math.abs(cameraZ / 5)
+		const camera = new FreeCamera("camera1", new Vector3(0, cameraY, cameraZ), scene);
 
 		camera.setTarget(Vector3.Zero());
 
@@ -40,7 +45,7 @@ export class PongBuilder
 	public static CreatePack(scene?: Scene) {
 		const pack = CreateCylinder("pack", {
 			height: 0.5,
-			diameter: 1.5,
+			diameter: ServerToPongMapper.x2zMap(PongConfigs.packSize),
 		}, scene);
 		pack.position.y = 0.25;
 
@@ -62,10 +67,10 @@ export class PongBuilder
 	public static CreateBottomBar(scene?: Scene) {
 		const bar = MeshBuilder.CreateBox("bottom-bar", {
 			height: 1,
-			width: ServerToPongMapper.x2zMap(100),
+			width: ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth),
 		}, scene);
 		bar.position.y = 0.5;
-		bar.position.z = -15;
+		bar.position.z = - PongConfigs.pongHeight / 2 + ServerToPongMapper.x2zMap(PongConfigs.gameApiPaddlePositionOffset);
 
 		const material = new GradientMaterial("bar-material", scene);
 		material.topColor = Color3.White();
@@ -79,10 +84,10 @@ export class PongBuilder
 	public static CreateTopBar(scene?: Scene) {
 		const bar = CreateBox("top-bar", {
 			height: 1,
-			width: ServerToPongMapper.x2zMap(100),
+			width: ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth),
 		}, scene);
 		bar.position.y = 0.5;
-		bar.position.z = 15;
+		bar.position.z = PongConfigs.pongHeight / 2 - ServerToPongMapper.x2zMap(PongConfigs.gameApiPaddlePositionOffset);
 
 		const material = new GradientMaterial("bar-material", scene);
 		material.topColor = Color3.White();
@@ -106,8 +111,10 @@ export class PongBuilder
 	}
 
 	public static CreateGround(scene?: Scene) {
-		const ground = MeshBuilder.CreateGround("ground", { width: 20, height: 30 }, scene);
-
+		const ground = MeshBuilder.CreateGround("ground", {
+			width: PongConfigs.pongWidth,
+			height: PongConfigs.pongHeight
+		}, scene);
 
 		const material = new GridMaterial("ground-material", scene);
 		material.mainColor = Color3.Black();
