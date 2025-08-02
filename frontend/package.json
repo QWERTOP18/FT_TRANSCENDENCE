@@ -12,6 +12,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babylonjs/core": "^8.20.0",
+    "@babylonjs/gui": "^8.20.0",
+    "@babylonjs/materials": "^8.20.0",
     "express": "^5.1.0"
   },
   "devDependencies": {

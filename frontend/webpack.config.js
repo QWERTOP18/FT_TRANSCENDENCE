@@ -29,6 +29,8 @@ module.exports = {
     new CopyPlugin({
       patterns: [
         { from: 'index.html', to: '.' },
+        { from: './src/guiTexture.json', to: '.' },
+        { from: './src/ScoreBoard.json', to: '.' },
         // ★★★ "dist/style.css"をコピーする不要な行を削除 ★★★
         { from: 'assets', to: 'assets', noErrorOnMissing: true },
       ],

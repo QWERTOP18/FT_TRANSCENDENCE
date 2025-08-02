@@ -1,37 +1,5 @@
-import { gameState, gameEndState, MY_USERNAME } from '../data/mockData';
-
-export class PongGame {
-
-    // PongGameの作成
-    public static async bootPongGame(canvas: HTMLCanvasElement) {
-        console.log('bootPongGame')
-        return new PongGame();
-    }
-
-    dispose() {
-        console.log('dispose');
-    }
-
-    // AIとの対戦を開始する
-    public async battleAi(props: {
-        aiLevel: number,
-        userId: string,
-        onStart: () => void,
-        onEnd: () => void,
-    }) {
-        console.log('battleAi');
-    }
-
-    // 部屋にプレイヤーとして接続する
-    public async connectRoom(props: {
-        roomId: string,
-        userId: string,
-        onConnect: () => void,
-        onEnd: () => void,
-    }) {
-        console.log('connectRoom')
-    }
-}
+import { gameEndState } from '../data/mockData';
+import { PongGame } from '../PongGame/PongGame';
 
 
 // 作成されたPongGameインスタンスを保持するための変数
