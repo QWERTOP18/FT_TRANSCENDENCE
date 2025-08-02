@@ -21,7 +21,7 @@ export class GameState {
   private winner: number = 0;
   private isPaused: boolean = true;
   private scoreUpdate: boolean = false;
-  private resumeTime: number | null = null;
+  private resumeTime: number | null = Date.now() + 3000;
 
   constructor(winningScore: number) {
     this.ballSpeedX = Math.random() > 0.5 ? 5 : -5;
