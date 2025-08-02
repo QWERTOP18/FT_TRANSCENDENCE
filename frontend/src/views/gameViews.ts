@@ -24,8 +24,8 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
 
     const contentHTML = `
         <div class="w-full h-full flex flex-col items-center justify-center">
-            <h2 class="text-2xl font-bold mb-4">${gameParams.title || 'Pong Game'}</h2>
-            <canvas id="pong-canvas" class="bg-black border-2 border-white"></canvas>
+            <h2 class="text-2xl font-bold mb-4 text-white">${gameParams.title || 'Pong Game'}</h2>
+            <canvas id="pong-canvas" class="bg-black border-2 border-white w-4/5 h-4/5 max-w-4xl max-h-4xl rounded-lg shadow-2xl"></canvas>
         </div>
     `;
     render(appElement, contentHTML);
@@ -83,11 +83,11 @@ export function renderResultScreen(appElement: HTMLElement, isWin: boolean) {
     const result = gameEndState;
     const winnerCard = `<div class="flex flex-col items-center transform scale-110 font-bold"><img src="${result.winner_image}" alt="${result.winner}" class="w-32 h-32 rounded-full border-4 border-yellow-400 object-cover shadow-lg"><h3 class="text-2xl mt-4 mb-1">${result.winner}</h3><p class="text-4xl">${result.winner_score}</p></div>`;
     const loserCard = `<div class="flex flex-col items-center opacity-70"><img src="${result.loser_image}" alt="${result.loser}" class="w-28 h-28 rounded-full border-4 border-gray-400 object-cover"><h3 class="text-xl mt-4 mb-1">${result.loser}</h3><p class="text-3xl">${result.loser_score}</p></div>`;
-    const content = `<div class="text-center bg-white p-10 rounded-lg shadow-xl"><h2 class="text-5xl font-extrabold mb-8 ${isWin ? 'text-green-500' : 'text-red-500'}">${isWin ? 'YOU WIN!' : 'YOU LOSE...'}</h2><div class="flex justify-around items-center gap-10">${isWin ? winnerCard + loserCard : loserCard + winnerCard}</div></div>`;
+    const content = `<div class="metallic-card text-center p-10 rounded-lg shadow-xl"><h2 class="text-5xl font-extrabold mb-8 ${isWin ? 'text-green-500' : 'text-red-500'}">${isWin ? 'YOU WIN!' : 'YOU LOSE...'}</h2><div class="flex justify-around items-center gap-10">${isWin ? winnerCard + loserCard : loserCard + winnerCard}</div></div>`;
     render(appElement, content);
 }
 
 export function renderErrorScreen(appElement: HTMLElement) {
-    const content = `<div class="text-center bg-white p-10 rounded-lg shadow-xl"><h2 class="text-5xl font-extrabold text-yellow-500">Error</h2><p class="mt-4 text-lg">An error occurred during the game.</p></div>`;
+    const content = `<div class="metallic-card text-center p-10 rounded-lg shadow-xl"><h2 class="text-5xl font-extrabold text-yellow-500">Error</h2><p class="mt-4 text-lg">An error occurred during the game.</p></div>`;
     render(appElement, content);
 }

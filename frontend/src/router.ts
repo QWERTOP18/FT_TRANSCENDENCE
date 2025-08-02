@@ -2,7 +2,6 @@ import * as api from './services/api';
 import * as auth from './services/auth';
 import * as gameViews from './views/gameViews';
 import * as tournamentViews from './views/tournamentIndex';
-import * as matchmakingView from './views/matchmakingView';
 import * as authView from './views/authView';
 
 export class AppRouter {
@@ -88,12 +87,7 @@ export class AppRouter {
                     this.currentTournamentData = editData;
                     tournamentViews.renderEditTournamentScreen(this.appElement, editData, auth.getUserId());
                     break;
-                case path === '/matchmaking':
-                    matchmakingView.renderMatchmakingScreen(this.appElement);
-                    break;
-                case path === '/game':
-                    this.appElement.innerHTML = `<p>No game specified. Please start a match from matchmaking or a tournament.</p>`;
-                    break;
+
                 default:
                     this.navigateTo(loggedIn ? '/tournaments' : '/login');
                     break;
@@ -269,13 +263,6 @@ export class AppRouter {
     //     }
     // }
 
-    public async handleCreateRoom() {
-        const responseDisplay = document.getElementById('response-data');
-        if (!responseDisplay) return;
-        responseDisplay.textContent = 'Creating multiplayer room...';
-        alert("トーナメント外のルーム作成APIは現在利用できません。");
-        responseDisplay.textContent = "Error: API endpoint for non-tournament rooms is not available.";
-    }
     
     /**
      * トーナメント詳細画面の「試合開始」ボタンの処理
