@@ -28,7 +28,7 @@ export async function startAiClient(roomId: string, aiLevel: number) {
     let finalY: number;
 
     if (preX <= ballX) {
-      console.log("ボールが近づいていない、中央に移動");
+      // console.log("ボールが近づいていない、中央に移動");
       return topEnd / 2;
     }
     
@@ -43,7 +43,7 @@ export async function startAiClient(roomId: string, aiLevel: number) {
       finalY = finalY % topEnd;
     }
     
-    console.log("予測位置計算:", { ballX, ballY, preX, preY, time, finalY });
+    // console.log("予測位置計算:", { ballX, ballY, preX, preY, time, finalY });
     return finalY;
   }
 
@@ -126,7 +126,7 @@ export async function startAiClient(roomId: string, aiLevel: number) {
       sendMoveDown();
     }
     else {
-      console.log("停止");
+      // console.log("停止");
       sendStop();
     }
   }
