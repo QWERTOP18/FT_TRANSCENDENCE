@@ -108,6 +108,28 @@ class BattleService {
     return participant.id;
   }
 
+  private async convertExternalIdsToParticipantIds(
+    tournamentId: string,
+    externalIds: string[]
+  ): Promise<string[]> {
+    const participants = await this.getParticipants(tournamentId);
+
+    const participantIds = externalIds.map((externalId) => {
+      const participant = participants.find(
+        (p: any) => p.external_id === externalId
+      );
+      if (!participant) {
+        throw new Error(`Participant not found for external_id: ${externalId}`);
+      }
+      return participant.id;
+    });
+
+    console.log(
+      `Converted external IDs ${externalIds} to participant IDs: ${participantIds}`
+    );
+    return participantIds;
+  }
+
   private async getParticipants(tournamentId: string) {
     try {
       const response = await axios.get(
@@ -160,9 +182,36 @@ class BattleService {
       const tournamentId = request.params.id;
       const battleResult = request.body;
 
+      // external_idをparticipant_idに変換
+      const winnerExternalId = battleResult.winner.id;
+      const loserExternalId = battleResult.loser.id;
+
+      const [winnerParticipantId, loserParticipantId] =
+        await this.convertExternalIdsToParticipantIds(tournamentId, [
+          winnerExternalId,
+          loserExternalId,
+        ]);
+
+      // 変換されたparticipant_idでゲーム結果を作成
+      const convertedBattleResult = {
+        winner: {
+          id: winnerParticipantId,
+          score: battleResult.winner.score,
+        },
+        loser: {
+          id: loserParticipantId,
+          score: battleResult.loser.score,
+        },
+      };
+
+      console.log("Converting battle result:", {
+        original: battleResult,
+        converted: convertedBattleResult,
+      });
+
       const response = await axios.post(
         `${this.endpoint}/${tournamentId}/battle/end`,
-        battleResult,
+        convertedBattleResult,
         {
           headers: {
             "Content-Type": "application/json",
