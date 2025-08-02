@@ -278,3 +278,16 @@ export async function setParticipantCancel(tournamentId: string) {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
+
+/**
+ * トーナメントのゲームルームIDを取得する (GET /tournaments/{id}/room)
+ */
+export async function getTournamentRoomId(tournamentId: string) {
+    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/room`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+    });
+    console.log(response);
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}

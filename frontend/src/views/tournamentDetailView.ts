@@ -110,12 +110,25 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                     </div>
                 `).join('');
             
+            // 自分がin_progressの場合のゲーム開始ボタン
+            let gameStartButtonHTML = '';
+            const myParticipant = participants.find((p: any) => p.external_id === myUserId);
+            if (myParticipant && myParticipant.state === 'in_progress') {
+                gameStartButtonHTML = `
+                    <div class="mt-6">
+                        <button class="px-6 py-2 metallic-button-green rounded text-white font-bold" onclick="window.router.handleStartGame('${tournamentId}')">
+                            ゲーム開始
+                        </button>
+                    </div>`;
+            }
+            
             contentHTML = `
                 <div class="text-center">
                     <p class="text-yellow-400 mb-4">トーナメントは開始されています。</p>
                     <h4 class="text-lg font-bold mb-4">参加者 (${participants.length}人)</h4>
                     ${participantsHTML}
                     ${readyButtonHTML}
+                    ${gameStartButtonHTML}
                 </div>`;
             break;
         }
@@ -183,7 +196,13 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
 
     const finalHTML = `
         <div class="metallic-card p-6 rounded-lg text-white">
-            <h2 class="text-3xl font-bold text-center mb-6">${name}</h2>
+            <div class="flex justify-between items-center mb-6">
+                <button class="px-4 py-2 metallic-button rounded text-white hover:bg-gray-600 transition-colors" onclick="window.router.navigateTo('/tournaments')">
+                    ← Home
+                </button>
+                <h2 class="text-3xl font-bold text-center flex-1">${name}</h2>
+                <div class="w-24"></div>
+            </div>
             ${contentHTML}
         </div>
     `;

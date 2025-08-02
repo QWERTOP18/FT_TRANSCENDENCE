@@ -287,4 +287,37 @@ export class AppRouter {
             console.error(error);
         }
     }
+
+    /**
+     * トーナメントのWebSocket通信を開始する
+     */
+    public async handleStartGame(tournamentId: string) {
+        try {
+            const myUserId = auth.getUserId();
+            if (!myUserId) {
+                alert("ログインが必要です。");
+                return;
+            }
+
+            alert("ゲームルームを取得しています...");
+            const roomData = await api.getTournamentRoomId(tournamentId);
+            
+            if (!roomData.room_id) {
+                alert("ルームIDが取得できませんでした。");
+                return;
+            }
+
+            // ゲーム画面を描画し、WebSocket通信を開始
+            gameViews.renderGameScreen(this.appElement, {
+                type: 'room',
+                title: `Tournament Match: ${this.currentTournamentData?.name || 'Tournament'}`,
+                roomId: roomData.room_id,
+                token: myUserId
+            });
+
+        } catch (error) {
+            alert('ゲームの開始に失敗しました。');
+            console.error(error);
+        }
+    }
 }

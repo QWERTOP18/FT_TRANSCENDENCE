@@ -7,6 +7,7 @@ import { tournamentService } from "../tournament/TournamentService";
 
 class BattleService {
   private endpoint: string;
+  private roomIdMap: Map<string, string> = new Map(); // tournamentId -> roomId
 
   constructor(baseURL: string) {
     this.endpoint = `${baseURL}/tournaments`;
@@ -51,12 +52,16 @@ class BattleService {
         });
         const tournamentRule = tournament.rule;
 
-        // ゲームルームを作成 ここからは非同期処理
-        const gameRoom = gameService.createGame(
+        // ゲームルームを作成
+        const gameRoom = await gameService.createGame(
           tournamentId,
           readyParticipantIds,
           tournamentRule
         );
+        console.log(gameRoom);
+
+        // roomIdを保存
+        this.roomIdMap.set(tournamentId, gameRoom.room_id);
       }
 
       return response.data;
@@ -168,6 +173,20 @@ class BattleService {
       return response.data;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async getRoomId(
+    tournamentId: string,
+    userId: string
+  ): Promise<string | null> {
+    // 参加者かどうかを確認
+    try {
+      const participantId = await this.getParticipantId(tournamentId, userId);
+      const roomId = this.roomIdMap.get(tournamentId);
+      return roomId || null;
+    } catch (error) {
+      return null;
     }
   }
 }
