@@ -191,6 +191,14 @@ export async function getTournamentById(id: string) {
     return await response.json();
 }
 
+export async function getTournamentParticipants(id: string) {
+    const response = await fetch(`${SERVERURL}/tournaments/${id}/participants`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}
+
+
+
 /**
  * トーナメントを開始（オープン）状態にする (PUT /tournaments/{id}/open)
  */
@@ -251,10 +259,12 @@ export async function setParticipantReady(tournamentId: string) {
     const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/ready`, {
         method: 'PUT',
         headers: getAuthHeaders(),
+        body: "{}",
     });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
+
 
 /**
  * 参加者のステータスを 'pending' (キャンセル) にする (PUT /tournaments/{id}/battle/cancel)
@@ -263,6 +273,7 @@ export async function setParticipantCancel(tournamentId: string) {
     const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/cancel`, {
         method: 'PUT',
         headers: getAuthHeaders(),
+        body: "{}",
     });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();

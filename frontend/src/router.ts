@@ -1,13 +1,13 @@
 import * as api from './services/api';
 import * as auth from './services/auth';
 import * as gameViews from './views/gameViews';
-import * as tournamentViews from './views/tournamentView';
+import * as tournamentViews from './views/tournamentIndex';
 import * as matchmakingView from './views/matchmakingView';
 import * as authView from './views/authView';
 
 export class AppRouter {
     private appElement: HTMLElement;
-    private userDatabase: any = {}; // ユーザー情報をここにキャッシュ
+    // private userDatabase: any = {}; // ユーザー情報をここにキャッシュ
     private currentTournamentData: any = null;
 
     constructor() {
@@ -61,14 +61,16 @@ export class AppRouter {
                 case path === '/tournaments':
                     const tournaments = await api.getTournaments();
                     console.log(tournaments);
-                    tournamentViews.renderTournamentListScreen(this.appElement, tournaments, auth.getUserId(), this.userDatabase);
+                    tournamentViews.renderTournamentListScreen(this.appElement, tournaments, auth.getUserId());
                     break;
                 case path.startsWith('/tournament/detail/'):
                     const detailId = path.split('/')[3];
                     const detailData = await api.getTournamentById(detailId);
+                    const participants = await api.getTournamentParticipants(detailId);
                     console.log(detailData);
+                    console.log(participants);
                     this.currentTournamentData = detailData;
-                    tournamentViews.renderTournamentScreen(this.appElement, detailData, this.userDatabase, auth.getUserId());
+                    tournamentViews.renderTournamentScreen(this.appElement, detailData, auth.getUserId(), participants);
                     break;
                 case path.startsWith('/tournament/admin/'):
                     const adminId = path.split('/')[3];
@@ -189,11 +191,7 @@ export class AppRouter {
 
     public async handleSetReady(tournamentId: string, currentStatus: string) {
         try {
-            if (currentStatus === 'pending' || currentStatus === 'accepted') {
-                await api.setParticipantReady(tournamentId);
-            } else {
-                await api.setParticipantCancel(tournamentId);
-            }
+            await api.setParticipantReady(tournamentId);
             this.handleLocation();
         } catch (error) {
             alert('ステータスの変更に失敗しました。');
