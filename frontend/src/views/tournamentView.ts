@@ -66,6 +66,9 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
     const contentHTML = `
         <div class="bg-gray-800 bg-opacity-80 p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
             <h2 class="text-3xl font-bold text-center mb-8">Tournament List</h2>
+            <button class="flex-1 px-6 py-4 text-lg font-bold text-white bg-teal-600 rounded-lg shadow-lg hover:bg-teal-700 focus:outline-none focus:ring-4 focus:ring-teal-300 transition-transform transform hover:scale-105" onClick="window.router.navigateTo('/tournaments/new')">
+                Create New Tournament
+            </button>
             ${listHTML}
         </div>
     `;
