@@ -11,23 +11,26 @@ export class FastifyError extends Error {
 	statusCode: number;
 	error: string;
 	endpoint?: string;
+	method?: string;
 
-	constructor(json: FastifyErrorSchema, endpoint?: string) {
+	constructor(json: FastifyErrorSchema, endpoint?: string, method?: string) {
 		super(json.message);
 		this.code = json.code;
 		this.statusCode = json.statusCode;
 		this.error = json.error;
 		this.name = 'AuthError';
 		this.endpoint = endpoint;
+		this.method = method;
 	}
 
-	valueOf(): FastifyErrorSchema & { endpoint?: string } {
+	valueOf(): FastifyErrorSchema & { endpoint?: string, method?: string } {
 		return {
 			code: this.code,
 			statusCode: this.statusCode,
 			error: this.error,
 			message: this.message,
 			endpoint: this.endpoint,
+			method: this.method,
 		};
 	}
 }

@@ -21,31 +21,31 @@ export interface TournamentParticipant {
 
 export class TournamentAPI {
   async getTournaments(userId?: string): Promise<Tournament[]> {
-	return await this.sendAPIRequest<Tournament[]>(`tournaments`, undefined, 'GET', userId);
+    return await this.sendAPIRequest<Tournament[]>(`tournaments`, undefined, 'GET', userId);
   }
 
   async joinTournament(tournamentId: string, userId: string): Promise<{
     ok: true;
   }> {
-	return await this.sendAPIRequest<{ ok: true }>(`tournaments/${tournamentId}/join`, {}, 'POST', userId);
+    return await this.sendAPIRequest<{ ok: true }>(`tournaments/${tournamentId}/join`, {}, 'POST', userId);
   }
 
   async getTournamentParticipants(tournamentId: string): Promise<TournamentParticipant[]> {
-	return await this.sendAPIRequest<TournamentParticipant[]>(`tournaments/${tournamentId}/participants`);
+    return await this.sendAPIRequest<TournamentParticipant[]>(`tournaments/${tournamentId}/participants`);
   }
 
   async sendAPIRequest<T>(endpoint: string, body?: any, method: 'GET' | 'POST' = 'GET', userId?: string): Promise<T> {
     const url = `${config.gatewayURL}${endpoint}`;
-	const x_userId = userId || '';
-	const headers = {
-		'X-User-ID': x_userId,
-		'Content-Type': 'application/json',
-	};
+    const x_userId = userId || '';
+    const headers = {
+      'X-User-ID': x_userId,
+      'Content-Type': 'application/json',
+    };
     return await axios({
       url,
       method,
       data: body,
-	  headers,
+      headers,
     }).then((response) => {
       return response.data as T;
     }).catch((error) => {

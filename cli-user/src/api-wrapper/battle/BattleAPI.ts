@@ -44,7 +44,7 @@ export class BattleAPI {
       if (axios.isAxiosError(error)) {
         const errorData = error.response?.data as BattleErrorSchema;
         if (errorData) {
-          throw new BattleError(errorData, url);
+          throw new BattleError(errorData, url, method);
         }
       }
       throw error;
