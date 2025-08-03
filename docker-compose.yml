@@ -5,8 +5,7 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     ports:
-      - "80:80"
-      - "443:443"
+      - "4430:4430"
     depends_on:
       - frontend
       - gateway
