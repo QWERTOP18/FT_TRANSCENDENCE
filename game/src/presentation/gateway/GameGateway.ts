@@ -63,28 +63,58 @@ export class GameGateway {
   private setup() {
     this.wss.on("connection", (ws, req) => {
       const parsedUrl = url.parse(req.url || "", true);
-      const match = parsedUrl.pathname?.match(/^\/game\/([a-zA-Z0-9\-]+)/);
-      const roomId = match ? match[1] : null;
-      const query = parsedUrl.query;
-      const user_id = query.user_id as string | undefined; 
+      
+      // より柔軟なパス解析
+      let roomId = null;
+      let user_id = null;
+      
+      // パスからroomIdを抽出（複数のパターンを試行）
+      const pathname = parsedUrl.pathname || "";
+      
+      // パターン1: /game/{roomId}
+      let match = pathname.match(/^\/game\/([a-zA-Z0-9\-]+)/);
+      if (match) {
+        roomId = match[1];
+      }
+      
+      // パターン2: /{roomId} (nginxのrewrite後の場合)
+      if (!roomId) {
+        match = pathname.match(/^\/([a-zA-Z0-9\-]+)/);
+        if (match) {
+          roomId = match[1];
+        }
+      }
+      
+      // クエリパラメータからuser_idを取得
+      user_id = parsedUrl.query.user_id as string | undefined;
 
       if (!roomId) {
-        console.log("roomId not found");
+        console.log("❌ roomId not found:", pathname);
         ws.close();
         return;
       }
       if (!this.rooms[roomId]) {
-        console.log("room not found");
+        console.log("❌ room not found:", roomId);
         ws.close();
         return;
       }
       if (!user_id) {
-        console.log("Token not provided, closing connection.");
+        console.log("❌ user_id not provided");
         ws.close();
-        return ;
+        return;
       }
+      
+      console.log("✅ WebSocket接続:", roomId, user_id);
       const room = this.rooms[roomId];
       room.assignPlayer(ws, user_id);
+      
+      // 接続確認メッセージを送信
+      ws.send(JSON.stringify({
+        type: "connection",
+        message: "WebSocket接続が確立されました",
+        roomId: roomId,
+        userId: user_id
+      }));
       ws.on("message", (message) => {
         try {
           const data = JSON.parse(message.toString());
