@@ -1,8 +1,8 @@
 import { User } from './api-wrapper/auth/auth';
+import { BattleAPI } from './api-wrapper/battle/BattleAPI';
 import { Tournament, TournamentAPI } from './api-wrapper/tournament/TournamentAPI';
 import { ErrorResponse } from './errors/JoinErrorResponse';
 import { TournamentErrorResponse } from './errors/TournamentErrorResponse';
-import { BattleService } from './services/battleService';
 import { GameService } from './services/gameService';
 import { MenuService } from './services/menuService';
 import { UserInputService } from './services/userInputService';
@@ -11,7 +11,7 @@ import { UserService } from './services/userService';
 async function main(): Promise<void> {
   try {
     const userService = new UserService();
-    const battleService = new BattleService();
+    const battleService = new BattleAPI();
     const gameService = new GameService();
     
     // ユーザー認証
@@ -33,7 +33,7 @@ async function main(): Promise<void> {
 
 async function showMainMenuLoop(
   user: User, 
-  battleService: BattleService, 
+  battleService: BattleAPI, 
   gameService: GameService, 
   menuService: MenuService,
   userInputService: UserInputService
@@ -46,8 +46,9 @@ async function showMainMenuLoop(
         case '1':
           // AI対戦を開始
           console.log('\nStarting AI battle...');
-          const roomId = await battleService.startAIBattle();
-          gameService.connectToGameWebSocket(roomId, user.id);
+          const resp = await battleService.startAIBattle();
+          console.log("resp: ", resp);
+          gameService.connectToGameWebSocket(resp.room_id, user.id);
           return; // ゲーム終了後はアプリケーションを終了
           
         case '2':
@@ -140,7 +141,7 @@ async function handleJoinTournament(
 async function handleTournamentReady(tournament: Tournament, user: User) {
   console.log('Ready to play tournament!');
   try {
-    const battleService = new BattleService();
+    const battleService = new BattleAPI();
     await battleService.ready(tournament.id, user.id);
     console.log('Ready signal sent successfully!');
     return;
