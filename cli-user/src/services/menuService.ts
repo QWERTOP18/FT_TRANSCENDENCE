@@ -50,9 +50,8 @@ export class MenuService {
 
     console.log('\n=== Tournament Details ===');
     console.log(`Name: ${tournament.name}`);
-    console.log(`Status: ${tournament.status}`);
-    console.log(`Participants: ${tournament.participants}/${tournament.maxParticipants}`);
-    console.log(`Created: ${new Date(tournament.createdAt).toLocaleDateString()}`);
+    console.log(`Status: ${tournament.state}`);
+    console.log(`Participants: ${tournament.participants}/${tournament.max_num}`);
     console.log('==========================');
 
     console.log('\n1. Join Tournament');

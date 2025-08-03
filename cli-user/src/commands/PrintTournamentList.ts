@@ -15,9 +15,9 @@ export class PrintTournamentListCommand {
 		console.log('\n=== Available Tournaments ===');
 		tournaments.forEach((tournament, index) => {
 			console.log(`${index + 1}. ${tournament.name}`);
-			console.log(`   Status: ${tournament.status}`);
-			console.log(`   Participants: ${tournament.participants}/${tournament.maxParticipants}`);
-			console.log(`   Created: ${new Date(tournament.createdAt).toLocaleDateString()}`);
+			console.log(`   Description: ${tournament.description}`);
+			console.log(`   State: ${tournament.state}`);
+			console.log(`   Participants: ${tournament.participants}/${tournament.max_num}`);
 			console.log('');
 		});
 	}

@@ -5,10 +5,10 @@ import { TournamentError, TournamentErrorSchema } from "./TournamentError";
 export interface Tournament {
   id: string;
   name: string;
-  status: string;
+  state: string;
+  description: string;
   participants: number;
-  maxParticipants: number;
-  createdAt: string;
+  max_num: number;
 }
 
 export interface TournamentParticipant {

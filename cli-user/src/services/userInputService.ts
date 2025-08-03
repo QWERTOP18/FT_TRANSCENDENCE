@@ -11,6 +11,10 @@ export class UserInputService {
       input: process.stdin,
       output: process.stdout,
     });
+
+    this.rl.on('SIGINT', () => {
+      process.kill(process.pid, 'SIGINT');
+    });
   }
 
   static getInstance() {
@@ -18,6 +22,11 @@ export class UserInputService {
       UserInputService.instance = new UserInputService();
     }
     return UserInputService.instance;
+  }
+
+  async pause(): Promise<void> {
+    await this.askQuestion('Please enter...');
+    return;
   }
 
   async askQuestion(question: string): Promise<string> {
@@ -31,7 +40,7 @@ export class UserInputService {
   async askUserName(): Promise<string> {
     console.log('\n=== Welcome to Pong Game ===');
     console.log('Please enter your username to start playing.');
-    
+
     let userName: string;
     do {
       userName = await this.askQuestion('Enter your username: ');
@@ -39,7 +48,7 @@ export class UserInputService {
         console.log('Username cannot be empty. Please try again.');
       }
     } while (!userName);
-    
+
     return userName;
   }
 
