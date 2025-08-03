@@ -43,7 +43,18 @@ docker-compose up
 # HTTPS: https://localhost
 ```
 
-### SSL証明書の更新
+### SSL証明書の自動生成
+
+SSL証明書はdocker build時に自動的に生成されます。手動で生成する必要はありません。
+
+```bash
+# コンテナをビルドすると自動的にSSL証明書が生成されます
+docker-compose build nginx
+docker-compose up nginx
+```
+
+### 手動でSSL証明書を生成する場合（開発時のみ）
+
 ```bash
 # 新しい自己署名証明書を生成
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
