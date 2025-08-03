@@ -1,13 +1,12 @@
 import * as api from './services/api';
 import * as auth from './services/auth';
 import * as gameViews from './views/gameViews';
-import * as tournamentViews from './views/tournamentView';
-import * as matchmakingView from './views/matchmakingView';
+import * as tournamentViews from './views/tournamentIndex';
 import * as authView from './views/authView';
 
 export class AppRouter {
     private appElement: HTMLElement;
-    private userDatabase: any = {}; // ユーザー情報をここにキャッシュ
+
     private currentTournamentData: any = null;
 
     constructor() {
@@ -16,12 +15,6 @@ export class AppRouter {
     }
     
     public async init() {
-        // ここでユーザー一覧などを取得してキャッシュするのが理想
-        // try {
-        //     this.userDatabase = await api.getUsers();
-        // } catch (error) {
-        //     console.error("Failed to fetch users:", error);
-        // }
         this.handleLocation(); // 最初の画面描画
     }
 
@@ -60,27 +53,35 @@ export class AppRouter {
                     break;
                 case path === '/tournaments':
                     const tournaments = await api.getTournaments();
-                    tournamentViews.renderTournamentListScreen(this.appElement, tournaments, auth.getUserId(), this.userDatabase);
+                    console.log(tournaments);
+                    tournamentViews.renderTournamentListScreen(this.appElement, tournaments, auth.getUserId());
                     break;
                 case path.startsWith('/tournament/detail/'):
                     const detailId = path.split('/')[3];
                     const detailData = await api.getTournamentById(detailId);
+                    const participants = await api.getTournamentParticipants(detailId);
+                    console.log(detailData);
+                    console.log(participants);
                     this.currentTournamentData = detailData;
-                    tournamentViews.renderTournamentScreen(this.appElement, detailData, this.userDatabase, auth.getUserId());
+                    tournamentViews.renderTournamentScreen(this.appElement, detailData, auth.getUserId(), participants);
                     break;
                 case path.startsWith('/tournament/admin/'):
                     const adminId = path.split('/')[3];
                     if (!adminId) { this.navigateTo('/tournaments'); return; }
                     const adminData = await api.getTournamentById(adminId);
+                    console.log(adminData);
                     this.currentTournamentData = adminData;
                     tournamentViews.renderAdminScreen(this.appElement, adminData, auth.getUserId());
                     break;
-                case path === '/matchmaking':
-                    matchmakingView.renderMatchmakingScreen(this.appElement);
+                case path.startsWith('/tournament/edit/'):
+                    const editId = path.split('/')[3];
+                    if (!editId) { this.navigateTo('/tournaments'); return; }
+                    const editData = await api.getTournamentById(editId);
+                    console.log(editData);
+                    this.currentTournamentData = editData;
+                    tournamentViews.renderEditTournamentScreen(this.appElement, editData, auth.getUserId());
                     break;
-                case path === '/game':
-                    this.appElement.innerHTML = `<p>No game specified. Please start a match from matchmaking or a tournament.</p>`;
-                    break;
+
                 default:
                     this.navigateTo(loggedIn ? '/tournaments' : '/login');
                     break;
@@ -139,6 +140,33 @@ export class AppRouter {
         }
     }
 
+    public async handleOpenTournament() {
+        if (!this.currentTournamentData) {
+            alert('トーナメント情報が見つかりません。');
+            return;
+        }
+        
+        console.log('Current tournament data:', this.currentTournamentData);
+        
+        // 参加者数をチェック
+        if (this.currentTournamentData.participants && this.currentTournamentData.participants.length < 2) {
+            alert('トーナメントを開始するには最低2人以上の参加者が必要です。');
+            return;
+        }
+        
+        if (confirm('トーナメントを開始しますか？\n開始すると新しい参加者の追加ができなくなります。')) {
+            try {
+                console.log('Calling openTournament with ID:', this.currentTournamentData.id);
+                await api.openTournament(this.currentTournamentData.id);
+                alert('トーナメントを開始しました！');
+                this.navigateTo(`/tournament/detail/${this.currentTournamentData.id}`);
+            } catch (error) {
+                console.error('Error opening tournament:', error);
+                alert(`トーナメントの開始に失敗しました: ${error}`);
+            }
+        }
+    }
+
     public async handleJoinTournament(tournamentId: string) {
         try {
             await api.joinTournament(tournamentId);
@@ -151,11 +179,7 @@ export class AppRouter {
 
     public async handleSetReady(tournamentId: string, currentStatus: string) {
         try {
-            if (currentStatus === 'pending' || currentStatus === 'accepted') {
-                await api.setParticipantReady(tournamentId);
-            } else {
-                await api.setParticipantCancel(tournamentId);
-            }
+            await api.setParticipantReady(tournamentId);
             this.handleLocation();
         } catch (error) {
             alert('ステータスの変更に失敗しました。');
@@ -199,69 +223,51 @@ export class AppRouter {
         }
     }
     
-    // public async handlePlayAi() {
-    //     const responseDisplay = document.getElementById('response-data');
-    //     if (responseDisplay) responseDisplay.textContent = 'Creating AI room...';
 
-    //     try {
-    //         // 1. AI対戦用のルーム作成APIを呼び出す
-    //         const roomDataFromServer = await api.createAiRoom();
-    //         if (!roomDataFromServer.room_id) {
-    //             throw new Error("API did not return a room_id");
-    //         }
-            
-    //         alert(`AI対戦ルームが作成されました！ Room ID: ${roomDataFromServer.room_id}`);
 
-    //         // 2. ★★★ 3D Pongライブラリに渡すためのパラメータを準備 ★★★
-    //         // AI対戦は、ルーム接続(connectRoom)として扱う
-    //         const gameParams = {
-    //             type: 'room',
-    //             title: 'AI Battle',
-    //             roomId: roomDataFromServer.room_id,
-    //             // 3D PongライブラリのconnectRoomがユーザーIDを必要とするため、ここで渡す
-    //             userId: auth.getUserId() 
-    //         };
-
-    //         // 3. ゲーム画面を描画し、ルームに接続する
-    //         gameViews.renderGameScreen(this.appElement, gameParams);
-
-    //     } catch (error) {
-    //         const errorMessage = `エラーが発生しました: ${error as string}`;
-    //         if (responseDisplay) responseDisplay.textContent = errorMessage;
-    //         alert('AI対戦の開始に失敗しました。');
-    //         console.error(error);
-    //     }
-    // }
-
-    public async handleCreateRoom() {
-        const responseDisplay = document.getElementById('response-data');
-        if (!responseDisplay) return;
-        responseDisplay.textContent = 'Creating multiplayer room...';
-        alert("トーナメント外のルーム作成APIは現在利用できません。");
-        responseDisplay.textContent = "Error: API endpoint for non-tournament rooms is not available.";
-    }
     
-    /**
-     * トーナメント詳細画面の「試合開始」ボタンの処理
-     */
-    public async startBattle(tournamentId: string) {
-        if (!this.currentTournamentData) { alert("トーナメント情報が見つかりません。"); return; }
-        alert('対戦ルームを作成しています...');
-        try {
-            // バックエンドが次の対戦者を決定し、ルーム情報とトークンを返すと仮定
-            const battleInfo = await api.startBattle(tournamentId);
 
-            // ★★★ 新しいゲーム画面描画関数を呼び出す ★★★
+
+    /**
+     * トーナメントのWebSocket通信を開始する
+     */
+    public async handleStartGame(tournamentId: string) {
+        try {
+            const myUserId = auth.getUserId();
+            if (!myUserId) {
+                alert("ログインが必要です。");
+                return;
+            }
+
+            alert("ゲームルームを取得しています...");
+            const roomData = await api.getTournamentRoomId(tournamentId);
+            
+            if (!roomData.room_id) {
+                alert("ルームIDが取得できませんでした。対戦相手が準備完了になるまでお待ちください。");
+                return;
+            }
+
+            // ゲーム画面を描画し、WebSocket通信を開始
             gameViews.renderGameScreen(this.appElement, {
                 type: 'room',
-                title: `Tournament Match: ${this.currentTournamentData.name}`,
-                roomId: battleInfo.room_id,
-                token: battleInfo.token // どのトークンかはAPI仕様による
+                title: `Tournament Match: ${this.currentTournamentData?.name || 'Tournament'}`,
+                roomId: roomData.room_id,
+                token: myUserId
             });
 
         } catch (error) {
-            alert('対戦の開始に失敗しました。');
+            alert('ゲームの開始に失敗しました。');
             console.error(error);
         }
+    }
+
+    /**
+     * ログアウト処理を行う
+     * localStorageからユーザーIDを削除し、ログイン画面にリダイレクトする
+     */
+    public handleLogout(): void {
+        auth.logout();
+        alert('ログアウトしました。');
+        this.navigateTo('/login');
     }
 }

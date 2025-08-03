@@ -66,6 +66,36 @@ class TournamentService {
     return response.data;
   }
 
+  async getParticipantExternalIds(
+    tournamentId: string,
+    participantIds: string[]
+  ): Promise<string[]> {
+    try {
+      const response = await axios.get(
+        `${this.endpoint}/${tournamentId}/participants`
+      );
+      const participants = response.data;
+
+      const externalIds = participantIds.map((participantId) => {
+        const participant = participants.find(
+          (p: any) => p.id === participantId
+        );
+        if (!participant) {
+          throw new Error(`Participant not found: ${participantId}`);
+        }
+        return participant.external_id;
+      });
+
+      console.log(
+        `Converted participant IDs ${participantIds} to external IDs: ${externalIds}`
+      );
+      return externalIds;
+    } catch (error) {
+      console.error("Failed to get participant external IDs:", error);
+      throw error;
+    }
+  }
+
   async getTournament(request: any): Promise<TournamentSchema> {
     const id = request.params.id;
     const response = await axios.get(`${this.endpoint}/${id}`, {});

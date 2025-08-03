@@ -15,7 +15,19 @@ export function saveUserId(id: string): void {
  * @returns ユーザーID、または存在しない場合はnull
  */
 export function getUserId(): string | null {
-    return localStorage.getItem(USER_ID_KEY);
+    const userId = localStorage.getItem(USER_ID_KEY);
+    console.log("getUserId() called, returning:", userId);
+    return userId;
+}
+
+/**
+ * ログアウト処理を行う
+ * localStorageからユーザーIDを削除する
+ */
+export function logout(): void {
+    localStorage.removeItem(USER_ID_KEY);
+    console.log("User logged out, user ID removed from localStorage");
+    window.location.reload();
 }
 
 /**
@@ -34,11 +46,3 @@ export function getAuthHeaders(): HeadersInit {
     return headers;
 }
 
-
-/**
- * ログアウト処理（localStorageからユーザーIDを削除）
- */
-// export function logout(): void {
-//     localStorage.removeItem(USER_ID_KEY);
-//     console.log('Logged out, user ID removed.');
-// }

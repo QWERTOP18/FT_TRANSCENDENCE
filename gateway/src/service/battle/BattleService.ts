@@ -7,6 +7,7 @@ import { tournamentService } from "../tournament/TournamentService";
 
 class BattleService {
   private endpoint: string;
+  private roomIdMap: Map<string, string> = new Map(); // tournamentId -> roomId
 
   constructor(baseURL: string) {
     this.endpoint = `${baseURL}/tournaments`;
@@ -35,9 +36,9 @@ class BattleService {
         throw new Error("Failed to ready battle");
       }
 
-      console.log(await this.countReadyParticipants(tournamentId));
-      if ((await this.countReadyParticipants(tournamentId)) >= 2) {
-        console.log("Creating game");
+      const readyCount = await this.countReadyParticipants(tournamentId);
+
+      if (readyCount >= 2) {
         const readyParticipantIds =
           await this.getReadyParticipantIds(tournamentId);
 
@@ -47,16 +48,20 @@ class BattleService {
         // トーナメントのルールを取得
         const tournament = await tournamentService.getTournament({
           params: { id: tournamentId },
+          headers: { "x-user-id": userId },
         });
         const tournamentRule = tournament.rule;
 
-        // ゲームルームを作成 ここからは非同期処理
-        const gameRoom = gameService.createGame(
+        // ゲームルームを作成
+        const gameRoom = await gameService.createGame(
           tournamentId,
           readyParticipantIds,
           tournamentRule
         );
-        console.log("Game room created");
+        console.log(gameRoom);
+
+        // roomIdを保存
+        this.roomIdMap.set(tournamentId, gameRoom.room_id);
       }
 
       return response.data;
@@ -84,9 +89,10 @@ class BattleService {
 
   private async countReadyParticipants(tournamentId: string) {
     const participants = await this.getParticipants(tournamentId);
-    return participants.filter(
+    const readyParticipants = participants.filter(
       (participant: any) => participant.state === "ready"
-    ).length;
+    );
+    return readyParticipants.length;
   }
 
   private async getParticipantId(tournamentId: string, userId: string) {
@@ -102,6 +108,28 @@ class BattleService {
     return participant.id;
   }
 
+  private async convertExternalIdsToParticipantIds(
+    tournamentId: string,
+    externalIds: string[]
+  ): Promise<string[]> {
+    const participants = await this.getParticipants(tournamentId);
+
+    const participantIds = externalIds.map((externalId) => {
+      const participant = participants.find(
+        (p: any) => p.external_id === externalId
+      );
+      if (!participant) {
+        throw new Error(`Participant not found for external_id: ${externalId}`);
+      }
+      return participant.id;
+    });
+
+    console.log(
+      `Converted external IDs ${externalIds} to participant IDs: ${participantIds}`
+    );
+    return participantIds;
+  }
+
   private async getParticipants(tournamentId: string) {
     try {
       const response = await axios.get(
@@ -115,17 +143,16 @@ class BattleService {
 
   private async getReadyParticipantIds(tournamentId: string) {
     const participants = await this.getParticipants(tournamentId);
-    return participants
+    const readyParticipants = participants
       .filter((participant: any) => participant.state === "ready")
-      .slice(0, 2)
-      .map((participant: any) => participant.id);
+      .slice(0, 2);
+    return readyParticipants.map((participant: any) => participant.id);
   }
 
   private async notifyGameInprogress(
     tournamentId: string,
     readyParticipantIds: string[]
   ) {
-    console.log(readyParticipantIds);
     const response = await axios.put(
       `${this.endpoint}/${tournamentId}/battle/start`,
       readyParticipantIds
@@ -147,6 +174,68 @@ class BattleService {
       return response;
     } catch (error) {
       throw error;
+    }
+  }
+
+  async endBattle(request: any) {
+    try {
+      const tournamentId = request.params.id;
+      const battleResult = request.body;
+
+      // external_idをparticipant_idに変換
+      const winnerExternalId = battleResult.winner.id;
+      const loserExternalId = battleResult.loser.id;
+
+      const [winnerParticipantId, loserParticipantId] =
+        await this.convertExternalIdsToParticipantIds(tournamentId, [
+          winnerExternalId,
+          loserExternalId,
+        ]);
+
+      // 変換されたparticipant_idでゲーム結果を作成
+      const convertedBattleResult = {
+        winner: {
+          id: winnerParticipantId,
+          score: battleResult.winner.score,
+        },
+        loser: {
+          id: loserParticipantId,
+          score: battleResult.loser.score,
+        },
+      };
+
+      console.log("Converting battle result:", {
+        original: battleResult,
+        converted: convertedBattleResult,
+      });
+
+      const response = await axios.post(
+        `${this.endpoint}/${tournamentId}/battle/end`,
+        convertedBattleResult,
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      return response.data;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  async getRoomId(
+    tournamentId: string,
+    userId: string
+  ): Promise<string | null> {
+    // 参加者かどうかを確認
+    try {
+      const participantId = await this.getParticipantId(tournamentId, userId);
+      const roomId = this.roomIdMap.get(tournamentId);
+      return roomId || null;
+    } catch (error) {
+      return null;
     }
   }
 }

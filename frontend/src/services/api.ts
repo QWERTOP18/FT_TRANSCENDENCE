@@ -70,29 +70,7 @@ export async function createAiRoom() {
     }
 }
 
-//8000番の方のai対戦
 
-// export async function createAiRoom() {
-//     try {
-//         const response = await fetch(`${SERVERURL}/battle/ai`, {
-//             method: 'POST',
-//             headers: getAuthHeaders(),
-//             body: JSON.stringify({}), // ★★★ API仕様に合わせてボディを空のオブジェクトにする ★★★
-//         });
-
-//         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-
-//         // ★★★ サーバーがJSONではなく文字列を返す問題に対応 ★★★
-//         const roomId = await response.text(); 
-        
-//         // アプリケーションが使いやすいように、JSONオブジェクトの形に整形して返す
-//         return { room_id: roomId };
-
-//     } catch (error) {
-//         console.error('Failed to create AI room:', error);
-//         throw error;
-//     }
-// }
 
 /**
  * マルチプレイヤー用のルームを作成する (POST /room)
@@ -117,14 +95,7 @@ export async function createRoom(roomData: {
     }
 }
 
-export async function startBattle(tournamentId: string) {
-    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/start`, {
-        method: 'PUT',
-        headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
-}
+
 
 /**
  * gameサーバーの死活確認 (GET /ping)
@@ -170,6 +141,19 @@ export async function createTournament(data: { name: string; description: string
 }
 
 /**
+ * トーナメントを更新する (PUT /tournaments/{id})
+ */
+export async function updateTournament(id: string, data: { name: string; description: string; max_num: number; rule: string; }) {
+    const response = await fetch(`${SERVERURL}/tournaments/${id}`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}
+
+/**
  * 特定のトーナメント詳細を取得する (GET /tournaments/{id})
  */
 export async function getTournamentById(id: string) {
@@ -178,16 +162,52 @@ export async function getTournamentById(id: string) {
     return await response.json();
 }
 
+export async function getTournamentParticipants(id: string) {
+    const response = await fetch(`${SERVERURL}/tournaments/${id}/participants`, { headers: getAuthHeaders() });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}
+
+
+
 /**
  * トーナメントを開始（オープン）状態にする (PUT /tournaments/{id}/open)
  */
 export async function openTournament(id: string) {
+    console.log('Opening tournament:', id);
+    console.log('Request URL:', `${SERVERURL}/tournaments/${id}/open`);
+    console.log('Headers:', getAuthHeaders());
+    
     const response = await fetch(`${SERVERURL}/tournaments/${id}/open`, {
         method: 'PUT',
         headers: getAuthHeaders(),
+        body: "{}",
     });
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-    return await response.json();
+    
+    console.log('Response status:', response.status);
+    console.log('Response ok:', response.ok);
+    
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error('Error response:', errorText);
+        
+        // エラーメッセージをより分かりやすくする
+        let errorMessage = `HTTP error! status: ${response.status}`;
+        try {
+            const errorData = JSON.parse(errorText);
+            if (errorData.message) {
+                errorMessage = errorData.message;
+            }
+        } catch (e) {
+            errorMessage = errorText;
+        }
+        
+        throw new Error(errorMessage);
+    }
+    
+    const result = await response.json();
+    console.log('Success response:', result);
+    return result;
 }
 
 /**
@@ -210,10 +230,12 @@ export async function setParticipantReady(tournamentId: string) {
     const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/ready`, {
         method: 'PUT',
         headers: getAuthHeaders(),
+        body: "{}",
     });
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
+
 
 /**
  * 参加者のステータスを 'pending' (キャンセル) にする (PUT /tournaments/{id}/battle/cancel)
@@ -222,7 +244,21 @@ export async function setParticipantCancel(tournamentId: string) {
     const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/battle/cancel`, {
         method: 'PUT',
         headers: getAuthHeaders(),
+        body: "{}",
     });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    return await response.json();
+}
+
+/**
+ * トーナメントのゲームルームIDを取得する (GET /tournaments/{id}/room)
+ */
+export async function getTournamentRoomId(tournamentId: string) {
+    const response = await fetch(`${SERVERURL}/tournaments/${tournamentId}/room`, {
+        method: 'GET',
+        headers: getAuthHeaders(),
+    });
+    console.log(response);
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
 }
