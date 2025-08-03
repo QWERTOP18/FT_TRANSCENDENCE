@@ -22,7 +22,7 @@ body {
     /* 背景を繰り返さない */
     background-repeat: no-repeat;
     
-    /* スクロールしても背景を固定 */
+    /* 背景をスクロールしても固定 */
     background-attachment: fixed;
     
     /* メタリック効果のための追加スタイル */
@@ -321,13 +321,13 @@ body {
 .tournament-bracket {
     display: flex;
     justify-content: space-around;
-  }
-  .round {
+}
+.round {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-  }
-  .matchup {
+}
+.matchup {
     background-color: rgba(0, 0, 0, 0.4);
     margin: 20px 0;
     border-radius: 8px;
@@ -336,29 +336,29 @@ body {
     display: flex;
     flex-direction: column;
     gap: 10px;
-  }
-  /* 試合の間のスペースを確保 */
-  .matchup + .matchup {
-      margin-top: 60px;
-  }
-  .player {
+}
+/* 試合の間のスペースを確保 */
+.matchup + .matchup {
+    margin-top: 60px;
+}
+.player {
     display: flex;
     align-items: center;
     gap: 10px;
-  }
-  .player-avatar {
+}
+.player-avatar {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-  }
-  .score {
+}
+.score {
     margin-left: auto;
     font-family: monospace;
     font-size: 1.2rem;
-  }
-  
-  /* 勝ち上がり線の描画 */
-  .matchup::after {
+}
+
+/* 勝ち上がり線の描画 */
+.matchup::after {
     content: '';
     position: absolute;
     top: 50%;
@@ -366,8 +366,8 @@ body {
     width: 25px;
     height: 2px;
     background-color: #9ca3af; /* gray-400 */
-  }
-  .round + .round .matchup::before {
+}
+.round + .round .matchup::before {
     content: '';
     position: absolute;
     top: -21px; /* (margin-top - matchup-height) / 2 + matchup-height/2 - 1 */
@@ -377,8 +377,8 @@ body {
     border: 2px solid #9ca3af; /* gray-400 */
     border-right: none;
     border-radius: 10px 0 0 10px;
-  }
-  
+}
+
 /* 最後のラウンドの線は不要 */
 .round:last-child > .matchup::after {
     display: none;
@@ -394,4 +394,492 @@ body {
     font-weight: bold;
     min-width: 60px; /* Pending/Readyの幅を揃える */
     text-align: center;
+}
+
+/* ===== レスポンシブデザイン ===== */
+
+/* iPad (768px - 1024px) */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* ボタンサイズの調整 */
+    .metallic-button,
+    .metallic-button-blue,
+    .metallic-button-green,
+    .metallic-button-purple,
+    .metallic-button-orange,
+    .metallic-button-red {
+        padding: 12px 24px;
+        font-size: 16px;
+        min-height: 48px;
+    }
+    
+    /* カードのパディング調整 */
+    .metallic-card {
+        padding: 20px;
+        margin: 15px;
+    }
+    
+    /* トーナメントブラケットの調整 */
+    .tournament-bracket {
+        flex-direction: column;
+        gap: 30px;
+    }
+    
+    .round {
+        flex-direction: row;
+        justify-content: center;
+        gap: 40px;
+    }
+    
+    .matchup {
+        min-width: 280px;
+        margin: 10px 0;
+    }
+    
+    /* プレイヤーアバターサイズ調整 */
+    .player-avatar {
+        width: 40px;
+        height: 40px;
+    }
+    
+    /* スコアフォントサイズ調整 */
+    .score {
+        font-size: 1.4rem;
+    }
+    
+    /* ステータス表示の調整 */
+    .metallic-status {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+
+/* スマートフォン (320px - 767px) */
+@media (max-width: 767px) {
+    /* ボタンサイズの調整 */
+    .metallic-button,
+    .metallic-button-blue,
+    .metallic-button-green,
+    .metallic-button-purple,
+    .metallic-button-orange,
+    .metallic-button-red {
+        padding: 16px 20px;
+        font-size: 14px;
+        min-height: 56px;
+        width: 100%;
+        max-width: 300px;
+        margin: 8px auto;
+    }
+    
+    /* カードのパディング調整 */
+    .metallic-card {
+        padding: 16px;
+        margin: 10px;
+        border-radius: 12px;
+    }
+    
+    /* トーナメントブラケットの調整 */
+    .tournament-bracket {
+        flex-direction: column;
+        gap: 20px;
+        padding: 10px;
+    }
+    
+    .round {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .matchup {
+        min-width: 100%;
+        margin: 8px 0;
+        padding: 12px;
+    }
+    
+    /* プレイヤー情報の調整 */
+    .player {
+        padding: 8px;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .player-avatar {
+        width: 36px;
+        height: 36px;
+    }
+    
+    /* スコアフォントサイズ調整 */
+    .score {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+    
+    /* ステータス表示の調整 */
+    .metallic-status {
+        padding: 6px 12px;
+        font-size: 12px;
+        border-radius: 6px;
+    }
+    
+    /* 勝ち上がり線の調整 */
+    .matchup::after {
+        display: none; /* モバイルでは線を非表示 */
+    }
+    
+    .round + .round .matchup::before {
+        display: none; /* モバイルでは線を非表示 */
+    }
+    
+    /* チャンピオン表示の調整 */
+    .champion {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    /* ステータス表示の幅調整 */
+    .status {
+        min-width: 50px;
+        font-size: 12px;
+    }
+}
+
+/* 超小型スマートフォン (320px以下) */
+@media (max-width: 320px) {
+    /* ボタンサイズの調整 */
+    .metallic-button,
+    .metallic-button-blue,
+    .metallic-button-green,
+    .metallic-button-purple,
+    .metallic-button-orange,
+    .metallic-button-red {
+        padding: 14px 16px;
+        font-size: 13px;
+        min-height: 52px;
+    }
+    
+    /* カードのパディング調整 */
+    .metallic-card {
+        padding: 12px;
+        margin: 8px;
+    }
+    
+    /* プレイヤーアバターサイズ調整 */
+    .player-avatar {
+        width: 32px;
+        height: 32px;
+    }
+    
+    /* スコアフォントサイズ調整 */
+    .score {
+        font-size: 1rem;
+    }
+    
+    /* ステータス表示の調整 */
+    .metallic-status {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+    
+    /* ステータス表示の幅調整 */
+    .status {
+        min-width: 45px;
+        font-size: 11px;
+    }
+}
+
+/* 横画面スマートフォン (768px以下、高さが幅より小さい) */
+@media (max-width: 768px) and (orientation: landscape) {
+    /* トーナメントブラケットの調整 */
+    .tournament-bracket {
+        flex-direction: row;
+        gap: 15px;
+        overflow-x: auto;
+        padding: 10px;
+    }
+    
+    .round {
+        flex-direction: column;
+        gap: 15px;
+        min-width: 200px;
+    }
+    
+    .matchup {
+        min-width: 180px;
+        margin: 5px 0;
+        padding: 8px;
+    }
+    
+    /* ボタンサイズの調整 */
+    .metallic-button,
+    .metallic-button-blue,
+    .metallic-button-green,
+    .metallic-button-purple,
+    .metallic-button-orange,
+    .metallic-button-red {
+        padding: 12px 16px;
+        font-size: 13px;
+        min-height: 44px;
+    }
+    
+    /* プレイヤーアバターサイズ調整 */
+    .player-avatar {
+        width: 28px;
+        height: 28px;
+    }
+    
+    /* スコアフォントサイズ調整 */
+    .score {
+        font-size: 1rem;
+    }
+    
+    /* ステータス表示の調整 */
+    .metallic-status {
+        padding: 4px 8px;
+        font-size: 11px;
+    }
+}
+
+/* ===== タッチ操作用スタイル ===== */
+
+/* タッチコントロールボタンのスタイル */
+.touch-control-button {
+    background: linear-gradient(145deg, 
+        rgba(59, 130, 246, 0.8) 0%, 
+        rgba(59, 130, 246, 0.6) 50%, 
+        rgba(59, 130, 246, 0.4) 100%);
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 20px;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: all 0.2s ease;
+    font-family: 'Exo', sans-serif;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.touch-control-button:active {
+    background: linear-gradient(145deg, 
+        rgba(59, 130, 246, 0.9) 0%, 
+        rgba(59, 130, 246, 0.7) 50%, 
+        rgba(59, 130, 246, 0.5) 100%);
+    box-shadow: 
+        0 4px 16px rgba(0, 0, 0, 0.4),
+        inset 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform: scale(0.95);
+}
+
+/* タッチコントロールパネルのスタイル */
+.touch-control-panel {
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 10px;
+    position: relative;
+    z-index: 1000;
+}
+
+/* デスクトップでのタッチコントロール調整 */
+@media (min-width: 1025px) {
+    .touch-control-button {
+        width: 160px !important;
+        height: 100px !important;
+        font-size: 48px !important;
+    }
+    
+    .touch-control-panel {
+        width: 400px !important;
+        height: 120px !important;
+        top: 20px !important;
+    }
+}
+
+/* タブレットデバイスでのタッチコントロール調整 */
+@media (min-width: 768px) and (max-width: 1024px) {
+    .touch-control-button {
+        width: 140px !important;
+        height: 90px !important;
+        font-size: 42px !important;
+    }
+    
+    .touch-control-panel {
+        width: 350px !important;
+        height: 110px !important;
+        top: 15px !important;
+    }
+}
+
+/* モバイルデバイスでのタッチコントロール調整 */
+@media (max-width: 767px) {
+    .touch-control-button {
+        width: 120px !important;
+        height: 80px !important;
+        font-size: 36px !important;
+    }
+    
+    .touch-control-panel {
+        width: 300px !important;
+        height: 100px !important;
+        top: 10px !important;
+    }
+}
+
+/* 横画面モードでのタッチコントロール調整 */
+@media (max-width: 768px) and (orientation: landscape) {
+    .touch-control-button {
+        width: 100px !important;
+        height: 70px !important;
+        font-size: 30px !important;
+    }
+    
+    .touch-control-panel {
+        width: 250px !important;
+        height: 90px !important;
+        top: 5px !important;
+    }
+}
+
+/* ===== ゲームキャンバス用スタイル ===== */
+
+/* ゲームキャンバスの基本スタイル */
+#pong-canvas {
+    aspect-ratio: 4/5;
+    min-height: 600px;
+    max-height: 80vh;
+}
+
+/* デスクトップでのゲームキャンバス調整 */
+@media (min-width: 1025px) {
+    #pong-canvas {
+        min-height: 700px;
+        max-height: 85vh;
+    }
+}
+
+/* タブレットデバイスでのゲームキャンバス調整 */
+@media (min-width: 768px) and (max-width: 1024px) {
+    #pong-canvas {
+        min-height: 650px;
+        max-height: 80vh;
+    }
+}
+
+/* モバイルデバイスでのゲームキャンバス調整 */
+@media (max-width: 767px) {
+    #pong-canvas {
+        min-height: 500px;
+        max-height: 75vh;
+        width: 95% !important;
+    }
+}
+
+/* 横画面モードでのゲームキャンバス調整 */
+@media (max-width: 768px) and (orientation: landscape) {
+    #pong-canvas {
+        min-height: 400px;
+        max-height: 70vh;
+        width: 90% !important;
+    }
+}
+
+/* ===== トーナメントリスト用スタイル ===== */
+
+/* スマートフォンでのトーナメントリスト調整 */
+@media (max-width: 767px) {
+    .metallic-card {
+        padding: 1rem !important;
+    }
+    
+    /* トーナメントカードのボタン調整 */
+    .metallic-card button {
+        font-size: 0.875rem !important;
+        padding: 0.5rem 1rem !important;
+    }
+    
+    /* ステータス表示の調整 */
+    .metallic-status {
+        font-size: 0.75rem !important;
+        padding: 0.25rem 0.5rem !important;
+    }
+}
+
+/* 超小型スマートフォンでの調整 */
+@media (max-width: 320px) {
+    .metallic-card {
+        padding: 0.75rem !important;
+    }
+    
+    .metallic-card button {
+        font-size: 0.75rem !important;
+        padding: 0.375rem 0.75rem !important;
+    }
+    
+    .metallic-status {
+        font-size: 0.625rem !important;
+        padding: 0.125rem 0.375rem !important;
+    }
+}
+
+/* ===== ヘッダー用レスポンシブスタイル ===== */
+
+/* スマートフォンでのヘッダー調整 */
+@media (max-width: 767px) {
+    /* ヘッダーのパディング調整 */
+    .w-full.bg-gradient-to-r {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+    
+    /* ヘッダーボタンの調整 */
+    .w-full.bg-gradient-to-r button {
+        font-size: 0.875rem !important;
+        padding: 0.5rem 1rem !important;
+        min-height: 2.5rem !important;
+    }
+    
+    /* タイトルテキストの調整 */
+    .w-full.bg-gradient-to-r span {
+        font-size: 1rem !important;
+    }
+}
+
+/* 超小型スマートフォンでのヘッダー調整 */
+@media (max-width: 320px) {
+    /* ヘッダーのパディング調整 */
+    .w-full.bg-gradient-to-r {
+        padding-left: 0.5rem !important;
+        padding-right: 0.5rem !important;
+        padding-top: 0.375rem !important;
+        padding-bottom: 0.375rem !important;
+    }
+    
+    /* ヘッダーボタンの調整 */
+    .w-full.bg-gradient-to-r button {
+        font-size: 0.75rem !important;
+        padding: 0.375rem 0.75rem !important;
+        min-height: 2.25rem !important;
+    }
+    
+    /* タイトルテキストの調整 */
+    .w-full.bg-gradient-to-r span {
+        font-size: 0.875rem !important;
+    }
+}
+
+/* タブレットでのヘッダー調整 */
+@media (min-width: 768px) and (max-width: 1024px) {
+    /* ヘッダーボタンの調整 */
+    .w-full.bg-gradient-to-r button {
+        font-size: 0.875rem !important;
+        padding: 0.625rem 1.25rem !important;
+    }
+    
+    /* タイトルテキストの調整 */
+    .w-full.bg-gradient-to-r span {
+        font-size: 1.125rem !important;
+    }
 }
