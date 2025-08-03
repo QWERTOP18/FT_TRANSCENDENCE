@@ -20,7 +20,7 @@ export interface TournamentParticipant {
 }
 
 export class TournamentAPI {
-  async getTournaments(userId?: string): Promise<Tournament[]> {
+  async getTournaments(userId: string): Promise<Tournament[]> {
     return await this.sendAPIRequest<Tournament[]>(`tournaments`, undefined, 'GET', userId);
   }
 

@@ -7,16 +7,14 @@ import { GameService } from './services/gameService';
 import { LoginSessionService } from './services/LoginSessionService';
 import { MenuService } from './services/menuService';
 import { UserInputService } from './services/userInputService';
-import { UserService } from './services/userService';
 
 async function main(): Promise<void> {
   try {
-    const userService = new UserService();
     const battleService = new BattleAPI();
     const gameService = new GameService();
 
     // ユーザー認証
-    const userInputService = userService.userInputService;
+    const userInputService = new UserInputService();
     const menuService = new MenuService(userInputService);
     await menuService.authenticateUser();
     const user: User = LoginSessionService.getCurrentUser();
@@ -82,7 +80,8 @@ async function handleTournamentMenu(
 ): Promise<void> {
   try {
     while (true) {
-      const tournaments = await menuService.displayTournaments(user.id);
+      const api = new TournamentAPI();
+      const tournaments = await api.getTournaments(user.id);
       const selectedTournamentId = await menuService.showTournamentMenu(tournaments);
 
       if (selectedTournamentId) {
