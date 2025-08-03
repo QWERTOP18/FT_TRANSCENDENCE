@@ -17,12 +17,12 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
             </button>` : '';
 
         return `
-            <div class="metallic-card p-4 rounded-lg mb-4 flex justify-between items-center transition hover:scale-102 duration-200">
-                <div>
+            <div class="metallic-card p-4 rounded-lg mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center transition hover:scale-102 duration-200 gap-4">
+                <div class="flex-1">
                     <h3 class="text-xl font-bold text-white">${t.name}</h3>
                     <p class="text-gray-300">${t.description}</p>
                 </div>
-                <div class="text-right w-32 flex-shrink-0">
+                <div class="text-right sm:text-right w-full sm:w-32 flex-shrink-0">
                     <span class="text-sm font-semibold px-3 py-1 rounded-full metallic-status ${
                         t.state === 'open' ? 'metallic-status-open' :
                         t.state === 'reception' ? 'metallic-status-reception' :
@@ -41,9 +41,9 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
     const contentHTML = `
         ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <h2 class="text-3xl font-bold">Tournament List</h2>
-                <div class="flex gap-2">
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <button class="px-6 py-2 metallic-button-purple rounded text-white font-bold" onclick="window.router.handlePlayAi()">
                         Play vs AI
                     </button>
