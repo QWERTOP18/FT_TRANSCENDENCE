@@ -30,8 +30,12 @@ export class TournamentAPI {
     return await this.sendAPIRequest<{ ok: true }>(`tournaments/${tournamentId}/join`, {}, 'POST', userId);
   }
 
-  async getTournamentParticipants(tournamentId: string): Promise<TournamentParticipant[]> {
-    return await this.sendAPIRequest<TournamentParticipant[]>(`tournaments/${tournamentId}/participants`);
+  async getTournamentParticipants(tournamentId: string, userId: string): Promise<TournamentParticipant[]> {
+    return await this.sendAPIRequest<TournamentParticipant[]>(`tournaments/${tournamentId}/participants`, undefined, 'GET', userId);
+  }
+
+  async getTournament(tournamentId: string, userId: string): Promise<Tournament> {
+    return await this.sendAPIRequest<Tournament>(`tournaments/${tournamentId}`, undefined, 'GET', userId);
   }
 
   async sendAPIRequest<T>(endpoint: string, body?: any, method: 'GET' | 'POST' = 'GET', userId?: string): Promise<T> {

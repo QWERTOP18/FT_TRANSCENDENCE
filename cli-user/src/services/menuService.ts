@@ -1,28 +1,36 @@
-import { Tournament, TournamentAPI } from '../api-wrapper/tournament/TournamentAPI';
+import { Tournament } from '../api-wrapper/tournament/TournamentAPI';
 import { PrintTournamentListCommand } from '../commands/PrintTournamentList';
 import { UserInputService } from './userInputService';
 
 export class MenuService {
-  private userInputService: UserInputService;
-
   constructor() {
-    this.userInputService = UserInputService.getInstance();
   }
 
-  async showMainMenu(): Promise<string> {
+  async showMainMenu(): Promise<'1' | '2' | '3'> {
     console.log('\n=== Main Menu ===');
     console.log('1. Play against AI');
     console.log('2. View Tournaments');
     console.log('3. Exit');
 
-    const choice = await this.userInputService.askQuestion('Select an option (1-3): ');
-    return choice.trim();
+    const validChoices = ['1', '2', '3'];
+    const validate = (choice: string): choice is '1' | '2' | '3' => {
+      return validChoices.includes(choice.trim());
+    }
+    while (true) {
+      const userInputService = UserInputService.getInstance();
+      const choice = await userInputService.askQuestion('Select an option (1-3): ');
+      const trimmedChoice = choice.trim();
+      if (validate(trimmedChoice)) {
+        return trimmedChoice;
+      }
+    }
   }
 
-  async showTournamentMenu(tournaments: Tournament[]): Promise<string | null> {
+  async selectTournamentMenu(tournaments: Tournament[]): Promise<string | null> {
     new PrintTournamentListCommand(tournaments).execute();
 
-    const choice = await this.userInputService.askQuestion(`Select a tournament (1-${tournaments.length}) or 'b' to go back: `);
+    const userInputService = UserInputService.getInstance();
+    const choice = await userInputService.askQuestion(`Select a tournament (1-${tournaments.length}) or 'b' to go back: `);
     const trimmedChoice = choice.trim().toLowerCase();
 
     if (trimmedChoice === 'b' || trimmedChoice === 'back') {
@@ -35,7 +43,7 @@ export class MenuService {
     }
 
     console.log('Invalid selection. Please try again.');
-    return await this.showTournamentMenu(tournaments);
+    return await this.selectTournamentMenu(tournaments);
   }
 
   async showTournamentDetailsMenu(tournament: Tournament): Promise<'join' | 'ready' | 'back'> {
@@ -52,7 +60,8 @@ export class MenuService {
     console.log('3. Back to Tournaments');
 
     while (true) {
-      const choice = await this.userInputService.askQuestion(`Select a tournament (1-3) or \'b\' to go back: `);
+      const userInputService = UserInputService.getInstance();
+      const choice = await userInputService.askQuestion(`Select a tournament (1-3) or \'b\' to go back: `);
       if (choice === '1') {
         return 'join';
       } else if (choice === '2') {
@@ -62,9 +71,5 @@ export class MenuService {
       }
       console.log('Invalid selection. Please try again.');
     }
-  }
-
-  close(): void {
-    this.userInputService.close();
   }
 } 
