@@ -16,6 +16,6 @@ RUN chmod +x /usr/local/bin/test-config.sh
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
-EXPOSE 80 443
+EXPOSE 4430
 
 ENTRYPOINT ["/docker-entrypoint.sh"] 
