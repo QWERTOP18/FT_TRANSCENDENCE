@@ -16,10 +16,7 @@ export class TournamentListService {
 				if (selectedTournamentId === null) {
 					break;
 				}
-				const selection = await new TournamentDetailService().tournamentDetailMenu(selectedTournamentId);
-				if (selection === 'back') {
-					break;
-				}
+				await new TournamentDetailService().tournamentDetailMenu(selectedTournamentId);
 			}
 		}
 		catch (error) {

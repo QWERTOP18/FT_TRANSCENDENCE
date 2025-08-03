@@ -54,20 +54,27 @@ export class MenuService {
     console.log(`Participants: ${tournament.participants}/${tournament.max_num}`);
     console.log('==========================');
 
-    console.log('\n1. Join Tournament');
-    console.log('2. Ready to Play');
-    console.log('3. Back to Tournaments');
+    const selections = [];
+    if (tournament.state === 'reception') {
+      selections.push({ label: 'Join Tournament', value: 'join' });
+    }
+    else if (tournament.state === 'open') {
+      selections.push({ label: 'Ready to Play', value: 'ready' });
+    }
+    selections.push({ label: 'Back to Tournaments', value: 'back' });
+    const message = selections.map((s, index) => `${index + 1}. ${s.label}`).join('\n');
+    console.log('');
+    console.log(message);
 
     while (true) {
       const userInputService = UserInputService.getInstance();
-      const choice = await userInputService.askQuestion(`Select a tournament (1-3) or \'b\' to go back: `);
-      if (choice === '1') {
-        return 'join';
-      } else if (choice === '2') {
-        return 'ready';
-      } else if (choice === '3' || choice.toLowerCase() === 'b' || choice.toLowerCase() === 'back') {
-        return 'back';
+      const choice = await userInputService.askQuestion(`Select a tournament (1-${selections.length}) or \'b\' to go back: `);
+      const selected = selections[parseInt(choice.trim()) - 1];
+      if (selected) {
+        return selected.value as 'join' | 'ready' | 'back';
       }
+      if (choice.trim() == 'b')
+        return 'back';
       console.log('Invalid selection. Please try again.');
     }
   }

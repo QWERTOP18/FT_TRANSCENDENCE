@@ -6,7 +6,6 @@ import { LoginSessionService } from "../services/LoginSessionService";
 export class BattleAIService {
 	
 	async battleAI() {
-		  const user = LoginSessionService.getCurrentUser();
 		  const api = new BattleAPI();
           console.log('\nStarting AI battle...');
           const resp = await api.startAIBattle();

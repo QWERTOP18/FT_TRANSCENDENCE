@@ -43,7 +43,7 @@ export class ReadyService {
 			return await gameService.connectToGameWebSocket(roomData.room_id, user.id);
 		} catch (error) {
 			if (error instanceof BattleError) {
-				console.error('Can not ready: ', error.error);
+				console.error('Can not ready: ', error);
 				return;
 			}
 			else if (error instanceof UsageError) {
