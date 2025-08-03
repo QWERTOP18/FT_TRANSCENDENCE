@@ -1,41 +1,12 @@
-import { User } from '../api-wrapper/auth/auth';
 import { Tournament, TournamentAPI } from '../api-wrapper/tournament/TournamentAPI';
 import { PrintTournamentListCommand } from '../commands/PrintTournamentList';
-import { LoginSessionService } from './LoginSessionService';
 import { UserInputService } from './userInputService';
 
 export class MenuService {
   private userInputService: UserInputService;
-  private tournamentService: TournamentAPI;
 
-  constructor(userInputService?: UserInputService) {
-    this.userInputService = userInputService || new UserInputService();
-    this.tournamentService = new TournamentAPI();
-  }
-
-  async authenticateUser(): Promise<User> {
-    // ユーザー名を尋ねる
-    const userName = await this.userInputService.askUserName();
-
-    try {
-      // まず認証を試行
-      const user = await LoginSessionService.login(userName);
-      console.log(`Welcome back, ${user.name}!`);
-      return user;
-    } catch (error) {
-      // 認証に失敗した場合、新規作成を提案
-      console.log(`User "${userName}" not found.`);
-      const createNew = await this.userInputService.askForNewUser();
-
-      if (createNew) {
-        const newUser = await LoginSessionService.signup(userName);
-        console.log(`Welcome, ${newUser.name}! Your account has been created.`);
-        return newUser;
-      } else {
-        console.log('Goodbye!');
-        process.exit(0);
-      }
-    }
+  constructor() {
+    this.userInputService = UserInputService.getInstance();
   }
 
   async showMainMenu(): Promise<string> {
@@ -81,7 +52,7 @@ export class MenuService {
     console.log('3. Back to Tournaments');
 
     while (true) {
-      const choice = await this.userInputService.askQuestion(`Select a tournament (1-3): `);
+      const choice = await this.userInputService.askQuestion(`Select a tournament (1-3) or \'b\' to go back: `);
       if (choice === '1') {
         return 'join';
       } else if (choice === '2') {
@@ -90,26 +61,6 @@ export class MenuService {
         return 'back';
       }
       console.log('Invalid selection. Please try again.');
-    }
-  }
-
-  async displayTournaments(userId: string): Promise<Tournament[]> {
-    try {
-      const tournaments = await this.tournamentService.getTournaments(userId);
-      return tournaments;
-    } catch (error) {
-      console.error('Failed to fetch tournaments:', error);
-      return [];
-    }
-  }
-
-  async joinSelectedTournament(tournamentId: string, userId: string) {
-    try {
-      const resp = await this.tournamentService.joinTournament(tournamentId, userId);
-      return resp;
-    } catch (error) {
-      console.error('Failed to join tournament:', error);
-      throw error;
     }
   }
 

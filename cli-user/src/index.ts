@@ -3,8 +3,8 @@ import { BattleAPI } from './api-wrapper/battle/BattleAPI';
 import { BattleError } from './api-wrapper/battle/BattleError';
 import { Tournament, TournamentAPI } from './api-wrapper/tournament/TournamentAPI';
 import { TournamentError } from './api-wrapper/tournament/TournamentError';
+import { AuthenticateService } from './services/AutehnticateService';
 import { GameService } from './services/gameService';
-import { LoginSessionService } from './services/LoginSessionService';
 import { MenuService } from './services/menuService';
 import { UserInputService } from './services/userInputService';
 
@@ -12,17 +12,11 @@ async function main(): Promise<void> {
   try {
     const battleService = new BattleAPI();
     const gameService = new GameService();
-
-    // ユーザー認証
-    const userInputService = new UserInputService();
+    const userInputService = UserInputService.getInstance();
     const menuService = new MenuService(userInputService);
-    await menuService.authenticateUser();
-    const user: User = LoginSessionService.getCurrentUser();
+    
+    const user: User = await new AuthenticateService().authenticateUser();
     console.log(`User ID: ${user.id}`);
-
-    // UserServiceのUserInputServiceインスタンスを取得してMenuServiceと共有
-
-    // メインメニューを表示
     await showMainMenuLoop(user, battleService, gameService, menuService, userInputService);
 
   } catch (error) {

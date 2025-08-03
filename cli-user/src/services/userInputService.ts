@@ -1,13 +1,23 @@
 import * as readline from 'readline';
 
 export class UserInputService {
+
+  static instance: UserInputService | null = null;
+
   private rl: readline.Interface;
 
-  constructor() {
+  private constructor() {
     this.rl = readline.createInterface({
       input: process.stdin,
       output: process.stdout,
     });
+  }
+
+  static getInstance() {
+    if (!UserInputService.instance) {
+      UserInputService.instance = new UserInputService();
+    }
+    return UserInputService.instance;
   }
 
   async askQuestion(question: string): Promise<string> {
