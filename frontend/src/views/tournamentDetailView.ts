@@ -1,4 +1,5 @@
 import { render } from './tournamentView';
+import { createHeader } from './header';
 
 /**
  * トーナメント詳細画面を描画する
@@ -32,10 +33,10 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                                     ${p.name.charAt(0).toUpperCase()}
                                 </div>
                                 <span class="text-white font-medium">${p.name}</span>
-                                <span class="ml-auto text-xs px-2 py-1 rounded-full ${
-                                    p.state === 'ready' ? 'bg-green-500 text-white' : 
-                                    p.state === 'pending' ? 'bg-yellow-500 text-black' : 
-                                    'bg-gray-500 text-white'
+                                <span class="ml-auto text-xs px-2 py-1 rounded-full metallic-status ${
+                                    p.state === 'ready' ? 'metallic-status-ready' : 
+                                    p.state === 'pending' ? 'metallic-status-pending' : 
+                                    'metallic-status-pending'
                                 }">${p.state}</span>
                             </li>
                         `).join('')}
@@ -95,21 +96,21 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                                         ${p.name.charAt(0).toUpperCase()}
                                     </div>
                                     <span class="text-white font-medium">${p.name}</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full ${
-                                        p.state === 'ready' ? 'bg-green-500 text-white' : 
-                                        p.state === 'pending' ? 'bg-yellow-500 text-black' : 
-                                        p.state === 'in_progress' ? 'bg-blue-500 text-white' :
-                                        p.state === 'battled' ? 'bg-purple-500 text-white' :
-                                        p.state === 'eliminated' ? 'bg-red-500 text-white' :
-                                        p.state === 'champion' ? 'bg-yellow-400 text-black' :
-                                        'bg-gray-500 text-white'
+                                    <span class="ml-auto text-xs px-2 py-1 rounded-full metallic-status ${
+                                        p.state === 'ready' ? 'metallic-status-ready' : 
+                                        p.state === 'pending' ? 'metallic-status-pending' : 
+                                        p.state === 'in_progress' ? 'metallic-status-in-progress' :
+                                        p.state === 'battled' ? 'metallic-status-battled' :
+                                        p.state === 'eliminated' ? 'metallic-status-eliminated' :
+                                        p.state === 'champion' ? 'metallic-status-champion' :
+                                        'metallic-status-pending'
                                     }">${stateLabels[p.state] || p.state}</span>
                                 </li>
                             `).join('')}
                         </ul>
                     </div>
                 `).join('');
-            
+
             // 自分がin_progressの場合のゲーム開始ボタン
             let gameStartButtonHTML = '';
             const myParticipant = participants.find((p: any) => p.external_id === myUserId);
@@ -169,14 +170,14 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                                         ${p.name.charAt(0).toUpperCase()}
                                     </div>
                                     <span class="text-white font-medium">${p.name}</span>
-                                    <span class="ml-auto text-xs px-2 py-1 rounded-full ${
-                                        p.state === 'ready' ? 'bg-green-500 text-white' : 
-                                        p.state === 'pending' ? 'bg-yellow-500 text-black' : 
-                                        p.state === 'in_progress' ? 'bg-blue-500 text-white' :
-                                        p.state === 'battled' ? 'bg-purple-500 text-white' :
-                                        p.state === 'eliminated' ? 'bg-red-500 text-white' :
-                                        p.state === 'champion' ? 'bg-yellow-400 text-black' :
-                                        'bg-gray-500 text-white'
+                                    <span class="ml-auto text-xs px-2 py-1 rounded-full metallic-status ${
+                                        p.state === 'ready' ? 'metallic-status-ready' : 
+                                        p.state === 'pending' ? 'metallic-status-pending' : 
+                                        p.state === 'in_progress' ? 'metallic-status-in-progress' :
+                                        p.state === 'battled' ? 'metallic-status-battled' :
+                                        p.state === 'eliminated' ? 'metallic-status-eliminated' :
+                                        p.state === 'champion' ? 'metallic-status-champion' :
+                                        'metallic-status-pending'
                                     }">${stateLabels[p.state] || p.state}</span>
                                 </li>
                             `).join('')}
@@ -195,13 +196,10 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
     }
 
     const finalHTML = `
+        ${createHeader()}
         <div class="metallic-card p-6 rounded-lg text-white">
-            <div class="flex justify-between items-center mb-6">
-                <button class="px-4 py-2 metallic-button rounded text-white hover:bg-gray-600 transition-colors" onclick="window.router.navigateTo('/tournaments')">
-                    ← Home
-                </button>
-                <h2 class="text-3xl font-bold text-center flex-1">${name}</h2>
-                <div class="w-24"></div>
+            <div class="text-center mb-6">
+                <h2 class="text-3xl font-bold">${name}</h2>
             </div>
             ${contentHTML}
         </div>

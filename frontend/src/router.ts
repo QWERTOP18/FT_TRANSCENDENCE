@@ -260,4 +260,14 @@ export class AppRouter {
             console.error(error);
         }
     }
+
+    /**
+     * ログアウト処理を行う
+     * localStorageからユーザーIDを削除し、ログイン画面にリダイレクトする
+     */
+    public handleLogout(): void {
+        auth.logout();
+        alert('ログアウトしました。');
+        this.navigateTo('/login');
+    }
 }

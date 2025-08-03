@@ -1,4 +1,5 @@
 import { render } from './tournamentView';
+import { createHeader } from './header';
 
 /**
  * トーナメント一覧画面を描画する
@@ -22,10 +23,10 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
                     <p class="text-gray-300">${t.description}</p>
                 </div>
                 <div class="text-right w-32 flex-shrink-0">
-                    <span class="text-sm font-semibold px-3 py-1 rounded-full ${
-                        t.state === 'open' ? 'bg-green-500 text-white' :
-                        t.state === 'reception' ? 'bg-yellow-500 text-black' :
-                        'bg-gray-500 text-white'
+                    <span class="text-sm font-semibold px-3 py-1 rounded-full metallic-status ${
+                        t.state === 'open' ? 'metallic-status-open' :
+                        t.state === 'reception' ? 'metallic-status-reception' :
+                        'metallic-status-close'
                     }">${t.state}</span>
                     <button class="mt-2 block w-full px-4 py-2 metallic-button-blue rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/detail/${t.id}')">
                         詳細を見る
@@ -38,6 +39,7 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
     }).join('');
 
     const contentHTML = `
+        ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
             <div class="flex justify-between items-center mb-8">
                 <h2 class="text-3xl font-bold">Tournament List</h2>
