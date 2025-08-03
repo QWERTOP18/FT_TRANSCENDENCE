@@ -11,6 +11,6 @@ export class BattleAIService {
           console.log('\nStarting AI battle...');
           const resp = await api.startAIBattle();
           const gameService = new GameService();
-          return await gameService.connectToGameWebSocket(resp.room_id, user.id);
+          return await gameService.connectToGameWebSocket(resp.room_id, 'ai');
 	}
 }
