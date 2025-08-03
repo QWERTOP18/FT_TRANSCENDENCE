@@ -1,3 +1,4 @@
+import { DisplayStageService } from '../main/DisplayStageService';
 import { GameState } from '../types/game';
 import { GameEndData, GameWebSocket } from '../websocket-wrapper/game/GameWebSocket';
 import { KeyboardService } from './keyboardService';
@@ -56,6 +57,8 @@ export class GameService {
     console.log(`Paddle 1 Y: ${state.paddle1Y.toFixed(1)}`);
     console.log(`Paddle 2 Y: ${state.paddle2Y.toFixed(1)}`);
     console.log('\nControls: W/S or Arrow Keys to move, Ctrl+C to exit');
+    const displayService = new DisplayStageService();
+    console.log(displayService.generateStage(state));
   }
 
   private displayGameEnd(state: GameEndData['state']): void {
