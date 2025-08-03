@@ -1,13 +1,12 @@
-import { config } from './config/config';
-import { BattleService } from './services/battleService';
-import { GameService } from './services/gameService';
-import { UserService } from './services/userService';
-import { MenuService } from './services/menuService';
-import { UserInputService } from './services/userInputService';
 import { User } from './api-wrapper/auth/auth';
-import { Tournament, TournamentService } from './services/tournamentService';
+import { Tournament, TournamentAPI } from './api-wrapper/tournament/TournamentAPI';
 import { ErrorResponse } from './errors/JoinErrorResponse';
 import { TournamentErrorResponse } from './errors/TournamentErrorResponse';
+import { BattleService } from './services/battleService';
+import { GameService } from './services/gameService';
+import { MenuService } from './services/menuService';
+import { UserInputService } from './services/userInputService';
+import { UserService } from './services/userService';
 
 async function main(): Promise<void> {
   try {
@@ -126,8 +125,8 @@ async function handleJoinTournament(
 ): Promise<void> {
   try {
     console.log('\nJoining tournament...');
-    const tournamentService = new TournamentService();
-    await tournamentService.joinTournament(tournamentId, userId);
+    const tournamentAPI = new TournamentAPI();
+    await tournamentAPI.joinTournament(tournamentId, userId);
     console.log('Successfully joined the tournament!');
   } catch (error) {
     if (error instanceof ErrorResponse) {

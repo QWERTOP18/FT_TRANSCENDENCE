@@ -1,13 +1,13 @@
-import { AuthService } from './authService';
 import { UserInputService } from './userInputService';
 import { User } from '../api-wrapper/auth/auth';
+import { AuthAPI } from '../api-wrapper/auth/AuthAPI';
 
 export class UserService {
-  private authService: AuthService;
+  private authService: AuthAPI;
   public userInputService: UserInputService;
 
   constructor() {
-    this.authService = new AuthService();
+    this.authService = new AuthAPI();
     this.userInputService = new UserInputService();
   }
 

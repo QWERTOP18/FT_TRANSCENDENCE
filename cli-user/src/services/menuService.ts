@@ -1,14 +1,13 @@
+import { Tournament, TournamentAPI } from '../api-wrapper/tournament/TournamentAPI';
 import { UserInputService } from './userInputService';
-import { TournamentService, Tournament } from './tournamentService';
-import { ErrorResponse } from '../errors/JoinErrorResponse';
 
 export class MenuService {
   private userInputService: UserInputService;
-  private tournamentService: TournamentService;
+  private tournamentService: TournamentAPI;
 
   constructor(userInputService?: UserInputService) {
     this.userInputService = userInputService || new UserInputService();
-    this.tournamentService = new TournamentService();
+    this.tournamentService = new TournamentAPI();
   }
 
   async showMainMenu(): Promise<string> {

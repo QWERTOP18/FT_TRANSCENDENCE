@@ -3,7 +3,7 @@ import { AuthenticateRequest, AuthErrorSchema as AuthErrorSchema, SignupRequest,
 import { config } from "../../config/config";
 import { AuthError } from "./AuthError";
 
-export class AuthService {
+export class AuthAPI {
   async signup(name: string): Promise<User> {
     const requestBody: SignupRequest = { name };
     return await this.sendAPIRequest<User>('auth/signup', requestBody, 'POST');
