@@ -1,12 +1,13 @@
 import { render } from './tournamentView';
 import { createHeader } from './header';
+import { t } from '../i18n';
 
 /**
  * トーナメント詳細画面を描画する
  */
 export function renderTournamentScreen(appElement: HTMLElement, tournamentData: any, myUserId: string | null, participants: any): void {
     if (!tournamentData) {
-        render(appElement, `<p class="text-red-500">Tournament data not found.</p>`);
+        render(appElement, `<p class="text-red-500">${t('tournamentnotfound')}</p>`);
         return;
     }
     const { id: tournamentId, name, histories, champion, state, owner_id, is_participating ,is_owner} = tournamentData;
@@ -18,14 +19,14 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
             
             const joinButtonHTML = !isAlreadyParticipating ? 
                 `<button class="mt-6 px-6 py-2 metallic-button-blue rounded text-white" onclick="window.router.handleJoinTournament('${tournamentId}')">
-                    トーナメントに参加する
+                    ${t('joinTournament')}
                 </button>` 
-                : `<p class="mt-6 text-green-400">あなたは既に参加しています。</p>`;
+                : `<p class="mt-6 text-green-400">${t('alreadyParticipating')}</p>`;
 
             contentHTML = `
                 <div class="text-center">
-                    <p class="text-yellow-400 mb-4">オーナーがトーナメントを開始するのを待っています...</p>
-                    <h4 class="text-lg font-bold mb-2">現在の参加者 (${participants.length}人)</h4>
+                    <p class="text-yellow-400 mb-4">${t('waitingForOwner')}</p>
+                    <h4 class="text-lg font-bold mb-2">${t('nowmember')} (${participants.length}${t('num')})</h4>
                     <ul class="text-left max-w-xs mx-auto mb-4">
                         ${participants.map((p: any) => `
                             <li class="flex items-center gap-4 py-2 px-4 bg-gray-700 rounded mb-2 hover:bg-gray-600 transition-colors">

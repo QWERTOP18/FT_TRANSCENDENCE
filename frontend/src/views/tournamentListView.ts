@@ -1,5 +1,6 @@
 import { render } from './tournamentView';
 import { createHeader } from './header';
+import { t } from '../i18n';
 
 /**
  * トーナメント一覧画面を描画する
@@ -8,12 +9,12 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
     const listHTML = tournaments.reverse().map(t => {
         const adminButtonHTML = t.owner_id === myUserId ?
             `<button class="mt-2 block w-full px-4 py-2 metallic-button-red rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/admin/${t.id}')">
-                管理する
+                ${t('manage')}
             </button>` : '';
 
         const editButtonHTML = t.is_owner && t.state === 'reception' ?
             `<button class="mt-2 block w-full px-4 py-2 metallic-button-orange rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/edit/${t.id}')">
-                開始する
+                ${t('start')}
             </button>` : '';
 
         return `
@@ -29,7 +30,7 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
                         'metallic-status-close'
                     }">${t.state}</span>
                     <button class="mt-2 block w-full px-4 py-2 metallic-button-blue rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/detail/${t.id}')">
-                        詳細を見る
+                        ${t('detail')}
                     </button>
                     ${adminButtonHTML}
                     ${editButtonHTML}
@@ -42,13 +43,13 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
         ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
             <div class="flex justify-between items-center mb-8">
-                <h2 class="text-3xl font-bold">Tournament List</h2>
+                <h2 class="text-3xl font-bold">${t('TournamentList')}</h2>
                 <div class="flex gap-2">
                     <button class="px-6 py-2 metallic-button-purple rounded text-white font-bold" onclick="window.router.handlePlayAi()">
-                        Play vs AI
+                        ${t('vsAI')}
                     </button>
                     <button class="px-6 py-2 metallic-button-green rounded text-white font-bold" onclick="window.router.navigateTo('/tournaments/new')">
-                        Create Tournament
+                        ${t('createTournamentTitle')}
                     </button>
                 </div>
             </div>
