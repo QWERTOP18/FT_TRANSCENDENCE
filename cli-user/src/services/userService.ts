@@ -1,6 +1,7 @@
 import { UserInputService } from './userInputService';
 import { User } from '../api-wrapper/auth/auth';
 import { AuthAPI } from '../api-wrapper/auth/AuthAPI';
+import { LoginSessionService } from './LoginSessionService';
 
 export class UserService {
   private authService: AuthAPI;
@@ -17,7 +18,7 @@ export class UserService {
     
     try {
       // まず認証を試行
-      const user = await this.authService.authenticate(userName);
+      const user = await LoginSessionService.login(userName);
       console.log(`Welcome back, ${user.name}!`);
       return user;
     } catch (error) {
@@ -26,7 +27,7 @@ export class UserService {
       const createNew = await this.userInputService.askForNewUser();
       
       if (createNew) {
-        const newUser = await this.authService.signup(userName);
+        const newUser = await LoginSessionService.signup(userName);
         console.log(`Welcome, ${newUser.name}! Your account has been created.`);
         return newUser;
       } else {
