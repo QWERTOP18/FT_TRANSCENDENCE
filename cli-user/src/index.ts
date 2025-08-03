@@ -4,7 +4,7 @@ import { GameService } from './services/gameService';
 import { UserService } from './services/userService';
 import { MenuService } from './services/menuService';
 import { UserInputService } from './services/userInputService';
-import { User } from './types/auth';
+import { User } from './api-wrapper/auth/auth';
 import { Tournament, TournamentService } from './services/tournamentService';
 import { ErrorResponse } from './errors/JoinErrorResponse';
 import { TournamentErrorResponse } from './errors/TournamentErrorResponse';

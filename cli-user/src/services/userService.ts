@@ -1,6 +1,6 @@
 import { AuthService } from './authService';
 import { UserInputService } from './userInputService';
-import { User } from '../types/auth';
+import { User } from '../api-wrapper/auth/auth';
 
 export class UserService {
   private authService: AuthService;

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { config } from '../config/config';
-import { User, SignupRequest, AuthenticateRequest, AuthError } from '../types/auth';
+import { User, SignupRequest, AuthenticateRequest, AuthErrorSchema } from '../api-wrapper/auth/auth';
 
 export class AuthService {
   async signup(name: string): Promise<User> {
@@ -23,7 +23,7 @@ export class AuthService {
     } catch (error) {
       console.error('Failed to create user account:', error);
       if (axios.isAxiosError(error)) {
-        const errorData = error.response?.data as AuthError;
+        const errorData = error.response?.data as AuthErrorSchema;
         if (errorData) {
           throw new Error(`Signup failed: ${errorData.message}`);
         }
@@ -52,7 +52,7 @@ export class AuthService {
     } catch (error) {
     //   console.error('Failed to authenticate user:', error);
       if (axios.isAxiosError(error)) {
-        const errorData = error.response?.data as AuthError;
+        const errorData = error.response?.data as AuthErrorSchema;
         if (errorData) {
           throw new Error(`Authentication failed: ${errorData.message}`);
         }
