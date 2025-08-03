@@ -1,4 +1,5 @@
 import { Tournament, TournamentAPI } from '../api-wrapper/tournament/TournamentAPI';
+import { PrintTournamentListCommand } from '../commands/PrintTournamentList';
 import { UserInputService } from './userInputService';
 
 export class MenuService {
@@ -21,19 +22,7 @@ export class MenuService {
   }
 
   async showTournamentMenu(tournaments: Tournament[]): Promise<string | null> {
-    if (tournaments.length === 0) {
-      console.log('\nNo tournaments available.');
-      return null;
-    }
-
-    console.log('\n=== Available Tournaments ===');
-    tournaments.forEach((tournament, index) => {
-      console.log(`${index + 1}. ${tournament.name}`);
-      console.log(`   Status: ${tournament.status}`);
-      console.log(`   Participants: ${tournament.participants}/${tournament.maxParticipants}`);
-      console.log(`   Created: ${new Date(tournament.createdAt).toLocaleDateString()}`);
-      console.log('');
-    });
+    new PrintTournamentListCommand(tournaments).execute();
 
     const choice = await this.userInputService.askQuestion(`Select a tournament (1-${tournaments.length}) or 'b' to go back: `);
     const trimmedChoice = choice.trim().toLowerCase();
