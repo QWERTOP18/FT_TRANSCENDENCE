@@ -1,5 +1,6 @@
 import { PongGame } from '../PongGame/PongGame';
 import { getUserId } from '../services/auth';
+import { t } from '../i18n';
 
 
 // 作成されたPongGameインスタンスを保持するための変数
@@ -53,7 +54,7 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
                     canvas.focus();
                 },
                 onEnd: () => {
-                    alert('AI対戦が終了しました。');
+                    alert(`${t('ai_gamend')}`); // ゲーム終了時のアラート
                     // 終了後はトーナメント一覧などに戻る
                     (window as any).router.navigateTo('/tournaments');
                 }
@@ -63,7 +64,7 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
         else if (gameParams.type === 'room') {
             const userId = getUserId();
             if (!userId) {
-                alert('ユーザーIDが取得できません。ログインしてください。');
+                alert(`${t('notloggedin')}`);
                 return;
             }
             
@@ -75,7 +76,7 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
                     canvas.focus();
                 },
                 onEnd: () => {
-                    alert('対戦が終了しました。');
+                    alert(`${t('room_gamend')}`); // ゲーム終了時のアラート
                     (window as any).router.navigateTo('/tournaments');
                 }
             });
@@ -83,11 +84,11 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
 
     } catch (error) {
         console.error("Failed to boot Pong game:", error);
-        appElement.innerHTML = `<p class="text-red-500">Failed to load game.</p>`;
+        appElement.innerHTML = `<p class="text-red-500">${t('Failedloadgame')}</p>`;
     }
 }
 
 export function renderErrorScreen(appElement: HTMLElement) {
-    const content = `<div class="metallic-card text-center p-10 rounded-lg shadow-xl"><h2 class="text-5xl font-extrabold text-yellow-500">Error</h2><p class="mt-4 text-lg">An error occurred during the game.</p></div>`;
+    const content = `<div class="metallic-card text-center p-10 rounded-lg shadow-xl"><h2 class="text-5xl font-extrabold text-yellow-500">Error</h2><p class="mt-4 text-lg">${t('errorgame')}</p></div>`;
     render(appElement, content);
 }
