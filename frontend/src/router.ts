@@ -3,6 +3,7 @@ import * as auth from './services/auth';
 import * as gameViews from './views/gameViews';
 import * as tournamentViews from './views/tournamentIndex';
 import * as authView from './views/authView';
+import { t } from './i18n';
 
 export class AppRouter {
     private appElement: HTMLElement;
@@ -98,13 +99,13 @@ export class AppRouter {
         event.preventDefault();
         const formData = new FormData(event.target as HTMLFormElement);
         const name = formData.get('name') as string;
-        if (!name) { alert('名前を入力してください。'); return; }
+        if (!name) { alert(`${t('typename')}`); return; }
         try {
             await api.signup(name);
-            alert(`ユーザー「${name}」を作成しました。ログインしてください。`);
+            alert(`${t('user')}「${name}」 ${t('creatlogin')}`);
             this.navigateTo('/login');
         } catch (error) {
-            alert('サインアップに失敗しました。');
+            alert(`${t('FailedSignup')}`);
         }
     }
     
@@ -112,13 +113,13 @@ export class AppRouter {
         event.preventDefault();
         const formData = new FormData(event.target as HTMLFormElement);
         const name = formData.get('name') as string;
-        if (!name) { alert('名前を入力してください。'); return; }
+        if (!name) { alert(`${t('typename')}`); return; }
         try {
             await api.authenticate(name);
-            alert(`ようこそ、${name}さん！`);
+            alert(`${t('welcome')} ${name}${t('mrs')}`);
             this.navigateTo('/tournaments');
         } catch (error) {
-            alert('ログインに失敗しました。');
+            alert(`${t('FailedLogin')}`);
         }
     }
 
@@ -133,16 +134,16 @@ export class AppRouter {
         };
         try {
             const newTournament = await api.createTournament(data);
-            alert('トーナメントを作成しました！');
+            alert(`${t('TournamentCreated')}`);
             this.navigateTo(`/tournament/detail/${newTournament.id}`);
         } catch (error) {
-            alert('トーナメントの作成に失敗しました。');
+            alert(`${t('FailedCreateTournament')}`);
         }
     }
 
     public async handleOpenTournament() {
         if (!this.currentTournamentData) {
-            alert('トーナメント情報が見つかりません。');
+            alert(`${t('tournamentnotfound')}`);
             return;
         }
         
@@ -150,19 +151,19 @@ export class AppRouter {
         
         // 参加者数をチェック
         if (this.currentTournamentData.participants && this.currentTournamentData.participants.length < 2) {
-            alert('トーナメントを開始するには最低2人以上の参加者が必要です。');
+            alert(`${t('startatention2')}`);
             return;
         }
         
-        if (confirm('トーナメントを開始しますか？\n開始すると新しい参加者の追加ができなくなります。')) {
+        if (confirm(`${t('starttournament?')}\n${t('startatention')}`)) {
             try {
                 console.log('Calling openTournament with ID:', this.currentTournamentData.id);
                 await api.openTournament(this.currentTournamentData.id);
-                alert('トーナメントを開始しました！');
+                alert(`${t('started')}`);
                 this.navigateTo(`/tournament/detail/${this.currentTournamentData.id}`);
             } catch (error) {
                 console.error('Error opening tournament:', error);
-                alert(`トーナメントの開始に失敗しました: ${error}`);
+                alert(`${t('failedstart')}: ${error}`);
             }
         }
     }
@@ -170,10 +171,10 @@ export class AppRouter {
     public async handleJoinTournament(tournamentId: string) {
         try {
             await api.joinTournament(tournamentId);
-            alert('トーナメントに参加しました！');
+            alert(`${t('joinedTournament')}`);
             this.handleLocation();
         } catch (error) {
-            alert('参加に失敗しました。');
+            alert(`${t('FailedJoinTournament')}`);
         }
     }
 
@@ -182,19 +183,19 @@ export class AppRouter {
             await api.setParticipantReady(tournamentId);
             this.handleLocation();
         } catch (error) {
-            alert('ステータスの変更に失敗しました。');
+            alert(`${t('FailedSetReady')}`);
         }
     }
 
     public async openTournament() {
         if (!this.currentTournamentData) return;
-        if (confirm('トーナメントをオープンしますか？')) {
+        if (confirm(`${t('open?')}`)) {
             try {
                 this.currentTournamentData = await api.openTournament(this.currentTournamentData.id);
-                alert('トーナメントがオープンされました！');
+                alert(`${t('opend')}`);
                 tournamentViews.renderAdminScreen(this.appElement, this.currentTournamentData, auth.getUserId());
             } catch (error) {
-                alert('トーナメントの開始に失敗しました。');
+                alert(`${t('FailedOpenTournament')}`);
             }
         }
     }
@@ -203,10 +204,10 @@ export class AppRouter {
         try {
             const myUserId = auth.getUserId();
             if (!myUserId) {
-                alert("ログインが必要です。");
+                alert(`${t('pleaselogin')}`);
                 return;
             }
-            alert("AI対戦用のルームを作成しています...");
+            alert(`${t('AiRoomcreating')}`);
             const roomData = await api.createAiRoom();
             
             // ★★★ 新しいゲーム画面描画関数を呼び出す
@@ -218,7 +219,7 @@ export class AppRouter {
             });
 
         } catch (error) {
-            alert('AI対戦の開始に失敗しました。');
+            alert(`${t('FailedCreateAiRoom')}`);
             console.error(error);
         }
     }
@@ -235,15 +236,15 @@ export class AppRouter {
         try {
             const myUserId = auth.getUserId();
             if (!myUserId) {
-                alert("ログインが必要です。");
+                alert(`${t('pleaselogin')}`);
                 return;
             }
 
-            alert("ゲームルームを取得しています...");
+            alert(`${t('TournamentRoomCreating')}`);
             const roomData = await api.getTournamentRoomId(tournamentId);
             
             if (!roomData.room_id) {
-                alert("ルームIDが取得できませんでした。対戦相手が準備完了になるまでお待ちください。");
+                alert(`${t('notfoundroom')}`);
                 return;
             }
 
@@ -256,7 +257,7 @@ export class AppRouter {
             });
 
         } catch (error) {
-            alert('ゲームの開始に失敗しました。');
+            alert(`${t('FailedStartGame')}`);
             console.error(error);
         }
     }
@@ -267,7 +268,7 @@ export class AppRouter {
      */
     public handleLogout(): void {
         auth.logout();
-        alert('ログアウトしました。');
+        alert(`${t('logoutsuccess')}`);
         this.navigateTo('/login');
     }
 }

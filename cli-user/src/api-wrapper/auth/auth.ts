@@ -3,7 +3,7 @@ export interface User {
   name: string;
 }
 
-export interface AuthError {
+export interface AuthErrorSchema {
   code: string;
   statusCode: number;
   error: string;
