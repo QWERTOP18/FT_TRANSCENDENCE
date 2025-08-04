@@ -4,7 +4,9 @@ import { config } from "../../config/config";
 export class GameWebSocket extends WebSocket {
 	constructor(roomId: string, userId: string) {
 		const wsUrl = `${config.wssURL}/game/${roomId}?user_id=${userId}`;
-		super(wsUrl);
+		super(wsUrl, {
+			rejectUnauthorized: false
+		});
 	}
 
 	// ゲーム状態のコールバックを設定

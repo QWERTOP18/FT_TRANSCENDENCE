@@ -39,7 +39,7 @@ export class BattleAPI {
   }
 
   async sendAPIRequest<T>(endpoint: string, body?: any, method: 'GET' | 'POST' | 'PUT' = 'GET', userId?: string): Promise<T> {
-    const url = `${config.gatewayURL}${endpoint}`;
+    const url = `${config.gatewayURL}/${endpoint}`;
     const x_userId = userId || '';
     const headers = {
       'X-User-ID': x_userId,
@@ -50,6 +50,9 @@ export class BattleAPI {
       method,
       data: body,
       headers,
+      httpsAgent: new (require('https').Agent)({
+        rejectUnauthorized: false
+      })
     }).then((response) => {
       return response.data as T;
     }).catch((error) => {
