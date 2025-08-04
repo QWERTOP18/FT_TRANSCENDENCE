@@ -133,24 +133,28 @@ export class Tournament {
 			pending: pendingParticipants.length,
 			total: this._props.participants.length
 		});
-		
-		if (this.isOverRound() == false) {
-			console.log("Round not over yet, returning");
-			return;
-		}
-		
-		if (this.canSetChampion()) {
-			console.log("Can set champion, setting champion");
-			this.setChampion();
-			this.close();
-		}
-		else {
-			console.log("Cannot set champion, doing reRound");
-			this.reRound();
-			if (this.shouldCarryUpOneParticipant()) {
-				console.log("Should carry up one participant");
-				this.carryUpOneParticipant();
+		try {
+			
+			if (this.isOverRound() == false) {
+				console.log("Round not over yet, returning");
+				return;
 			}
+			
+			if (this.canSetChampion()) {
+				console.log("Can set champion, setting champion");
+				this.setChampion();
+				this.close();
+			}
+			else {
+				console.log("Cannot set champion, doing reRound");
+				this.reRound();
+				if (this.shouldCarryUpOneParticipant()) {
+					console.log("Should carry up one participant");
+					this.carryUpOneParticipant();
+				}
+			}
+		} catch (error) {
+			console.error(`Error in endBattle: ${error}`);
 		}
 	}
 
@@ -169,6 +173,7 @@ export class Tournament {
 		if (this.isOverRound() == false)
 			throw new UsageError("バトルが終了していません");
 		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
+		console.log("reRound", battledParticipants);
 		battledParticipants.forEach((p) => {
 			p.become(new ParticipantState('pending'));
 		});
@@ -226,8 +231,11 @@ export class Tournament {
 		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
 		// For tournaments with more than 2 participants, we can have multiple battled participants
 		// The champion should be the one with the highest score or the last one to battle
-		if (battledParticipants.length < 1)
-			throw new UsageError("バトル済みの参加者がいません");
+		if (battledParticipants.length !== 1)
+		{
+			console.log("バトル済みの参加者がいません");
+			return false;
+		}
 		return true;
 	}
 
