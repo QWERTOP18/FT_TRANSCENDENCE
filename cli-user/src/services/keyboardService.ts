@@ -45,16 +45,16 @@ export class KeyboardService {
           break;
         case 'a':
         case 'left':
-          if (!this.keyStates.get('a')) {
-            this.sendKeyEvent(ws, 'a', true);
-            this.keyStates.set('a', true);
+          if (!this.keyStates.get('w')) {
+            this.sendKeyEvent(ws, 'w', true);
+            this.keyStates.set('w', true);
           }
           break;
         case 'd':
         case 'right':
-          if (!this.keyStates.get('d')) {
-            this.sendKeyEvent(ws, 'd', true);
-            this.keyStates.set('d', true);
+          if (!this.keyStates.get('s')) {
+            this.sendKeyEvent(ws, 's', true);
+            this.keyStates.set('s', true);
           }
           break;
       }

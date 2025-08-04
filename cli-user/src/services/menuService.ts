@@ -1,42 +1,36 @@
+import { Tournament } from '../api-wrapper/tournament/TournamentAPI';
+import { PrintTournamentListCommand } from '../commands/PrintTournamentList';
 import { UserInputService } from './userInputService';
-import { TournamentService, Tournament } from './tournamentService';
-import { ErrorResponse } from '../errors/JoinErrorResponse';
 
 export class MenuService {
-  private userInputService: UserInputService;
-  private tournamentService: TournamentService;
-
-  constructor(userInputService?: UserInputService) {
-    this.userInputService = userInputService || new UserInputService();
-    this.tournamentService = new TournamentService();
+  constructor() {
   }
 
-  async showMainMenu(): Promise<string> {
+  async showMainMenu(): Promise<'1' | '2' | '3'> {
     console.log('\n=== Main Menu ===');
     console.log('1. Play against AI');
     console.log('2. View Tournaments');
     console.log('3. Exit');
-    
-    const choice = await this.userInputService.askQuestion('Select an option (1-3): ');
-    return choice.trim();
+
+    const validChoices = ['1', '2', '3'];
+    const validate = (choice: string): choice is '1' | '2' | '3' => {
+      return validChoices.includes(choice.trim());
+    }
+    while (true) {
+      const userInputService = UserInputService.getInstance();
+      const choice = await userInputService.askQuestion('Select an option (1-3): ');
+      const trimmedChoice = choice.trim();
+      if (validate(trimmedChoice)) {
+        return trimmedChoice;
+      }
+    }
   }
 
-  async showTournamentMenu(tournaments: Tournament[]): Promise<string | null> {
-    if (tournaments.length === 0) {
-      console.log('\nNo tournaments available.');
-      return null;
-    }
+  async selectTournamentMenu(tournaments: Tournament[]): Promise<string | null> {
+    new PrintTournamentListCommand(tournaments).execute();
 
-    console.log('\n=== Available Tournaments ===');
-    tournaments.forEach((tournament, index) => {
-      console.log(`${index + 1}. ${tournament.name}`);
-      console.log(`   Status: ${tournament.status}`);
-      console.log(`   Participants: ${tournament.participants}/${tournament.maxParticipants}`);
-      console.log(`   Created: ${new Date(tournament.createdAt).toLocaleDateString()}`);
-      console.log('');
-    });
-
-    const choice = await this.userInputService.askQuestion(`Select a tournament (1-${tournaments.length}) or 'b' to go back: `);
+    const userInputService = UserInputService.getInstance();
+    const choice = await userInputService.askQuestion(`Select a tournament (1-${tournaments.length}) or 'b' to go back: `);
     const trimmedChoice = choice.trim().toLowerCase();
 
     if (trimmedChoice === 'b' || trimmedChoice === 'back') {
@@ -49,56 +43,39 @@ export class MenuService {
     }
 
     console.log('Invalid selection. Please try again.');
-    return await this.showTournamentMenu(tournaments);
+    return await this.selectTournamentMenu(tournaments);
   }
 
   async showTournamentDetailsMenu(tournament: Tournament): Promise<'join' | 'ready' | 'back'> {
 
     console.log('\n=== Tournament Details ===');
     console.log(`Name: ${tournament.name}`);
-    console.log(`Status: ${tournament.status}`);
-    console.log(`Participants: ${tournament.participants}/${tournament.maxParticipants}`);
-    console.log(`Created: ${new Date(tournament.createdAt).toLocaleDateString()}`);
+    console.log(`Status: ${tournament.state}`);
+    console.log(`Participants: ${tournament.participants}/${tournament.max_num}`);
     console.log('==========================');
 
-    console.log('\n1. Join Tournament');
-    console.log('2. Ready to Play');
-    console.log('3. Back to Tournaments');
-    
+    const selections = [];
+    if (tournament.state === 'reception') {
+      selections.push({ label: 'Join Tournament', value: 'join' });
+    }
+    else if (tournament.state === 'open') {
+      selections.push({ label: 'Ready to Play', value: 'ready' });
+    }
+    selections.push({ label: 'Back to Tournaments', value: 'back' });
+    const message = selections.map((s, index) => `${index + 1}. ${s.label}`).join('\n');
+    console.log('');
+    console.log(message);
+
     while (true) {
-      const choice = await this.userInputService.askQuestion(`Select a tournament (1-3): `);
-      if (choice === '1') {
-        return 'join';
-      } else if (choice === '2') {
-        return 'ready';
-      } else if (choice === '3' || choice.toLowerCase() === 'b' || choice.toLowerCase() === 'back') {
-        return 'back';
+      const userInputService = UserInputService.getInstance();
+      const choice = await userInputService.askQuestion(`Select a tournament (1-${selections.length}) or \'b\' to go back: `);
+      const selected = selections[parseInt(choice.trim()) - 1];
+      if (selected) {
+        return selected.value as 'join' | 'ready' | 'back';
       }
+      if (choice.trim() == 'b')
+        return 'back';
       console.log('Invalid selection. Please try again.');
     }
-  }
-
-  async displayTournaments(userId: string): Promise<Tournament[]> {
-    try {
-      const tournaments = await this.tournamentService.getTournaments(userId);
-      return tournaments;
-    } catch (error) {
-      console.error('Failed to fetch tournaments:', error);
-      return [];
-    }
-  }
-
-  async joinSelectedTournament(tournamentId: string, userId: string) {
-    try {
-      const resp = await this.tournamentService.joinTournament(tournamentId, userId);
-      return resp;
-    } catch (error) {
-      console.error('Failed to join tournament:', error);
-      throw error;
-    }
-  }
-
-  close(): void {
-    this.userInputService.close();
   }
 } 
