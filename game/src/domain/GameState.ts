@@ -117,14 +117,14 @@ export class GameState {
   handleKeyEvent(key: string, pressed: boolean, ws: WebSocket, player1: WebSocket | null, player2: WebSocket | null) {
     if (ws === player1) {
         this.keys1[key] = pressed;
-        console.log("プレイヤー1のキーイベント");
+        // console.log("プレイヤー1のキーイベント");
     }
     else if (ws === player2) {
         this.keys2[key] = pressed;
-        console.log("プレイヤー2のキーイベント");
+        // console.log("プレイヤー2のキーイベント");
     }
     else {
-        console.log("それ以外のキーイベント");
+        // console.log("それ以外のキーイベント");
     }
   }
 

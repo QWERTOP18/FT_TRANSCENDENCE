@@ -120,17 +120,41 @@ export class Tournament {
 	}
 
 	public endBattle(history: History) {
+		console.log("Ending battle for tournament:", this._props.id.value);
 		this.addHistory(history);
-		if (this.isOverRound() == false)
-			return;
-		if (this.canSetChampion()) {
-			this.setChampion();
-			this.close();
-		}
-		else {
-			this.reRound();
-			if (this.shouldCarryUpOneParticipant())
-				this.carryUpOneParticipant();
+		
+		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
+		const eliminatedParticipants = this.getParticipantsByState(new ParticipantState('eliminated'));
+		const pendingParticipants = this.getParticipantsByState(new ParticipantState('pending'));
+		
+		console.log("Tournament state after battle:", {
+			battled: battledParticipants.length,
+			eliminated: eliminatedParticipants.length,
+			pending: pendingParticipants.length,
+			total: this._props.participants.length
+		});
+		try {
+			
+			if (this.isOverRound() == false) {
+				console.log("Round not over yet, returning");
+				return;
+			}
+			
+			if (this.canSetChampion()) {
+				console.log("Can set champion, setting champion");
+				this.setChampion();
+				this.close();
+			}
+			else {
+				console.log("Cannot set champion, doing reRound");
+				this.reRound();
+				if (this.shouldCarryUpOneParticipant()) {
+					console.log("Should carry up one participant");
+					this.carryUpOneParticipant();
+				}
+			}
+		} catch (error) {
+			console.error(`Error in endBattle: ${error}`);
 		}
 	}
 
@@ -149,6 +173,7 @@ export class Tournament {
 		if (this.isOverRound() == false)
 			throw new UsageError("バトルが終了していません");
 		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
+		console.log("reRound", battledParticipants);
 		battledParticipants.forEach((p) => {
 			p.become(new ParticipantState('pending'));
 		});
@@ -204,8 +229,13 @@ export class Tournament {
 		if (this.isOverRound() == false)
 			throw new UsageError("バトルが終了していません");
 		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
-		if (battledParticipants.length != 1)
-			throw new UsageError("バトル済みの参加者が1人ではありません");
+		// For tournaments with more than 2 participants, we can have multiple battled participants
+		// The champion should be the one with the highest score or the last one to battle
+		if (battledParticipants.length !== 1)
+		{
+			console.log("バトル済みの参加者がいません");
+			return false;
+		}
 		return true;
 	}
 

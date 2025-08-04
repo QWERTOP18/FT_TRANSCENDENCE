@@ -15,11 +15,14 @@ export class AuthAPI {
   }
 
   async sendAPIRequest<T>(endpoint: string, body?: any, method: 'GET' | 'POST' = 'GET'): Promise<T> {
-    const url = `${config.gatewayURL}${endpoint}`;
+    const url = `${config.gatewayURL}/${endpoint}`;
     return await axios({
       url,
       method,
       data: body,
+      httpsAgent: new (require('https').Agent)({
+        rejectUnauthorized: false
+      })
     }).then((response) => {
       return response.data as T;
     }).catch((error) => {

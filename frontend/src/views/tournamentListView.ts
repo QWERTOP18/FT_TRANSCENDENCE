@@ -6,30 +6,30 @@ import { t } from '../i18n';
  * トーナメント一覧画面を描画する
  */
 export function renderTournamentListScreen(appElement: HTMLElement, tournaments: any[], myUserId: string | null): void {
-    const listHTML = tournaments.reverse().map(t => {
-        const adminButtonHTML = t.owner_id === myUserId ?
-            `<button class="mt-2 block w-full px-4 py-2 metallic-button-red rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/admin/${t.id}')">
+    const listHTML = tournaments.reverse().map(tournament => {
+        const adminButtonHTML = tournament.owner_id === myUserId ?
+            `<button class="mt-2 block w-full px-4 py-2 metallic-button-red rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/admin/${tournament.id}')">
                 ${t('manage')}
             </button>` : '';
 
-        const editButtonHTML = t.is_owner && t.state === 'reception' ?
-            `<button class="mt-2 block w-full px-4 py-2 metallic-button-orange rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/edit/${t.id}')">
+        const editButtonHTML = tournament.is_owner && tournament.state === 'reception' ?
+            `<button class="mt-2 block w-full px-4 py-2 metallic-button-orange rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/edit/${tournament.id}')">
                 ${t('start')}
             </button>` : '';
 
         return `
-            <div class="metallic-card p-4 rounded-lg mb-4 flex justify-between items-center transition hover:scale-102 duration-200">
-                <div>
-                    <h3 class="text-xl font-bold text-white">${t.name}</h3>
-                    <p class="text-gray-300">${t.description}</p>
+            <div class="metallic-card p-4 rounded-lg mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center transition hover:scale-102 duration-200 gap-4">
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-white">${tournament.name}</h3>
+                    <p class="text-gray-300">${tournament.description}</p>
                 </div>
-                <div class="text-right w-32 flex-shrink-0">
+                <div class="text-right sm:text-right w-full sm:w-32 flex-shrink-0">
                     <span class="text-sm font-semibold px-3 py-1 rounded-full metallic-status ${
-                        t.state === 'open' ? 'metallic-status-open' :
-                        t.state === 'reception' ? 'metallic-status-reception' :
+                        tournament.state === 'open' ? 'metallic-status-open' :
+                        tournament.state === 'reception' ? 'metallic-status-reception' :
                         'metallic-status-close'
-                    }">${t.state}</span>
-                    <button class="mt-2 block w-full px-4 py-2 metallic-button-blue rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/detail/${t.id}')">
+                    }">${tournament.state}</span>
+                    <button class="mt-2 block w-full px-4 py-2 metallic-button-blue rounded text-white font-semibold text-sm" onclick="window.router.navigateTo('/tournament/detail/${tournament.id}')">
                         ${t('detail')}
                     </button>
                     ${adminButtonHTML}
@@ -42,9 +42,9 @@ export function renderTournamentListScreen(appElement: HTMLElement, tournaments:
     const contentHTML = `
         ${createHeader()}
         <div class="metallic-card p-8 rounded-lg text-white w-full max-w-3xl mx-auto">
-            <div class="flex justify-between items-center mb-8">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
                 <h2 class="text-3xl font-bold">${t('TournamentList')}</h2>
-                <div class="flex gap-2">
+                <div class="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
                     <button class="px-6 py-2 metallic-button-purple rounded text-white font-bold" onclick="window.router.handlePlayAi()">
                         ${t('vsAI')}
                     </button>
