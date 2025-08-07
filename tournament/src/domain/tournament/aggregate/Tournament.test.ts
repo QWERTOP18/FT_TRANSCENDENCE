@@ -53,50 +53,52 @@ function openTest() {
 	});
 
 	describe("open", () => {
-		// 正常系
-		test("参加者が二人以上ならトーナメントを開けること", () => {
-			const tournamentContext: TournamentValue = {
-				...genTournamentBaseContext(),
-				state: new TournamentState('reception'),
-			}
-			const tournament = Tournament.reconstruct(tournamentContext);
-			tournament.addParticipant(participants.A);
-			expect(() => tournament.open()).not.toThrowError();
-			expect(tournament.state.equals(new TournamentState('open'))).toBeTruthy();
-		});
+		describe("正常系", () => {
+			test("参加者が二人以上ならトーナメントを開けること", () => {
+				const tournamentContext: TournamentValue = {
+					...genTournamentBaseContext(),
+					state: new TournamentState('reception'),
+				}
+				const tournament = Tournament.reconstruct(tournamentContext);
+				tournament.addParticipant(participants.A);
+				expect(() => tournament.open()).not.toThrowError();
+				expect(tournament.state.equals(new TournamentState('open'))).toBeTruthy();
+			});
+		})
 
-		// 異常系
-		test("参加者が一人ならトーナメントを開けないこと", () => {
-			const tournamentContext: TournamentValue = {
-				...genTournamentBaseContext(),
-				state: new TournamentState('reception'),
-				participants: [participants.Owner],
-			}
-			const tournament = Tournament.reconstruct(tournamentContext);
-			expect(() => tournament.open()).toThrowError();
-			expect(tournament.state.equals(new TournamentState('reception'))).toBeTruthy();
-		});
-
-		test("open済みなら開けないこと", () => {
-			const tournamentContext: TournamentValue = {
-				...genTournamentBaseContext(),
-				state: new TournamentState('open'),
-				participants: [participants.Owner, participants.A],
-			}
-			const tournament = Tournament.reconstruct(tournamentContext);
-			expect(() => tournament.open()).toThrowError();
-			expect(tournament.state.equals(new TournamentState('open'))).toBeTruthy();
-		});
-
-		test("close済みなら開けないこと", () => {
-			const tournamentContext: TournamentValue = {
-				...genTournamentBaseContext(),
-				state: new TournamentState('close'),
-				participants: [participants.Owner, participants.A],
-			}
-			const tournament = Tournament.reconstruct(tournamentContext);
-			expect(() => tournament.open()).toThrowError();
-			expect(tournament.state.equals(new TournamentState('close'))).toBeTruthy();
+		describe("異常系", () => {
+			test("参加者が一人ならトーナメントを開けないこと", () => {
+				const tournamentContext: TournamentValue = {
+					...genTournamentBaseContext(),
+					state: new TournamentState('reception'),
+					participants: [participants.Owner],
+				}
+				const tournament = Tournament.reconstruct(tournamentContext);
+				expect(() => tournament.open()).toThrowError();
+				expect(tournament.state.equals(new TournamentState('reception'))).toBeTruthy();
+			});
+	
+			test("open済みなら開けないこと", () => {
+				const tournamentContext: TournamentValue = {
+					...genTournamentBaseContext(),
+					state: new TournamentState('open'),
+					participants: [participants.Owner, participants.A],
+				}
+				const tournament = Tournament.reconstruct(tournamentContext);
+				expect(() => tournament.open()).toThrowError();
+				expect(tournament.state.equals(new TournamentState('open'))).toBeTruthy();
+			});
+	
+			test("close済みなら開けないこと", () => {
+				const tournamentContext: TournamentValue = {
+					...genTournamentBaseContext(),
+					state: new TournamentState('close'),
+					participants: [participants.Owner, participants.A],
+				}
+				const tournament = Tournament.reconstruct(tournamentContext);
+				expect(() => tournament.open()).toThrowError();
+				expect(tournament.state.equals(new TournamentState('close'))).toBeTruthy();
+			});
 		});
 	})
 }
