@@ -161,6 +161,12 @@ export class Tournament {
 		const loser = this.getParticipantById(history.getLoserId());
 		if (!winner || !loser)
 			throw new UsageError("トーナメントに属していない参加者です");
+		if (winner.equals(loser))
+			throw new UsageError("同じ参加者を指定することはできません");
+		if (winner.state.equals(new ParticipantState('in_progress')) == false)
+			throw new UsageError("バトル中の参加者ではありません");
+		if (loser.state.equals(new ParticipantState('in_progress')) == false)
+			throw new UsageError("バトル中の参加者ではありません");
 		winner.become(new ParticipantState('battled'));
 		loser.become(new ParticipantState('eliminated'));
 		this._props.histories.push(history);
