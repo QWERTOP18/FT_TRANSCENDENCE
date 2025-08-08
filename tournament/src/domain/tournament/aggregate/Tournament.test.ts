@@ -242,7 +242,7 @@ function readyTest() {
 			test("参加者を準備完了にできること", () => {
 				const participantA = genParticipant('A'); // A
 				const participantOwner = genParticipant('Owner'); // Owner
-				const tournament = genTournamentValueBaseContext({
+				const tournament = genTournament({
 					state: new TournamentState('open'),
 					participants: [
 						participantOwner,
@@ -259,7 +259,7 @@ function readyTest() {
 			test("トーナメントがreception状態だと準備完了にできないこと", () => {
 				const participantA = genParticipant('A'); // A
 				const participantOwner = genParticipant('Owner'); // Owner
-				const tournament = genTournamentValueBaseContext({
+				const tournament = genTournament({
 					state: new TournamentState('reception'),
 					participants: [
 						participantOwner,
@@ -272,7 +272,7 @@ function readyTest() {
 			test("参加者がclose状態だと準備完了にできないこと", () => {
 				const participantA = genParticipant('A'); // A
 				const participantOwner = genParticipant('Owner'); // Owner
-				const tournament = genTournamentValueBaseContext({
+				const tournament = genTournament({
 					state: new TournamentState('close'),
 					participants: [
 						participantOwner,
@@ -286,7 +286,7 @@ function readyTest() {
 				const participantA = genParticipant('A'); // A
 				const participantOwner = genParticipant('Owner'); // Owner
 				const participantC = genParticipant('C'); // C
-				const tournament = genTournamentValueBaseContext({
+				const tournament = genTournament({
 					state: new TournamentState('open'),
 					participants: [
 						participantOwner,
@@ -368,7 +368,7 @@ function genParticipant(name: 'Owner' | 'A' | 'B' | 'C' | 'C_DupExternalId' | 'C
 	return participant;
 }
 
-function genTournamentValueBaseContext(options: Partial<TournamentValue> = {}): Tournament {
+function genTournament(options: Partial<TournamentValue> = {}): Tournament {
 	return Tournament.reconstruct({
 		id: tournamentId,
 		championId: undefined,
