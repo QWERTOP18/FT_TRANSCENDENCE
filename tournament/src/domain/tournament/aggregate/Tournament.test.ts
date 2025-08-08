@@ -116,7 +116,7 @@ function addParticipantTest() {
 function readyTest() {
 	describe("ready", () => {
 		describe("正常系", () => {
-			test("参加者を準備完了にできること", () => {
+			test("参加者を準備完了 ( ready ) にできること", () => {
 				const participantA = genParticipant('A'); // A
 				const participantOwner = genParticipant('Owner'); // Owner
 				const tournament = genTournament({
@@ -133,31 +133,20 @@ function readyTest() {
 		})
 
 		describe("異常系", () => {
-			test("トーナメントがreception状態だと準備完了にできないこと", () => {
-				const participantA = genParticipant('A'); // A
-				const participantOwner = genParticipant('Owner'); // Owner
-				const tournament = genTournament({
-					state: new TournamentState('reception'),
-					participants: [
-						participantOwner,
-						participantA,
-					]
+			for (const state of ['reception', 'close'] as const) {
+				test(`トーナメントが "${state}" 状態だと準備完了にできないこと`, () => {
+					const participantA = genParticipant('A'); // A
+					const participantOwner = genParticipant('Owner'); // Owner
+					const tournament = genTournament({
+						state: new TournamentState(state),
+						participants: [
+							participantOwner,
+							participantA,
+						]
+					});
+					expect(() => tournament.ready(participantA)).toThrowError();
 				});
-				expect(() => tournament.ready(participantA)).toThrowError();
-			});
-
-			test("参加者がclose状態だと準備完了にできないこと", () => {
-				const participantA = genParticipant('A'); // A
-				const participantOwner = genParticipant('Owner'); // Owner
-				const tournament = genTournament({
-					state: new TournamentState('close'),
-					participants: [
-						participantOwner,
-						participantA,
-					]
-				});
-				expect(() => tournament.ready(participantA)).toThrowError();
-			});
+			}
 
 			test("トーナメントに属していない参加者は準備完了にできないこと", () => {
 				const participantA = genParticipant('A'); // A
@@ -172,6 +161,24 @@ function readyTest() {
 				});
 				expect(() => tournament.ready(participantC)).toThrowError();
 			});
+
+			for (const state of ['ready', 'in_progress', 'battled', 'eliminated', 'champion'] as const)
+			{
+				test(`参加者が "${state}" のときはreadyにできないこと`, () => {
+					const participantOwner = genParticipant('Owner'); // Owner
+					const participantA = genParticipant('A', {
+						state: new ParticipantState(state)
+					}) // A
+					const tournament = genTournament({
+						state: new TournamentState('open'),
+						participants: [
+							participantOwner,
+							participantA,
+						]
+					});
+					expect(() => tournament.ready(participantA)).toThrowError();
+				});
+			}
 		})
 	});
 }
