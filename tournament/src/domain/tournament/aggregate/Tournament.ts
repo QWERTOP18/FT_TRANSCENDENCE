@@ -198,14 +198,14 @@ export class Tournament {
 
 	public canSetChampion() {
 		if (this._props.state.equals(new TournamentState('open')) == false)
-			throw new UsageError("開催中のトーナメントでのみ決定できます");
+			return false;
 		if (this._props.participants.length < 2)
-			throw new UsageError("参加者が2人以上必要です");
+			return false;
 		if (this.isOverRound() == false)
-			throw new UsageError("バトルが終了していません");
+			return false;
 		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
 		if (battledParticipants.length != 1)
-			throw new UsageError("バトル済みの参加者が1人ではありません");
+			return false;
 		return true;
 	}
 
