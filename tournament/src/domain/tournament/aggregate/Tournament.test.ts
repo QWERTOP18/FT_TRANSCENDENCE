@@ -12,6 +12,7 @@ describe("Tournament", () => {
 	addParticipantTest();
 	readyTest();
 	cancelTest();
+	startBattleTest();
 })
 
 // トーナメントを開くテスト
@@ -163,8 +164,7 @@ function readyTest() {
 				expect(() => tournament.ready(participantC)).toThrowError();
 			});
 
-			for (const state of ['ready', 'in_progress', 'battled', 'eliminated', 'champion'] as const)
-			{
+			for (const state of ['ready', 'in_progress', 'battled', 'eliminated', 'champion'] as const) {
 				test(`参加者が "${state}" のときはreadyにできないこと`, () => {
 					const participantOwner = genParticipant('Owner'); // Owner
 					const participantA = genParticipant('A', {
@@ -240,8 +240,7 @@ function cancelTest() {
 				expect(() => tournament.cancel(participantC)).toThrowError();
 			});
 
-			for (const state of ['pending', 'eliminated', 'champion'] as const)
-			{
+			for (const state of ['pending', 'eliminated', 'champion'] as const) {
 				test(`参加者が "${state}" のときはpendingにできないこと`, () => {
 					const participantOwner = genParticipant('Owner'); // Owner
 					const participantA = genParticipant('A', {
@@ -262,7 +261,120 @@ function cancelTest() {
 }
 
 // バトル開始のテスト
-function startBattleTest() { }
+function startBattleTest() {
+	describe("startBattle", () => {
+		describe("正常系", () => {
+			test("参加者をバトル開始状態 ( in_progress ) にできること", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('ready')
+				});
+				const participantB = genParticipant('B', {
+					state: new ParticipantState('ready')
+				});
+				const participantOwner = genParticipant('Owner'); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+						participantB,
+					]
+				})
+				expect(() => tournament.startBattle(participantA, participantB)).not.toThrowError();
+				expect(participantA.state.equals(new ParticipantState('in_progress'))).toBeTruthy();
+				expect(participantB.state.equals(new ParticipantState('in_progress'))).toBeTruthy();
+				expect(participantOwner.state.equals(new ParticipantState('pending'))).toBeTruthy();
+			});
+		});
+		describe("異常系", () => {
+			for (const state of ['reception', 'close'] as const) {
+				test(`トーナメントが "${state}" 状態だとバトル開始できないこと`, () => {
+					const participantA = genParticipant('A', {
+						state: new ParticipantState('ready')
+					});
+					const participantB = genParticipant('B', {
+						state: new ParticipantState('ready')
+					});
+					const participantOwner = genParticipant('Owner'); // Owner
+					const tournament = genTournament({
+						state: new TournamentState(state),
+						participants: [
+							participantOwner,
+							participantA,
+							participantB,
+						]
+					})
+					expect(() => tournament.startBattle(participantA, participantB)).toThrowError();
+				});
+			}
+
+			test("トーナメントに属していない参加者はバトル開始できないこと", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('ready')
+				});
+				const participantB = genParticipant('B', {
+					state: new ParticipantState('ready')
+				});
+				const participantC = genParticipant('C', {
+					state: new ParticipantState('ready')
+				});
+				const participantOwner = genParticipant('Owner'); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+						participantB,
+					]
+				})
+				expect(() => tournament.startBattle(participantC, participantB)).toThrowError();
+			});
+
+			test("同じ参加者を指定するとバトル開始できないこと", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('ready')
+				});
+				const participantOwner = genParticipant('Owner'); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+					]
+				})
+				expect(() => tournament.startBattle(participantA, participantA)).toThrowError();
+			});
+
+			describe("ready同士以外はバトルできないこと", () => {
+				const states = ['pending', 'ready', 'in_progress', 'battled', 'eliminated', 'champion'] as const;
+				for (const stateA of states) {
+					for (const stateB of states) {
+						if (stateA == 'ready' && stateB == 'ready')
+							continue; // ready同士は許容
+						test(`A="${stateA}", B="${stateB}" のとき`, () => {
+							const participantA = genParticipant('A', {
+								state: new ParticipantState(stateA)
+							});
+							const participantB = genParticipant('B', {
+								state: new ParticipantState(stateB)
+							});
+							const participantOwner = genParticipant('Owner'); // Owner
+							const tournament = genTournament({
+								state: new TournamentState('open'),
+								participants: [
+									participantOwner,
+									participantA,
+									participantB,
+								]
+							})
+							expect(() => tournament.startBattle(participantA, participantB)).toThrowError();
+						});
+					}
+				}
+			})
+		});
+	});
+}
 
 // バトル終了のテスト
 function endBattleTest() { }
