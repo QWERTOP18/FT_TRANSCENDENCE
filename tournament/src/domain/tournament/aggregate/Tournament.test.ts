@@ -13,6 +13,7 @@ describe("Tournament", () => {
 	readyTest();
 })
 
+// トーナメントを開くテスト
 function openTest() {
 	describe("open", () => {
 		describe("正常系", () => {
@@ -111,6 +112,7 @@ function addParticipantTest() {
 	})
 }
 
+// 参加者を準備完了にするテスト
 function readyTest() {
 	describe("ready", () => {
 		describe("正常系", () => {
@@ -174,12 +176,15 @@ function readyTest() {
 	});
 }
 
+// キャンセルのテスト
 function cancelTest() {
 
 }
 
+// バトル開始のテスト
 function startBattleTest() { }
 
+// バトル終了のテスト
 function endBattleTest() { }
 
 /**
