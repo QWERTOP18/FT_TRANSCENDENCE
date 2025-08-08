@@ -11,6 +11,7 @@ describe("Tournament", () => {
 	openTest();
 	addParticipantTest();
 	readyTest();
+	cancelTest();
 })
 
 // トーナメントを開くテスト
@@ -185,7 +186,79 @@ function readyTest() {
 
 // キャンセルのテスト
 function cancelTest() {
+	describe("cancel", () => {
+		describe("正常系", () => {
+			test("ready状態の参加者をキャンセルできること", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('ready')
+				}); // A
+				const participantOwner = genParticipant('Owner'); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+					]
+				});
+				expect(() => tournament.cancel(participantA)).not.toThrowError();
+				expect(participantA.state.equals(new ParticipantState('pending'))).toBeTruthy();
+				expect(participantOwner.state.equals(new ParticipantState('pending'))).toBeTruthy();
+			})
+		})
 
+		describe("異常系", () => {
+			for (const state of ['reception', 'close'] as const) {
+				test(`トーナメントが "${state}" 状態だとキャンセルにできないこと`, () => {
+					const participantA = genParticipant('A', {
+						state: new ParticipantState('ready')
+					}); // A
+					const participantOwner = genParticipant('Owner'); // Owner
+					const tournament = genTournament({
+						state: new TournamentState(state),
+						participants: [
+							participantOwner,
+							participantA,
+						]
+					});
+					expect(() => tournament.cancel(participantA)).toThrowError();
+				});
+			}
+
+			test("トーナメントに属していない参加者は準備完了にできないこと", () => {
+				const participantA = genParticipant('A'); // A
+				const participantOwner = genParticipant('Owner'); // Owner
+				const participantC = genParticipant('C', {
+					state: new ParticipantState('ready')
+				}); // C
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+					]
+				});
+				expect(() => tournament.cancel(participantC)).toThrowError();
+			});
+
+			for (const state of ['pending', 'eliminated', 'champion'] as const)
+			{
+				test(`参加者が "${state}" のときはpendingにできないこと`, () => {
+					const participantOwner = genParticipant('Owner'); // Owner
+					const participantA = genParticipant('A', {
+						state: new ParticipantState(state)
+					}) // A
+					const tournament = genTournament({
+						state: new TournamentState('open'),
+						participants: [
+							participantOwner,
+							participantA,
+						]
+					});
+					expect(() => tournament.cancel(participantA)).toThrowError();
+				});
+			}
+		})
+	})
 }
 
 // バトル開始のテスト
