@@ -6,6 +6,10 @@ import { Tournament, TournamentValue } from './Tournament';
 import { ParticipantId } from '../value-objects/ParticipantId';
 import { ParticipantState } from '../value-objects/ParticipantState';
 import { TournamentState } from '../value-objects/TournamentState';
+import { History, HistoryValue } from '../entities/History';
+import { HistoryId } from '../value-objects/HistoryId';
+import { ParticipantScore } from '../value-objects/ParticipantScore';
+import { Score } from '../value-objects/Score';
 
 describe("Tournament", () => {
 	openTest();
@@ -13,6 +17,7 @@ describe("Tournament", () => {
 	readyTest();
 	cancelTest();
 	startBattleTest();
+	endBattleTest();
 })
 
 // トーナメントを開くテスト
@@ -377,7 +382,237 @@ function startBattleTest() {
 }
 
 // バトル終了のテスト
-function endBattleTest() { }
+function endBattleTest() {
+	describe("endBattle", () => {
+		describe("正常系", () => {
+			test("バトルを終了できること", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantB = genParticipant('B', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantC = genParticipant('C');
+				const participantOwner = genParticipant('Owner'); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+						participantB,
+						participantC,
+					]
+				})
+				const winner = participantA;
+				const loser = participantB;
+				const history = genHistory(winner, loser);
+				expect(() => tournament.endBattle(history)).not.toThrowError();
+				expect(winner.state.equals(new ParticipantState('battled'))).toBeTruthy();
+				expect(loser.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(participantC.state.equals(new ParticipantState('pending'))).toBeTruthy();
+				expect(participantOwner.state.equals(new ParticipantState('pending'))).toBeTruthy();
+			});
+
+			test("バトル終了時に一人だけ勝ち残っているときは優勝になること(4人)", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantB = genParticipant('B', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantC = genParticipant('C', {
+					state: new ParticipantState('eliminated')
+				});
+				const participantOwner = genParticipant('Owner', {
+					state: new ParticipantState('eliminated')
+				}); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+						participantB,
+						participantC,
+					]
+				})
+				const winner = participantA;
+				const loser = participantB;
+				const history = genHistory(winner, loser);
+				expect(() => tournament.endBattle(history)).not.toThrowError();
+				expect(winner.state.equals(new ParticipantState('champion'))).toBeTruthy();
+				expect(loser.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(participantC.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(participantOwner.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(tournament.championId?.equals(winner.id)).toEqual(true);
+				expect(tournament.state.equals(new TournamentState('close'))).toBeTruthy();
+			});
+
+			test("ラウンドが終了したら勝ち残った人をpendingにする", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantB = genParticipant('B', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantC = genParticipant('C', {
+					state: new ParticipantState('battled')
+				});
+				const participantOwner = genParticipant('Owner', {
+					state: new ParticipantState('eliminated')
+				}); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+						participantB,
+						participantC,
+					]
+				})
+				const winner = participantA;
+				const loser = participantB;
+				const history = genHistory(winner, loser);
+				expect(() => tournament.endBattle(history)).not.toThrowError();
+				expect(winner.state.equals(new ParticipantState('pending'))).toBeTruthy();
+				expect(loser.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(participantC.state.equals(new ParticipantState('pending'))).toBeTruthy();
+				expect(participantOwner.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(tournament.championId).toEqual(undefined);
+				expect(tournament.state.equals(new TournamentState('open'))).toBeTruthy();
+			});
+
+			test("奇数人pendingになる場合は一人をbattledにする", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantB = genParticipant('B', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantC = genParticipant('C', {
+					state: new ParticipantState('battled')
+				});
+				const participantD = genParticipant('D', {
+					state: new ParticipantState('battled')
+				});
+				const participantOwner = genParticipant('Owner', {
+					state: new ParticipantState('eliminated')
+				}); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+						participantB,
+						participantC,
+						participantD,
+					]
+				})
+				const winner = participantA;
+				const loser = participantB;
+				const history = genHistory(winner, loser);
+				expect(() => tournament.endBattle(history)).not.toThrowError();
+				expect(loser.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(participantOwner.state.equals(new ParticipantState('eliminated'))).toBeTruthy();
+				expect(tournament.championId).toEqual(undefined);
+				expect(tournament.state.equals(new TournamentState('open'))).toBeTruthy();
+
+				const battledParticipants = tournament.getParticipantsByState(new ParticipantState('battled'));
+				const pendingParticipants = tournament.getParticipantsByState(new ParticipantState('pending'));
+				expect(battledParticipants.length).toEqual(1);
+				expect(pendingParticipants.length).toEqual(2);
+			});
+		});
+
+		describe("異常系", () => {
+			describe("バトル中でない参加者同士は終了できないこと", () => {
+				const states = ['pending', 'ready', 'in_progress', 'battled', 'eliminated', 'champion'] as const;
+				for (const stateA of states) {
+					for (const stateB of states) {
+						if (stateA == 'in_progress' && stateB == 'in_progress')
+							continue; // in_progress同士は許容
+						test(`A="${stateA}", B="${stateB}" のとき`, () => {
+							const participantA = genParticipant('A', {
+								state: new ParticipantState(stateA)
+							});
+							const participantB = genParticipant('B', {
+								state: new ParticipantState(stateB)
+							});
+							const participantOwner = genParticipant('Owner'); // Owner
+							const tournament = genTournament({
+								state: new TournamentState('open'),
+								participants: [
+									participantOwner,
+									participantA,
+									participantB,
+								]
+							})
+							const history = genHistory(participantA, participantB);
+							expect(() => tournament.endBattle(history)).toThrowError();
+						});
+					}
+				}
+			});
+
+			test("同じ参加者を指定するとバトル終了できないこと", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantOwner = genParticipant('Owner'); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+					]
+				})
+				const history = genHistory(participantA, participantA);
+				expect(() => tournament.endBattle(history)).toThrowError();
+			});
+
+			test("トーナメントに所属していない参加者を指定するとバトル終了できないこと", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantB = genParticipant('B', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantC = genParticipant('C', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantOwner = genParticipant('Owner'); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+					]
+				})
+				const history = genHistory(participantB, participantC);
+				expect(() => tournament.endBattle(history)).toThrowError();
+			});
+
+			test("履歴のトーナメントIDが一致しない場合はバトル終了できないこと", () => {
+				const participantA = genParticipant('A', {
+					state: new ParticipantState('in_progress')
+				});
+				const participantOwner = genParticipant('Owner', {
+					state: new ParticipantState('in_progress')
+				}); // Owner
+				const tournament = genTournament({
+					state: new TournamentState('open'),
+					participants: [
+						participantOwner,
+						participantA,
+					]
+				})
+				const history = genHistory(participantA, participantOwner, {
+					tournamentId: new TournamentId('00000000-0000-1000-8000-000000000000') // 不正なID
+				});
+				expect(() => tournament.endBattle(history)).toThrowError();
+			});
+		});
+	});
+}
 
 /**
  * Utils
@@ -391,7 +626,7 @@ function genParticipantBaseContext(): Pick<ParticipantValue, 'tournamentId' | 's
 	}
 }
 
-function genParticipant(name: 'Owner' | 'A' | 'B' | 'C' | 'C_DupExternalId' | 'C_DupId', options: Partial<ParticipantValue> = {}): Participant {
+function genParticipant(name: 'Owner' | 'A' | 'B' | 'C' | 'C_DupExternalId' | 'C_DupId' | 'D', options: Partial<ParticipantValue> = {}): Participant {
 	const participant_values: Record<typeof name, ParticipantValue> = {
 		Owner: {
 			...genParticipantBaseContext(),
@@ -432,6 +667,12 @@ function genParticipant(name: 'Owner' | 'A' | 'B' | 'C' | 'C_DupExternalId' | 'C
 			externalId: "not_same C",
 			name: "Charlie",
 		},
+		D: {
+			...genParticipantBaseContext(),
+			id: new ParticipantId("2f108208-e2a9-4aec-ab28-8a450a08a7de"),
+			externalId: "participantD",
+			name: "David",
+		}
 	};
 	const participant = Participant.reconstruct({
 		...participant_values[name],
@@ -456,4 +697,24 @@ function genTournament(options: Partial<TournamentValue> = {}): Tournament {
 		histories: [],
 		...options
 	});
+}
+
+function genHistory(winner: Participant, loser: Participant, options: Partial<HistoryValue> = {}): History {
+	const historyId = new HistoryId('dde110d2-1d92-4b48-988f-c2815f00cdbb');
+	const winnerScore = new ParticipantScore({
+		id: winner.id,
+		score: new Score(5),
+	})
+	const loserScore = new ParticipantScore({
+		id: loser.id,
+		score: new Score(1),
+	})
+	return History.reconstruct({
+		id: historyId,
+		tournamentId: tournamentId,
+		winner: winnerScore,
+		loser: loserScore,
+		created_at: new Date(),
+		...options,
+	})
 }
