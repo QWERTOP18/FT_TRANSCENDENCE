@@ -1,6 +1,7 @@
 import { PongGame } from '../PongGame/PongGame';
 import { getUserId } from '../services/auth';
 import { t } from '../i18n';
+import { StateReloader } from '../utils/StateReloader';
 
 
 // 作成されたPongGameインスタンスを保持するための変数
@@ -16,6 +17,7 @@ function render(appElement: HTMLElement, content: string): void {
  * @param gameParams ゲーム開始に必要な情報（AI対戦か、ルーム接続かなど）
  */
 export async function renderGameScreen(appElement: HTMLElement, gameParams: any): Promise<void> {
+    StateReloader.clearInstance();
     // 以前のゲームインスタンスが残っていれば、必ず破棄する
     if (pongGameInstance) {
         pongGameInstance.dispose();
@@ -56,7 +58,7 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
                 onEnd: () => {
                     alert(`${t('ai_gamend')}`); // ゲーム終了時のアラート
                     // 終了後はトーナメント一覧などに戻る
-                    (window as any).router.navigateTo('/tournaments');
+                    (window as any).router.handleLocation();
                 }
             });
         }
