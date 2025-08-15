@@ -39,14 +39,13 @@ const start = async () => {
       deepLinking: false
     }
   });
-
+  
+  // Health check route
+  fastify.get('/ping', async () => {
+    return { status: 'pong', service: 'auth-service' };
+  });
   // Register routes
   await fastify.register(authRoutes, { prefix: '/auth' });
-
-  // Health check route
-  fastify.get('/health', async () => {
-    return { status: 'ok', service: 'auth-service' };
-  });
 
   fastify.get('/', async (_, reply: FastifyReply) => {
     reply.redirect('/docs');

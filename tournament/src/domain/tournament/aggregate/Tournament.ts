@@ -235,7 +235,7 @@ export class Tournament {
 		if (this.isOverRound() == false)
 			return false;
 		const battledParticipants = this.getParticipantsByState(new ParticipantState('battled'));
-		if (battledParticipants.length !== 1)
+		if (battledParticipants.length  !== 1)
 		{
 			console.log("バトル済みの参加者が1人ではありません");
 			return false;

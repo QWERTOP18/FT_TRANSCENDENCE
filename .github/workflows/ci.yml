@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "*" ]
 
+env:
+  COMPOSE_BAKE: false
+
 jobs:
   docker-compose-test:
     runs-on: ubuntu-latest
@@ -17,105 +20,21 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
     
-    - name: Build and start services
+    - name: Run CI tests
       run: |
-        echo "Building Docker images..."
-        docker compose build
-        
-        echo "Starting services..."
-        docker compose up -d
-        
-        echo "Waiting for services to be ready..."
-        timeout 60 bash -c 'until curl -f -s http://localhost:3000 > /dev/null; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f -s http://localhost:4000/ping > /dev/null; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f -s http://localhost:8080 > /dev/null; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f -s http://localhost:8000 > /dev/null; do sleep 2; done'
-        timeout 60 bash -c 'until curl -f -s http://localhost:3001 > /dev/null; do sleep 2; done'
-
-        echo "=== Docker Compose Services ==="
+        chmod +x ./ci.sh
+        ./ci.sh
+    
+    - name: Show service status
+      if: always()
+      run: |
+        echo "=== Final Service Status ==="
         docker compose ps
-    
-
-    
-    - name: Test service connectivity
-      run: |
-        echo "=== Service Connectivity Test ==="
-        
-        echo "Testing frontend service (http://localhost:3000)..."
-        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:3000; then
-          echo "✅ Frontend service is responding correctly"
-        else
-          echo "❌ Frontend service is not responding"
-          echo "Frontend logs:"
-          docker compose logs --tail=10 frontend
-          exit 1
-        fi
-        echo ""
-        echo "Testing game service (http://localhost:4000/ping)..."
-        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:4000/ping; then
-          echo "✅ Game service is responding correctly"
-        else
-          echo "❌ Game service is not responding"
-          echo "Game logs:"
-          docker compose logs --tail=10 game
-          exit 1
-        fi
-        echo ""
-        echo "Testing tournament service (http://localhost:8080)..."
-        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:8080; then
-          echo "✅ Tournament service is responding correctly"
-        else
-          echo "❌ Tournament service is not responding"
-          echo "Tournament logs:"
-          docker compose logs --tail=10 tournament
-          exit 1
-        fi
-        echo ""
-        echo "Testing gateway service (http://localhost:8000)..."
-        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:8000; then
-          echo "✅ Gateway service is responding correctly"
-        else
-          echo "❌ Gateway service is not responding"
-          echo "Gateway logs:"
-          docker compose logs --tail=10 gateway
-          exit 1
-        fi
-        echo ""
-        echo "Testing auth service (http://localhost:3001)..."
-        if curl -f -s -w "Status: %{http_code}, Time: %{time_total}s\n" http://localhost:3001; then
-          echo "✅ Auth service is responding correctly"
-        else
-          echo "❌ Auth service is not responding"
-          echo "Auth logs:"
-          docker compose logs --tail=10 auth
-          exit 1
-        fi
-        echo ""
-        echo "=== Service Response Summary ==="
-        echo "Frontend: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3000)"
-        echo "Game: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:4000/ping)"
-        echo "Tournament: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)"
-        echo "Gateway: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:8000)"
-        echo "Auth: $(curl -s -o /dev/null -w "%{http_code}" http://localhost:3001)"
-    
-    - name: Check service logs
-      run: |
-        echo "=== Frontend Logs ==="
-        docker compose logs frontend
-        echo "=== Game Logs ==="
-        docker compose logs game
-        echo "=== Tournament Logs ==="
-        docker compose logs tournament
-        echo "=== Gateway Logs ==="
-        docker compose logs gateway
-        echo "=== Auth Logs ==="
-        docker compose logs auth
+        echo "=== Service Logs ==="
+        docker compose logs --tail=20
     
     - name: Cleanup
       if: always()
       run: |
-        echo "Stopping services..."
         docker compose down -v
-        
-        echo "Cleaning up images..."
         docker image prune -f
