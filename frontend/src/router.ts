@@ -4,6 +4,7 @@ import * as gameViews from './views/gameViews';
 import * as tournamentViews from './views/tournamentIndex';
 import * as authView from './views/authView';
 import { t } from './i18n';
+import { StateReloader } from './utils/StateReloader';
 
 export class AppRouter {
     private appElement: HTMLElement;
@@ -42,6 +43,7 @@ export class AppRouter {
         }
 
         try {
+            StateReloader.clearInstance();
             switch (true) {
                 case path === '/signup':
                     authView.renderSignupScreen(this.appElement);
@@ -234,6 +236,7 @@ export class AppRouter {
      */
     public async handleStartGame(tournamentId: string) {
         try {
+            StateReloader.clearInstance();
             const myUserId = auth.getUserId();
             if (!myUserId) {
                 alert(`${t('pleaselogin')}`);
