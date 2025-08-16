@@ -12,6 +12,7 @@ export class GameRoom {
   public player1: WebSocket | null = null;
   public player2: WebSocket | null = null;
   public watchers: Set<WebSocket> = new Set();
+  private battleEndNotified: boolean = false;
 
   constructor(body: any) {
     this.room_id = randomUUID();
@@ -51,5 +52,15 @@ export class GameRoom {
       player2_id: this.player2_id,
       tournament_id: this.tournament_id,
     };
+  }
+
+  shouldNotifyBattleEnd(): boolean {
+    if (this.battleEndNotified) {
+      console.log("Battle end already notified for room:", this.room_id);
+      return false;
+    }
+    this.battleEndNotified = true;
+    console.log("Battle end notification allowed for room:", this.room_id);
+    return true;
   }
 }

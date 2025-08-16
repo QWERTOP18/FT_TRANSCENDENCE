@@ -8,7 +8,25 @@ export class PongGameAPI {
 		roomId: string,
 		userId: string,
 	}) {
-		const ws = new WebSocket(`ws://localhost:4000/game/${props.roomId}?user_id=${props.userId}`);
+		// nginx経由でWebSocket接続
+		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		const wsUrl = `${protocol}//${window.location.host}/game/${props.roomId}?user_id=${props.userId}`;
+		console.log('🔌 WebSocket接続を開始:', wsUrl);
+		
+		const ws = new WebSocket(wsUrl);
+		
+		ws.onopen = () => {
+			console.log('✅ WebSocket接続が確立されました');
+		};
+		
+		ws.onerror = (error) => {
+			console.error('❌ WebSocketエラー:', error);
+		};
+		
+		ws.onclose = (event) => {
+			console.log('🔌 WebSocket接続が閉じられました:', event.code, event.reason);
+		};
+		
 		return ws;
 	}
 
@@ -16,7 +34,7 @@ export class PongGameAPI {
 		aiLevel: number,
 		userId: string,
 	}) {
-		const playAiResponse = await fetch("http://localhost:4000/play-ai", {
+		const playAiResponse = await fetch("/game/play-ai", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -32,7 +50,7 @@ export class PongGameAPI {
 	public static async authenticate(props: {
 		name: string,
 	}) {
-		const response = await fetch("/auth/authenticate", {
+		const response = await fetch("/api/auth/authenticate", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",
@@ -47,7 +65,7 @@ export class PongGameAPI {
 	public static async createUser(props: {
 		name: string,
 	}) {
-		const response = await fetch("/auth/signup", {
+		const response = await fetch("/api/auth/signup", {
 			method: "POST",
 			headers: {
 				"Content-Type": "application/json",

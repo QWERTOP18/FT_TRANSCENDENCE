@@ -33,21 +33,25 @@ export class PongBuilder
 
 	// This creates and positions a free camera (non-mesh)
 	public static CreateCamera(canvas: HTMLCanvasElement, scene?: Scene) {
-		const cameraZ = - PongConfigs.pongHeight / 2 - PongConfigs.pongWidth / 2 - 1; // 視野角90度としてカメラの位置を計算 幅が全て映るように引いている
-		const cameraY = Math.abs(cameraZ / 5)
+		// カメラの位置を調整して3Dオブジェクトがcanvas内に納まるようにする
+		const cameraZ = - PongConfigs.pongHeight / 2 - PongConfigs.pongWidth / 2 - 2; // より遠くに配置
+		const cameraY = Math.abs(cameraZ / 3); // より高い位置に配置
 		const camera = new FreeCamera("camera1", new Vector3(0, cameraY, cameraZ), scene);
 
 		camera.setTarget(Vector3.Zero());
+		
+		// カメラの視野角を調整
+		camera.fov = 0.8; // より狭い視野角でズーム効果
 
 		return camera;
 	}
 
 	public static CreatePack(scene?: Scene) {
 		const pack = CreateCylinder("pack", {
-			height: 0.5,
-			diameter: ServerToPongMapper.x2zMap(PongConfigs.packSize),
+			height: 0.3, // より小さく
+			diameter: ServerToPongMapper.x2zMap(PongConfigs.packSize) * 0.8, // より小さく
 		}, scene);
-		pack.position.y = 0.25;
+		pack.position.y = 0.15; // 高さに合わせて調整
 
 		const material = new StandardMaterial("pack-material", scene);
 		material.diffuseColor = Color3.White();
@@ -66,10 +70,10 @@ export class PongBuilder
 
 	public static CreateBottomBar(scene?: Scene) {
 		const bar = MeshBuilder.CreateBox("bottom-bar", {
-			height: 1,
-			width: ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth),
+			height: 0.6, // より小さく
+			width: ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth) * 0.9, // より小さく
 		}, scene);
-		bar.position.y = 0.5;
+		bar.position.y = 0.3; // 高さに合わせて調整
 		bar.position.z = - PongConfigs.pongHeight / 2 + ServerToPongMapper.x2zMap(PongConfigs.gameApiPaddlePositionOffset);
 
 		const material = new GradientMaterial("bar-material", scene);
@@ -83,10 +87,10 @@ export class PongBuilder
 
 	public static CreateTopBar(scene?: Scene) {
 		const bar = CreateBox("top-bar", {
-			height: 1,
-			width: ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth),
+			height: 0.6, // より小さく
+			width: ServerToPongMapper.y2xMap(PongConfigs.gameApiPaddleWidth) * 0.9, // より小さく
 		}, scene);
-		bar.position.y = 0.5;
+		bar.position.y = 0.3; // 高さに合わせて調整
 		bar.position.z = PongConfigs.pongHeight / 2 - ServerToPongMapper.x2zMap(PongConfigs.gameApiPaddlePositionOffset);
 
 		const material = new GradientMaterial("bar-material", scene);
@@ -119,7 +123,7 @@ export class PongBuilder
 		const material = new GridMaterial("ground-material", scene);
 		material.mainColor = Color3.Black();
 		material.lineColor = Color3.White();
-		material.gridRatio = 20;
+		material.gridRatio = 15; // より細かいグリッド
 		ground.material = material;
 
 		return ground;

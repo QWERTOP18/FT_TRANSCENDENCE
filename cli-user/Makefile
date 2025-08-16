@@ -1,3 +1,4 @@
+default: install dev
 install:
 	npm install
 

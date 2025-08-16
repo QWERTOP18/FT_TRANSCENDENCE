@@ -6,7 +6,24 @@ export class GameSocket extends WebSocket {
 		roomId: string,
 		userId: string,
 	}) {
-		super(`ws://localhost:4000/game/${props.roomId}?user_id=${props.userId}`);
+		// nginx経由でWebSocket接続
+		const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+		const wsUrl = `${protocol}//${window.location.host}/game/${props.roomId}?user_id=${props.userId}`;
+		console.log('🔌 GameSocket接続を開始:', wsUrl);
+		super(wsUrl);
+		
+		// デバッグ情報を追加
+		this.addEventListener('open', () => {
+			console.log('✅ GameSocket接続が確立されました');
+		});
+		
+		this.addEventListener('error', (error) => {
+			console.error('❌ GameSocketエラー:', error);
+		});
+		
+		this.addEventListener('close', (event) => {
+			console.log('🔌 GameSocket接続が閉じられました:', event.code, event.reason);
+		});
 	}
 
 	/**

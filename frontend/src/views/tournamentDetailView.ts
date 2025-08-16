@@ -1,6 +1,8 @@
 import { render } from './tournamentView';
 import { createHeader } from './header';
 import { t } from '../i18n';
+import { StateReloader } from '../utils/StateReloader';
+import * as api from '../services/api';
 
 /**
  * トーナメント詳細画面を描画する
@@ -13,6 +15,25 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
     const { id: tournamentId, name, histories, champion, state, owner_id, is_participating ,is_owner} = tournamentData;
     let contentHTML;
 
+    StateReloader.create({
+        initialValue: {
+            ...tournamentData,
+            participants: participants
+        },
+        updater: async () => {
+            const tournament = await api.getTournamentById(tournamentData.id)
+            const participants = await api.getTournamentParticipants(tournamentData.id);
+            return {
+                ...tournament,
+                participants: participants
+            }
+        },
+        onUpdate: (newState) => {
+            console.log('Tournament data updated:', newState);
+            StateReloader.clearInstance();
+            (window as any).router.handleLocation();
+        }
+    });
     switch(state) {
         case 'reception': {
             const isAlreadyParticipating = is_participating || false;    

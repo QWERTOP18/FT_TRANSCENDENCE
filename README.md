@@ -24,7 +24,8 @@ make up
 ```
 
 3. Access the application:
-- http://localhost:3000
+- HTTPS: https://localhost (自動的にHTTPからリダイレクト)
+- HTTP: http://localhost (HTTPSにリダイレクトされます)
 
 ## Development
 
@@ -44,3 +45,4 @@ For detailed development documentation, see [README_DEV.md](./README_DEV.md).
 - **Database**: sqlite, Prisma ORM
 - **Real-time**: WebSocket
 - **Containerization**: Docker
+- **Reverse Proxy**: Nginx with SSL/TLS
