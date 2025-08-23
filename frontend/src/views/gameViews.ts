@@ -2,7 +2,7 @@ import { PongGame } from '../PongGame/PongGame';
 import { getUserId } from '../services/auth';
 import { t } from '../i18n';
 import { StateReloader } from '../utils/StateReloader';
-
+import { escapeHTML } from '../utils/sanitizer';
 
 // 作成されたPongGameインスタンスを保持するための変数
 let pongGameInstance: PongGame | null = null;
@@ -28,7 +28,7 @@ export async function renderGameScreen(appElement: HTMLElement, gameParams: any)
     const contentHTML = `
         <div class="w-full h-full flex flex-col items-center justify-center">
             <div class="w-full max-w-4xl flex justify-center items-center mb-4">
-                <h2 class="text-2xl font-bold text-white">${gameParams.title || 'Pong Game'}</h2>
+                <h2 class="text-2xl font-bold text-white">${escapeHTML(gameParams.title || 'Pong Game')}</h2>
             </div>
             <canvas id="pong-canvas" class="bg-black border-2 border-white w-4/5 h-5/6 max-w-4xl max-h-5xl rounded-lg shadow-2xl"></canvas>
         </div>

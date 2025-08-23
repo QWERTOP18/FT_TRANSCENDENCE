@@ -1,6 +1,7 @@
 import { render } from './tournamentView';
 import { createHeader } from './header';
 import { t } from '../i18n';
+import { escapeHTML } from '../utils/sanitizer';
 
 /**
  * トーナメント管理画面を描画する
@@ -29,11 +30,11 @@ export function renderAdminScreen(appElement: HTMLElement, tournamentData: any, 
             <form onsubmit="window.router.handleAdminFormSubmit(event)">
                 <div class="mb-4">
                     <label for="name" class="block text-sm font-medium text-gray-300 mb-1">${t('tournamentName')}</label>
-                    <input type="text" id="name" name="name" value="${tournamentData.name}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:border-blue-500 focus:outline-none">
+                    <input type="text" id="name" name="name" value="${escapeHTML(tournamentData.name)}" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:border-blue-500 focus:outline-none">
                 </div>
                 <div class="mb-4">
                     <label for="description" class="block text-sm font-medium text-gray-300 mb-1">${t('description')}</label>
-                    <textarea id="description" name="description" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:border-blue-500 focus:outline-none">${tournamentData.description}</textarea>
+                    <textarea id="description" name="description" rows="3" class="w-full bg-gray-700 border border-gray-600 rounded px-3 py-2 focus:border-blue-500 focus:outline-none">${escapeHTML(tournamentData.description)}</textarea>
                 </div>
                 <div class="mb-6">
                     <label for="max_participants" class="block text-sm font-medium text-gray-300 mb-1">${t('max')}</label>
