@@ -3,6 +3,7 @@ import { createHeader } from './header';
 import { t } from '../i18n';
 import { StateReloader } from '../utils/StateReloader';
 import * as api from '../services/api';
+import { escapeHTML } from '../utils/sanitizer';
 
 /**
  * トーナメント詳細画面を描画する
@@ -52,14 +53,14 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                         ${participants.map((p: any) => `
                             <li class="flex items-center gap-4 py-2 px-4 bg-gray-700 rounded mb-2 hover:bg-gray-600 transition-colors">
                                 <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                    ${p.name.charAt(0).toUpperCase()}
+                                    ${escapeHTML(p.name.charAt(0).toUpperCase())}
                                 </div>
-                                <span class="text-white font-medium">${p.name}</span>
+                                <span class="text-white font-medium">${escapeHTML(p.name)}</span>
                                 <span class="ml-auto text-xs px-2 py-1 rounded-full metallic-status ${
                                     p.state === 'ready' ? 'metallic-status-ready' : 
                                     p.state === 'pending' ? 'metallic-status-pending' : 
                                     'metallic-status-pending'
-                                }">${p.state}</span>
+                                }">${escapeHTML(p.state)}</span>
                             </li>
                         `).join('')}
                     </ul>
@@ -109,15 +110,15 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                 .map(state => `
                     <div class="mb-6">
                         <h5 class="text-lg font-semibold mb-3 text-${state === 'ready' ? 'green' : state === 'pending' ? 'yellow' : state === 'in_progress' ? 'blue' : state === 'battled' ? 'purple' : state === 'eliminated' ? 'red' : 'gold'}-400">
-                            ${stateLabels[state] || state} (${groupedParticipants[state].length}人)
+                            ${escapeHTML(stateLabels[state] || state)} (${groupedParticipants[state].length}人)
                         </h5>
                         <ul class="text-left max-w-xs mx-auto">
                             ${groupedParticipants[state].map((p: any) => `
                                 <li class="flex items-center gap-4 py-2 px-4 bg-gray-700 rounded mb-2 hover:bg-gray-600 transition-colors">
                                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                        ${p.name.charAt(0).toUpperCase()}
+                                        ${escapeHTML(p.name.charAt(0).toUpperCase())}
                                     </div>
-                                    <span class="text-white font-medium">${p.name}</span>
+                                    <span class="text-white font-medium">${escapeHTML(p.name)}</span>
                                     <span class="ml-auto text-xs px-2 py-1 rounded-full metallic-status ${
                                         p.state === 'ready' ? 'metallic-status-ready' : 
                                         p.state === 'pending' ? 'metallic-status-pending' : 
@@ -126,7 +127,7 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                                         p.state === 'eliminated' ? 'metallic-status-eliminated' :
                                         p.state === 'champion' ? 'metallic-status-champion' :
                                         'metallic-status-pending'
-                                    }">${stateLabels[p.state] || p.state}</span>
+                                    }">${escapeHTML(stateLabels[p.state] || p.state)}</span>
                                 </li>
                             `).join('')}
                         </ul>
@@ -183,15 +184,15 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                 .map(state => `
                     <div class="mb-6">
                         <h5 class="text-lg font-semibold mb-3 text-${state === 'champion' ? 'gold' : state === 'eliminated' ? 'red' : state === 'battled' ? 'purple' : state === 'in_progress' ? 'blue' : state === 'ready' ? 'green' : 'yellow'}-400">
-                            ${stateLabels[state] || state} (${groupedParticipants[state].length}人)
+                            ${escapeHTML(stateLabels[state] || state)} (${groupedParticipants[state].length}人)
                         </h5>
                         <ul class="text-left max-w-xs mx-auto">
                             ${groupedParticipants[state].map((p: any) => `
                                 <li class="flex items-center gap-4 py-2 px-4 bg-gray-700 rounded mb-2 hover:bg-gray-600 transition-colors">
                                     <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
-                                        ${p.name.charAt(0).toUpperCase()}
+                                        ${escapeHTML(p.name.charAt(0).toUpperCase())}
                                     </div>
-                                    <span class="text-white font-medium">${p.name}</span>
+                                    <span class="text-white font-medium">${escapeHTML(p.name)}</span>
                                     <span class="ml-auto text-xs px-2 py-1 rounded-full metallic-status ${
                                         p.state === 'ready' ? 'metallic-status-ready' : 
                                         p.state === 'pending' ? 'metallic-status-pending' : 
@@ -200,7 +201,7 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
                                         p.state === 'eliminated' ? 'metallic-status-eliminated' :
                                         p.state === 'champion' ? 'metallic-status-champion' :
                                         'metallic-status-pending'
-                                    }">${stateLabels[p.state] || p.state}</span>
+                                    }">${escapeHTML(stateLabels[p.state] || p.state)}</span>
                                 </li>
                             `).join('')}
                         </ul>
@@ -221,7 +222,7 @@ export function renderTournamentScreen(appElement: HTMLElement, tournamentData: 
         ${createHeader()}
         <div class="metallic-card p-6 rounded-lg text-white">
             <div class="text-center mb-6">
-                <h2 class="text-3xl font-bold">${name}</h2>
+                <h2 class="text-3xl font-bold">${escapeHTML(name)}</h2>
             </div>
             ${contentHTML}
         </div>
