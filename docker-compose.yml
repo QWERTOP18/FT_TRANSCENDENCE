@@ -140,7 +140,7 @@ services:
       - DATABASE_URL=file:/app/prisma/dev.db
     networks:
       - transcendence-network
-    command: npx prisma migrate deploy
+    command: sh -c "npx prisma migrate deploy && npm start"
 
 volumes:
   tournament_data:
